@@ -1,0 +1,18 @@
+{
+    "name": "lion-framework/lion-route",
+    "description": "This library has a fast router usage with regular expressions.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "LionRoute\\": "src/LionRoute/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sergio León",
+            "email": "sergioleon4004@hotmail.com"
+        }
+    ],
+    "require": {}
+}

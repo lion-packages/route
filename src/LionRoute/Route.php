@@ -3,7 +3,7 @@
 namespace LionRoute;
 
 use LionRoute\Middleware;
-use LionRoute\RouteException;
+use LionRoute\Request;
 
 class Route {
 
@@ -16,7 +16,8 @@ class Route {
 
 	public static function init(array $filters): void {
 		self::$class_map = $filters['class'];
-		self::$router = new self::$class_map['RouteCollector'](new self::$class_map['RouteParser']());
+		$parser = isset(self::$class_map['RouteParser']) ? new self::$class_map['RouteParser']() : null;
+		self::$router = new self::$class_map['RouteCollector']($parser);
 		self::createMiddleware(isset($filters['middleware']) ? $filters['middleware'] : []);
 		$_POST = json_decode(file_get_contents("php://input"), true);
 	}

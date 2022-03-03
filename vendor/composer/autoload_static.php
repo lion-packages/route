@@ -4,19 +4,27 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1e0da1487238bcbb431a7771976c5313
+class ComposerStaticIniteca6f7f47b55b0b41bf755b088d69c02
 {
     public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'Phroute\\Phroute\\' => 16,
+        ),
         'L' => 
         array (
-            'LionFramework\\LionRoute\\' => 24,
+            'LionRoute\\' => 10,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'LionFramework\\LionRoute\\' => 
+        'Phroute\\Phroute\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/src',
+            0 => __DIR__ . '/..' . '/phroute/phroute/src/Phroute',
+        ),
+        'LionRoute\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/LionRoute',
         ),
     );
 
@@ -27,9 +35,9 @@ class ComposerStaticInit1e0da1487238bcbb431a7771976c5313
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1e0da1487238bcbb431a7771976c5313::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1e0da1487238bcbb431a7771976c5313::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1e0da1487238bcbb431a7771976c5313::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticIniteca6f7f47b55b0b41bf755b088d69c02::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticIniteca6f7f47b55b0b41bf755b088d69c02::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticIniteca6f7f47b55b0b41bf755b088d69c02::$classMap;
 
         }, null, ClassLoader::class);
     }

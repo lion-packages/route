@@ -6,5 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'LionFramework\\LionRoute\\' => array($baseDir . '/src'),
+    'Phroute\\Phroute\\' => array($vendorDir . '/phroute/phroute/src/Phroute'),
+    'LionRoute\\' => array($baseDir . '/src/LionRoute'),
 );

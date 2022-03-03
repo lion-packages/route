@@ -7,6 +7,7 @@ use Phroute\Phroute\RouteParser;
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
+use LionRoute\Middleware;
 
 class Route {
 
@@ -90,8 +91,8 @@ class Route {
 		}
 	}
 
-	public static function newMiddleware(string $middlewareName, string $objectClass, string $methodClass): MiddlewareCapsule {
-		return new MiddlewareCapsule($middlewareName, $objectClass, $methodClass);
+	public static function newMiddleware(string $middlewareName, string $objectClass, string $methodClass): Middleware {
+		return new Middleware($middlewareName, $objectClass, $methodClass);
 	}
 
 	private static function processInput($uri) {

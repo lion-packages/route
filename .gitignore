@@ -1,1 +1,4 @@
 /vendor/
+/routes/
+.htaccess
+index.php

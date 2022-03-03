@@ -2,28 +2,23 @@
 
 namespace LionRoute;
 
-use Phroute\Phroute\RouteCollector;
-use Phroute\Phroute\RouteParser;
-use Phroute\Phroute\Dispatcher;
-use Phroute\Phroute\Exception\HttpRouteNotFoundException;
-use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use LionRoute\Middleware;
+use LionRoute\RouteException;
 
 class Route {
 
-	private static RouteCollector $router;
+	private static $router;
+	private static array $class_map;
 	
 	public function __construct() {
 		
 	}
 
-	public static function getRoute(): RouteCollector {
-		return self::$router;
-	}
-
-	public static function router(array $filters = []): void {
-		self::$router = new RouteCollector(new RouteParser());
-		self::createMiddleware($filters);
+	public static function init(array $filters): void {
+		self::$class_map = $filters['class'];
+		self::$router = new self::$class_map['RouteCollector'](new self::$class_map['RouteParser']());
+		self::createMiddleware(isset($filters['middleware']) ? $filters['middleware'] : []);
+		$_POST = json_decode(file_get_contents("php://input"), true);
 	}
 
 	public static function createMiddleware(array $filters): void {
@@ -95,30 +90,24 @@ class Route {
 		return new Middleware($middlewareName, $objectClass, $methodClass);
 	}
 
-	private static function processInput($uri) {
-		return implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 3));
-	}
-
-	public static function dispatch() {
-		try {
-			return (new Dispatcher(self::$router->getData()))->dispatch(
-				$_SERVER['REQUEST_METHOD'], 
-				self::processInput($_SERVER['REQUEST_URI'])
-			);
-		} catch (HttpRouteNotFoundException $e) {
-			return new Request("error", "Page not found. [Dispatch]");
-		} catch (HttpMethodNotAllowedException $e) {
-			return new Request("error", "Method not allowed. [Dispatch]");
-		}
-	}
-
-	public static function fileGetContents(): void {
-		$_POST = json_decode(file_get_contents("php://input"), true);
+	private static function processInput($index): string {
+		return implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), $index));
 	}
 
 	public static function processOutput($response): void {
 		echo(json_encode($response));
 		die();
+	}
+
+	public static function dispatch($index) {
+		try {
+			return (new self::$class_map['Dispatcher'](self::$router->getData()))->dispatch(
+				$_SERVER['REQUEST_METHOD'], 
+				self::processInput($index)
+			);
+		} catch (\Exception $e) {
+			return new Request("error", "Page not found. [Dispatch]");
+		}
 	}
 
 }

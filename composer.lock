@@ -4,9 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca119256daf1d89d8df61d17ecbea191",
-    "packages": [],
-    "packages-dev": [
+    "content-hash": "5de14efb92ef20b3c8a413541b9998be",
+    "packages": [
         {
             "name": "phroute/phroute",
             "version": "v2.1.0",
@@ -56,6 +55,7 @@
             "time": "2015-07-22T20:46:43+00:00"
         }
     ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],

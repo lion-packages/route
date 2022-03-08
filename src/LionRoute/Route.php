@@ -19,7 +19,6 @@ class Route {
 		$parser = isset(self::$class_map['RouteParser']) ? new self::$class_map['RouteParser']() : null;
 		self::$router = new self::$class_map['RouteCollector']($parser);
 		self::createMiddleware(isset($filters['middleware']) ? $filters['middleware'] : []);
-		$_POST = json_decode(file_get_contents("php://input"), true);
 	}
 
 	public static function createMiddleware(array $filters): void {
@@ -106,7 +105,7 @@ class Route {
 				self::processInput($index)
 			);
 		} catch (\Exception $e) {
-			return new Request("error", "Page not found. [Dispatch]");
+			return new Request("error", $e->getMessage());
 		}
 	}
 

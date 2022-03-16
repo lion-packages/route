@@ -8,12 +8,8 @@ composer require lion-framework/lion-route
 ## Usage
 ```php
 require_once("vendor/autoload.php");
-spl_autoload_register(function($class_name) {
-    require_once(str_replace("\\", "/", $class_name) . '.php');
-});
 
 use LionRoute\Route;
-use LionRoute\Request;
 
 Route::init([
     'class' => [
@@ -23,22 +19,13 @@ Route::init([
 ]);
 
 Route::any('/', function() {
-    Route::processOutput(new Request(
-        'success', 
-        'hello world'
-    ));
+    return [
+        'status' => "success",
+        'message' => "Hello world"
+    ];
 });
 
-// or
-
-Route::any('/', function() {
-    Route::processOutput([
-        'status' => "warning",
-        'message' => "Hello world."
-    ]);
-});
-
-// 1 is for production and 2 for local environment.
+// 1 is for production and 2+ for local environment.
 Route::processOutput(Route::dispatch(2)); 
 ```
 
@@ -80,7 +67,7 @@ is identical to filters, we change the name of `filter` to `middleware`.
 `Route::newMiddleware('auth', Auth::class, 'auth')` is the basic syntax for adding a middleware to our RouteCollector object, The first parameter is the name of the middleware, The second parameter is the class to which that is referenced and the third parameter the name of the function to which it belongs.
 ```php
 use LionRoute\Route;
-use App\Http\Middleware\Auth;
+use Example\Auth;
 
 Route::init([
     'class' => [
@@ -93,23 +80,23 @@ Route::init([
 ]);
 
 Route::middleware(['before' => 'auth'], function() {
-    Route::post('/login', function() {
-        Route::processOutput([
+    Route::post('login', function() {
+        return [
             'status' => "success",
             'message' => "Hello world."
-        ]);
+        ];
     });
 });
 ```
 
 ### Prefix Groups:
 ```php
-Route::prefix('/authenticate', function() {
-    Route::post('/login', function() {
-        Route::processOutput([
+Route::prefix('authenticate', function() {
+    Route::post('login', function() {
+        return [
             'status' => "success",
             'message' => "Hello world."
-        ]);
+        ];
     });
 });
 ```
@@ -118,23 +105,35 @@ Route::prefix('/authenticate', function() {
 #### POST
 ```php
 Route::post('/example-url', function() {
-    $loginController = new App\Http\Controllers\Login();
-    $loginController->loginAuth();
+    $post = new Example();
+    $post->postMethod();
 });
 
 // or
 
-Route::post('/example-url', [App\Http\Controllers\Login::class, 'loginAuth']);
+Route::post('/example-url', [Example::class, 'postMethod']);
 ```
 
 #### PUT
 ```php
 Route::put('/example-url/{id}', function($id) {
-    $loginController = new App\Http\Controllers\Login();
-    $loginController->loginAuth();
+    $put = new Example();
+    $put->putMethod();
 });
 
 // or
 
-Route::post('/example-url/{id}', [App\Http\Controllers\Login::class, 'loginAuth']);
+Route::put('/example-url/{id}', [Example::class, 'putMethod']);
+```
+
+#### DELETE
+```php
+Route::delete('/example-url/{id}', function($id) {
+    $delete = new Example();
+    $delete->deleteMethod();
+});
+
+// or
+
+Route::delete('/example-url/{id}', [Example::class, 'deleteMethod']);
 ```

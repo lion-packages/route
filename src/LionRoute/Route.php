@@ -3,7 +3,6 @@
 namespace LionRoute;
 
 use LionRoute\Middleware;
-use LionRoute\Request;
 
 class Route {
 
@@ -105,7 +104,7 @@ class Route {
 				self::processInput($index)
 			);
 		} catch (\Exception $e) {
-			return new Request("error", $e->getMessage());
+			return ['status' => "error", 'message' => $e->getMessage()];
 		}
 	}
 

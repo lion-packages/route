@@ -75,7 +75,8 @@ Route::init([
         'Dispatcher' => Phroute\Phroute\Dispatcher::class
     ],
     'middleware' => [
-        Route::newMiddleware('auth', Auth::class, 'auth')
+        Route::newMiddleware('auth', Auth::class, 'auth'),
+        Route::newMiddleware('no-auth', Auth::class, 'auth')
     ]
 ]);
 
@@ -97,6 +98,37 @@ Route::prefix('authenticate', function() {
             'status' => "success",
             'message' => "Hello world."
         ];
+    });
+});
+```
+
+```php
+Route::middleware(['before' => 'no-auth'], function() {
+    Route::prefix('authenticate', function() {
+        Route::post('login', function() {
+            return [
+                'status' => "success",
+                'message' => "Hello world."
+            ];
+        });
+    });
+});
+
+Route::middleware(['before' => 'auth'], function() {
+    Route::prefix('dashboard', function() {
+        Route::get('home', function() {
+            return [
+                'status' => "success",
+                'message' => "GET success."
+            ];
+        });
+
+        Route::post('home', function() {
+            return [
+                'status' => "success",
+                'message' => "POST success."
+            ];
+        });
     });
 });
 ```

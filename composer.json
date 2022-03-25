@@ -15,9 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.9"
-    },
-    "require-dev": {
+        "php": ">=8.0.9",
         "phroute/phroute": "^2.1"
     }
 }

@@ -114,21 +114,14 @@ Route::middleware(['before' => 'no-auth'], function() {
     });
 });
 
-Route::middleware(['before' => 'auth'], function() {
-    Route::prefix('dashboard', function() {
-        Route::get('home', function() {
-            return [
-                'status' => "success",
-                'message' => "GET success."
-            ];
-        });
+// or
 
-        Route::post('home', function() {
-            return [
-                'status' => "success",
-                'message' => "POST success."
-            ];
-        });
+Route::middleware(['before' => 'no-auth', 'prefix' => 'authenticate'], function() {
+    Route::post('login', function() {
+        return [
+            'status' => "success",
+            'message' => "Hello world."
+        ];
     });
 });
 ```

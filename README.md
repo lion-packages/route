@@ -169,3 +169,9 @@ Route::delete('/example-url/{id}', function($id) {
 
 Route::delete('/example-url/{id}', [Example::class, 'deleteMethod']);
 ```
+
+## Credits
+[PHRoute](https://github.com/mrjgreen/phroute)
+
+## License
+Copyright © 2022 [MIT License](https://github.com/Sleon4/Lion-Security/blob/main/LICENSE)

@@ -1,4 +1,5 @@
 # This library has a quick use of the router with regular expressions based on [mrjgreen's phroute](https://github.com/mrjgreen/phroute).
+[![Latest Stable Version](http://poser.pugx.org/lion-framework/lion-route/v)](https://packagist.org/packages/lion-framework/lion-route) [![Total Downloads](http://poser.pugx.org/lion-framework/lion-route/downloads)](https://packagist.org/packages/lion-framework/lion-route) [![Latest Unstable Version](http://poser.pugx.org/lion-framework/lion-route/v/unstable)](https://packagist.org/packages/lion-framework/lion-route) [![License](http://poser.pugx.org/lion-framework/lion-route/license)](https://packagist.org/packages/lion-framework/lion-route) [![PHP Version Require](http://poser.pugx.org/lion-framework/lion-route/require/php)](https://packagist.org/packages/lion-framework/lion-route)
 
 ## Install
 ```
@@ -11,12 +12,7 @@ require_once("vendor/autoload.php");
 
 use LionRoute\Route;
 
-Route::init([
-    'class' => [
-        'RouteCollector' => Phroute\Phroute\RouteCollector::class,
-        'Dispatcher' => Phroute\Phroute\Dispatcher::class
-    ]
-]);
+Route::init();
 
 Route::any('/', function() {
     return [
@@ -33,12 +29,7 @@ Route::processOutput(Route::dispatch(2));
 ```php
 use LionRoute\Route;
 
-Route::init([
-    'class' => [
-        'RouteCollector' => Phroute\Phroute\RouteCollector::class,
-        'Dispatcher' => Phroute\Phroute\Dispatcher::class
-    ]
-]);
+Route::init();
 
 Route::get($route, $handler);
 Route::post($route, $handler);
@@ -63,24 +54,35 @@ use in routes:
 ```
 
 ### ~~Filters~~ Middleware:
-is identical to filters, we change the name of `filter` to `middleware`.
-`Route::newMiddleware('auth', Auth::class, 'auth')` is the basic syntax for adding a middleware to our RouteCollector object, The first parameter is the name of the middleware, The second parameter is the class to which that is referenced and the third parameter the name of the function to which it belongs.
+Is identical to filters, we change the name of `filter` to `middleware`.
+`Route::newMiddleware('auth', Auth::class, 'auth')` is the basic syntax for adding a middleware to our RouteCollector object. The first parameter is the name of the middleware. The second parameter is the class referenced and the third parameter the name of the function it belongs to. <br>
+
+```php
+'middleware' => [
+    Route::newMiddleware('auth', Auth::class, 'auth'),
+    Route::newMiddleware('no-auth', Auth::class, 'auth')
+]
+```
+
+When calling `Route::middleware()` keep in mind that the first parameter is an array loaded with data. <br>
+
+The first index is the middleware at position `before`. <br>
+The second index is optional and points to `after`. <br>
+The third index is optional and indicates a `prefix` to work the middleware in a more dynamic way. <br>
+
+Take into account that if more than 3 parameters are added, these are left over and do not generate internal errors in their operation.
 ```php
 use LionRoute\Route;
 use Example\Auth;
 
 Route::init([
-    'class' => [
-        'RouteCollector' => Phroute\Phroute\RouteCollector::class,
-        'Dispatcher' => Phroute\Phroute\Dispatcher::class
-    ],
     'middleware' => [
         Route::newMiddleware('auth', Auth::class, 'auth'),
         Route::newMiddleware('no-auth', Auth::class, 'auth')
     ]
 ]);
 
-Route::middleware(['before' => 'auth'], function() {
+Route::middleware(['no-auth'], function() {
     Route::post('login', function() {
         return [
             'status' => "success",
@@ -102,31 +104,19 @@ Route::prefix('authenticate', function() {
 });
 ```
 
+### Example methods:
+#### GET
 ```php
-Route::middleware(['before' => 'no-auth'], function() {
-    Route::prefix('authenticate', function() {
-        Route::post('login', function() {
-            return [
-                'status' => "success",
-                'message' => "Hello world."
-            ];
-        });
-    });
+Route::get('/example-url', function() {
+    $get = new Example();
+    $get->getMethod();
 });
 
 // or
 
-Route::middleware(['before' => 'no-auth', 'prefix' => 'authenticate'], function() {
-    Route::post('login', function() {
-        return [
-            'status' => "success",
-            'message' => "Hello world."
-        ];
-    });
-});
+Route::get('/example-url', [Example::class, 'getMethod']);
 ```
 
-### Example methods:
 #### POST
 ```php
 Route::post('/example-url', function() {
@@ -161,6 +151,18 @@ Route::delete('/example-url/{id}', function($id) {
 // or
 
 Route::delete('/example-url/{id}', [Example::class, 'deleteMethod']);
+```
+
+#### ANY
+```php
+Route::any('/example-url', function($id) {
+    $any = new Example();
+    $any->anyMethod();
+});
+
+// or
+
+Route::any('/example-url', [Example::class, 'anyMethod']);
 ```
 
 ## Credits

@@ -16,7 +16,10 @@ class Route {
 
 	public static function init(array $filters = []): void {
 		self::$router = new RouteCollector(new RouteParser());
-		self::createMiddleware(isset($filters['middleware']) ? $filters['middleware'] : []);
+
+		if (isset($filters['middleware'])) {
+			self::createMiddleware($filters['middleware']);
+		}
 	}
 
 	public static function newMiddleware(string $middlewareName, string $objectClass, string $methodClass): Middleware {
@@ -99,7 +102,7 @@ class Route {
 		}
 	}
 
-	private static function processInput($index): string {
+	private static function processInput(int $index): string {
 		return implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), $index));
 	}
 
@@ -107,7 +110,7 @@ class Route {
 		echo(json_encode($response));
 	}
 
-	public static function dispatch($index) {
+	public static function dispatch(int $index) {
 		try {
 			return (new Dispatcher(self::$router->getData()))->dispatch(
 				$_SERVER['REQUEST_METHOD'], 

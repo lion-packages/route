@@ -2,17 +2,13 @@
 
 namespace LionRoute;
 
-class Middleware implements \JsonSerializable {
+class Middleware {
 
 	public function __construct(
 		private ?string $middlewareName = null, 
 		private ?string $objectClass = null, 
 		private ?string $methodClass = null
 	) {}
-
-	public function jsonSerialize() {
-        return get_object_vars($this);
-    }
 
     public function getNewObjectClass() {
         $objectClass = $this->getObjectClass();

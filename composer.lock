@@ -4,28 +4,28 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5de14efb92ef20b3c8a413541b9998be",
+    "content-hash": "f1f7115f877c983bae09be7b6485a1e9",
     "packages": [
         {
             "name": "phroute/phroute",
-            "version": "v2.1.0",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mrjgreen/phroute.git",
-                "reference": "dbe2b986f9ee1dd33dc956fcc35d1fa22e8e196c"
+                "reference": "c1893b885966a0c7b50b9239dd867fda7a312dfa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mrjgreen/phroute/zipball/dbe2b986f9ee1dd33dc956fcc35d1fa22e8e196c",
-                "reference": "dbe2b986f9ee1dd33dc956fcc35d1fa22e8e196c",
+                "url": "https://api.github.com/repos/mrjgreen/phroute/zipball/c1893b885966a0c7b50b9239dd867fda7a312dfa",
+                "reference": "c1893b885966a0c7b50b9239dd867fda7a312dfa",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "*",
-                "satooshi/php-coveralls": "dev-master"
+                "php-coveralls/php-coveralls": "^2.5",
+                "phpunit/phpunit": "^9.0"
             },
             "type": "library",
             "autoload": {
@@ -50,9 +50,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mrjgreen/phroute/issues",
-                "source": "https://github.com/mrjgreen/phroute/tree/master"
+                "source": "https://github.com/mrjgreen/phroute/tree/v2.2.0"
             },
-            "time": "2015-07-22T20:46:43+00:00"
+            "time": "2022-05-04T16:22:33+00:00"
         }
     ],
     "packages-dev": [],
@@ -62,8 +62,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.0.9"
+        "php": ">=8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

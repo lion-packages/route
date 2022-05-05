@@ -16,6 +16,6 @@
     ],
     "require": {
         "php": ">=8.1",
-        "phroute/phroute": "^2.1"
+        "phroute/phroute": "^2.2"
     }
 }

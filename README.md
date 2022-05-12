@@ -6,6 +6,31 @@
 composer require lion-framework/lion-route
 ```
 
+## HTACCESS
+```apacheconf
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+```
+
 ## Usage
 ```php
 require_once("vendor/autoload.php");
@@ -22,7 +47,7 @@ Route::any('/', function() {
 });
 
 // 1 is for production and 2+ for local environment.
-Route::processOutput(Route::dispatch(2)); 
+Route::dispatch(2);
 ```
 
 ### Defining routes:
@@ -53,60 +78,11 @@ use in routes:
 '/user/{name:a}'
 ```
 
-### ~~Filters~~ Middleware:
-Is identical to filters, we change the name of `filter` to `middleware`.
-`Route::newMiddleware('auth', Auth::class, 'auth')` is the basic syntax for adding a middleware to our RouteCollector object. The first parameter is the name of the middleware. The second parameter is the class referenced and the third parameter the name of the function it belongs to. <br>
-
-```php
-'middleware' => [
-    Route::newMiddleware('auth', Auth::class, 'auth'),
-    Route::newMiddleware('no-auth', Auth::class, 'auth')
-]
-```
-
-When calling `Route::middleware()` keep in mind that the first parameter is an array loaded with data. <br>
-
-The first index is the middleware at position `before`. <br>
-The second index is optional and points to `after`. <br>
-The third index is optional and indicates a `prefix` to work the middleware in a more dynamic way. <br>
-
-Take into account that if more than 3 parameters are added, these are left over and do not generate internal errors in their operation.
-```php
-use LionRoute\Route;
-use Example\Auth;
-
-Route::init([
-    'middleware' => [
-        Route::newMiddleware('auth', Auth::class, 'auth'),
-        Route::newMiddleware('no-auth', Auth::class, 'auth')
-    ]
-]);
-
-Route::middleware(['no-auth'], function() {
-    Route::post('login', function() {
-        return [
-            'status' => "success",
-            'message' => "Hello world."
-        ];
-    });
-});
-```
-
-### Prefix Groups:
-```php
-Route::prefix('authenticate', function() {
-    Route::post('login', function() {
-        return [
-            'status' => "success",
-            'message' => "Hello world."
-        ];
-    });
-});
-```
-
 ### Example methods:
 #### GET
 ```php
+use App\Http\Controllers\Home\Example;
+
 Route::get('/example-url', function() {
     $get = new Example();
     $get->getMethod();
@@ -119,6 +95,8 @@ Route::get('/example-url', [Example::class, 'getMethod']);
 
 #### POST
 ```php
+use App\Http\Controllers\Home\Example;
+
 Route::post('/example-url', function() {
     $post = new Example();
     $post->postMethod();
@@ -131,6 +109,8 @@ Route::post('/example-url', [Example::class, 'postMethod']);
 
 #### PUT
 ```php
+use App\Http\Controllers\Home\Example;
+
 Route::put('/example-url/{id}', function($id) {
     $put = new Example();
     $put->putMethod();
@@ -143,6 +123,8 @@ Route::put('/example-url/{id}', [Example::class, 'putMethod']);
 
 #### DELETE
 ```php
+use App\Http\Controllers\Home\Example;
+
 Route::delete('/example-url/{id}', function($id) {
     $delete = new Example();
     $delete->deleteMethod();
@@ -155,6 +137,8 @@ Route::delete('/example-url/{id}', [Example::class, 'deleteMethod']);
 
 #### ANY
 ```php
+use App\Http\Controllers\Home\Example;
+
 Route::any('/example-url', function($id) {
     $any = new Example();
     $any->anyMethod();
@@ -163,6 +147,115 @@ Route::any('/example-url', function($id) {
 // or
 
 Route::any('/example-url', [Example::class, 'anyMethod']);
+```
+
+### ~~Filters~~ Middleware:
+It's identical to filters, we renamed `filter` to `middleware`. `['auth', Auth::class, 'auth']` is the basic syntax for adding a middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the class being referenced and the third parameter the name of the function it belongs to. <br>
+
+```php
+use LionRoute\Route;
+use App\Http\Middleware\Auth;
+
+Route::init()->newMiddleware([
+    ['auth', Auth::class, 'auth'],
+    ['no-auth', Auth::class, 'noAuth']
+]);
+```
+
+```php
+// Auth Class
+
+namespace App\Http\Middleware;
+
+class Auth {
+
+    public function __construct() {
+
+    }
+
+    public function auth(): void {
+        if (!isset($_SESSION['user_session'])) {
+            echo(json_encode([
+                'status' => "error",
+                'message' => "user session does not exist"
+            ]));
+
+            exit(); // exit to end the execution of the process up to that point.
+        }
+    }
+
+    public function noAuth(): void {
+        if (isset($_SESSION['user_session'])) {
+            echo(json_encode([
+                'status' => "error",
+                'message' => "user session exists"
+            ]));
+
+            exit(); // exit to end the execution of the process up to that point.
+        }
+    }
+
+}
+```
+
+When calling `Route::middleware()` keep in mind that the first parameter is an array loaded with data. <br>
+
+The first index is the middleware at position `before`. <br>
+The second index is optional and points to `after`. <br>
+The third index is optional and indicates a `prefix` to work the middleware in a more dynamic way. <br>
+
+Take into account that if more than 3 parameters are added, these are left over and do not generate internal errors in their operation.
+
+```php
+use App\Http\Controllers\Home\Example;
+
+Route::middleware(['no-auth'], function() {
+    Route::post('login', function() {
+        return [
+            'status' => "success",
+            'message' => "Hello world."
+        ];
+    });
+});
+
+// or
+
+Route::middleware(['no-auth'], function() {
+    Route::post('login', [Example::class, 'postMethod']);
+});
+
+// or
+
+Route::post('login', function() {
+    return [
+        'status' => "success",
+        'message' => "Hello world."
+    ];
+}, ['no-auth']);
+
+// or
+
+Route::post('login', [Example::class, 'postMethod'], ['no-auth']);
+```
+
+### Prefix Groups:
+```php
+Route::prefix('authenticate', function() {
+    Route::post('login', function() {
+        return [
+            'status' => "success",
+            'message' => "Hello world."
+        ];
+    });
+});
+
+Route::prefix('reports', function() {
+    Route::middleware(['auth'], function() {
+        Route::post('excel', [Example::class, 'excelMethod']);
+        Route::post('word', [Example::class, 'wordMethod']);
+        Route::post('power-point', [Example::class, 'powerPointMethod']);
+    });
+});
 ```
 
 ## Credits

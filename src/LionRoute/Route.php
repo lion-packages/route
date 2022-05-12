@@ -15,14 +15,14 @@ class Route {
 		
 	}
 
-	public static function init(array $filters = []): Route {
+	public static function init(): Route {
 		self::$router = new RouteCollector(new RouteParser());
 		return new Route();
 	}
 
-	// public static function getRoutes(): array {
-	// 	return (array) self::$router;
-	// }
+	public static function getRoutes(): array {
+		return (array) self::$router;
+	}
 
 	public static function newMiddleware(array $middleware): void {
 		if (count($middleware) > 0) {
@@ -74,27 +74,15 @@ class Route {
 	}
 
 	public static function post(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->post($url, $controller_function, $filters);
-		} else {
-			self::$router->post($url, $controller_function);
-		}
+		self::executeMethod('post', $url, $controller_function, $filters);
 	}
 
 	public static function put(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->put($url, $controller_function, $filters);
-		} else {
-			self::$router->put($url, $controller_function);
-		}
+		self::executeMethod('put', $url, $controller_function, $filters);
 	}
 
 	public static function delete(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->delete($url, $controller_function, $filters);
-		} else {
-			self::$router->delete($url, $controller_function);
-		}
+		self::executeMethod('delete', $url, $controller_function, $filters);
 	}
 
 	public static function any(string $url, \Closure|array $controller_function, array $filters = []): void {

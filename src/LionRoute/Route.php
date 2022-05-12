@@ -5,19 +5,18 @@ namespace LionRoute;
 use Phroute\Phroute\{ RouteCollector, RouteParser, Dispatcher };
 use Phroute\Phroute\Exception\{ HttpRouteNotFoundException, HttpMethodNotAllowedException };
 use LionRoute\Middleware;
+use LionRoute\Singleton;
 
 class Route {
 
+	use Singleton;
+
 	private static RouteCollector $router;
 	private static array $addMiddleware = [];
-	
-	public function __construct() {
-		
-	}
 
 	public static function init(): Route {
 		self::$router = new RouteCollector(new RouteParser());
-		return new Route();
+		return self::getInstance();
 	}
 
 	public static function getRoutes(): array {

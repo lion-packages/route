@@ -1,4 +1,5 @@
 /vendor/
+/app/
 /routes/
 .htaccess
 index.php

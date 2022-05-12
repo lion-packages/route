@@ -8,31 +8,38 @@ use LionRoute\Middleware;
 
 class Route {
 
-	private static $router;
+	private static RouteCollector $router;
+	private static array $addMiddleware = [];
 	
 	public function __construct() {
 		
 	}
 
-	public static function init(array $filters = []): void {
+	public static function init(array $filters = []): Route {
 		self::$router = new RouteCollector(new RouteParser());
+		return new Route();
+	}
 
-		if (isset($filters['middleware'])) {
-			self::createMiddleware($filters['middleware']);
+	// public static function getRoutes(): array {
+	// 	return (array) self::$router;
+	// }
+
+	public static function newMiddleware(array $middleware): void {
+		if (count($middleware) > 0) {
+			foreach ($middleware as $key => $add) {
+				array_push(self::$addMiddleware, new Middleware($add[0], $add[1], $add[2]));
+			}
 		}
+
+		self::createMiddleware();
 	}
 
-	public static function newMiddleware(string $middlewareName, string $objectClass, string $methodClass): Middleware {
-		return new Middleware($middlewareName, $objectClass, $methodClass);
-	}
-
-	private static function createMiddleware(array $filters): void {
-		if (count($filters) > 0) {
-			foreach ($filters as $key => $obj) {
+	private static function createMiddleware(): void {
+		if (count(self::$addMiddleware) > 0) {
+			foreach (self::$addMiddleware as $key => $obj) {
 				self::$router->filter($obj->getMiddlewareName(), function() use ($obj) {    
 					$objectClass = $obj->getNewObjectClass();
 					$methodClass = $obj->getMethodClass();
-
 					$objectClass->$methodClass();
 				});
 			}
@@ -63,11 +70,7 @@ class Route {
 	}
 
 	public static function get(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->get($url, $controller_function, $filters);
-		} else {
-			self::$router->get($url, $controller_function);
-		}
+		self::executeMethod('get', $url, $controller_function, $filters);
 	}
 
 	public static function post(string $url, \Closure|array $controller_function, array $filters = []): void {
@@ -95,10 +98,18 @@ class Route {
 	}
 
 	public static function any(string $url, \Closure|array $controller_function, array $filters = []): void {
+		self::executeMethod('any', $url, $controller_function, $filters);
+	}
+
+	private static function executeMethod(string $methodType, string $url, \Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
-			self::$router->any($url, $controller_function, $filters);
+			self::$router->$methodType(
+				$url,
+				$controller_function,
+				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
+			);
 		} else {
-			self::$router->any($url, $controller_function);
+			self::$router->$methodType($url, $controller_function);
 		}
 	}
 
@@ -106,20 +117,26 @@ class Route {
 		return implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), $index));
 	}
 
-	public static function processOutput($response): void {
+	private static function processOutput($response): void {
 		echo(json_encode($response));
 	}
 
-	public static function dispatch(int $index) {
+	public static function dispatch(int $index): void {
 		try {
-			return (new Dispatcher(self::$router->getData()))->dispatch(
-				$_SERVER['REQUEST_METHOD'], 
-				self::processInput($index)
+			self::processOutput(
+				(new Dispatcher(self::$router->getData()))->dispatch(
+					$_SERVER['REQUEST_METHOD'],
+					self::processInput($index)
+				)
 			);
 		} catch (HttpRouteNotFoundException $e) {
-			return ['status' => "error", 'message' => "Path not found: {$e->getMessage()}"];
+			self::processOutput(
+				['status' => "error", 'message' => "Path not found: {$e->getMessage()}"]
+			);
 		} catch (HttpMethodNotAllowedException $e) {
-			return ['status' => "error", 'message' => "Method not allowed: {$e->getMessage()}"];
+			self::processOutput(
+				['status' => "error", 'message' => "Method not allowed: {$e->getMessage()}"]
+			);
 		}
 	}
 

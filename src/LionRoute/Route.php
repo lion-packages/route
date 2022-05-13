@@ -69,35 +69,55 @@ class Route {
 	}
 
 	public static function get(string $url, \Closure|array $controller_function, array $filters = []): void {
-		self::executeMethod('get', $url, $controller_function, $filters);
-	}
-
-	public static function post(string $url, \Closure|array $controller_function, array $filters = []): void {
-		self::executeMethod('post', $url, $controller_function, $filters);
-	}
-
-	public static function put(string $url, \Closure|array $controller_function, array $filters = []): void {
-		self::executeMethod('put', $url, $controller_function, $filters);
-	}
-
-	public static function delete(string $url, \Closure|array $controller_function, array $filters = []): void {
-		self::executeMethod('delete', $url, $controller_function, $filters);
-	}
-
-	public static function any(string $url, \Closure|array $controller_function, array $filters = []): void {
-		self::executeMethod('any', $url, $controller_function, $filters);
-	}
-
-	private static function executeMethod(string $methodType, string $url, \Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
-			self::$router->$methodType(
+			self::$router->get(
 				$url,
 				$controller_function,
 				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
 			);
 		} else {
-			self::$router->$methodType($url, $controller_function);
+			self::$router->get($url, $controller_function);
 		}
+	}
+
+	public static function post(string $url, \Closure|array $controller_function, array $filters = []): void {
+		if (count($filters) > 0) {
+			self::$router->post(
+				$url,
+				$controller_function,
+				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
+			);
+		} else {
+			self::$router->post($url, $controller_function);
+		}
+	}
+
+	public static function put(string $url, \Closure|array $controller_function, array $filters = []): void {
+		if (count($filters) > 0) {
+			self::$router->put(
+				$url,
+				$controller_function,
+				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
+			);
+		} else {
+			self::$router->put($url, $controller_function);
+		}
+	}
+
+	public static function delete(string $url, \Closure|array $controller_function, array $filters = []): void {
+		if (count($filters) > 0) {
+			self::$router->delete(
+				$url,
+				$controller_function,
+				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
+			);
+		} else {
+			self::$router->delete($url, $controller_function);
+		}
+	}
+
+	public static function any(string $url, \Closure|array $controller_function, array $filters = []): void {
+		self::executeMethod('any', $url, $controller_function, $filters);
 	}
 
 	private static function processInput(int $index): string {

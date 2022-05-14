@@ -5,18 +5,16 @@ namespace LionRoute;
 use Phroute\Phroute\{ RouteCollector, RouteParser, Dispatcher };
 use Phroute\Phroute\Exception\{ HttpRouteNotFoundException, HttpMethodNotAllowedException };
 use LionRoute\Middleware;
-use LionRoute\Singleton;
+use LionRoute\{ Singleton, Http };
 
-class Route {
+class Route extends Http {
 
 	use Singleton;
 
-	private static RouteCollector $router;
-	private static array $addMiddleware = [];
-	private static array $route_methods = ['GET', 'POST', 'PUT', 'DELETE', 'ANY', 'OPTIONS', 'HEAD', 'PATCH'];
+	protected static array $addMiddleware = [];
 
 	public static function init(): Route {
-		self::$router = new RouteCollector(new RouteParser());
+		self::$router = new RouteCollector();
 		return self::getInstance();
 	}
 
@@ -37,7 +35,7 @@ class Route {
 	private static function createMiddleware(): void {
 		if (count(self::$addMiddleware) > 0) {
 			foreach (self::$addMiddleware as $key => $obj) {
-				self::$router->filter($obj->getMiddlewareName(), function() use ($obj) {    
+				self::$router->filter($obj->getMiddlewareName(), function() use ($obj) {
 					$objectClass = $obj->getNewObjectClass();
 					$methodClass = $obj->getMethodClass();
 					$objectClass->$methodClass();
@@ -67,66 +65,6 @@ class Route {
 		self::$router->group($list_middleware, function($router) use ($closure) {
 			$closure();
 		});
-	}
-
-	public static function get(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->get(
-				$url,
-				$controller_function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->get($url, $controller_function);
-		}
-	}
-
-	public static function post(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->post(
-				$url,
-				$controller_function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->post($url, $controller_function);
-		}
-	}
-
-	public static function put(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->put(
-				$url,
-				$controller_function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->put($url, $controller_function);
-		}
-	}
-
-	public static function delete(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->delete(
-				$url,
-				$controller_function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->delete($url, $controller_function);
-		}
-	}
-
-	public static function any(string $url, \Closure|array $controller_function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->any(
-				$url,
-				$controller_function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->any($url, $controller_function);
-		}
 	}
 
 	private static function processInput(int $index): string {

@@ -13,6 +13,7 @@ class Route {
 
 	private static RouteCollector $router;
 	private static array $addMiddleware = [];
+	private static array $route_methods = ['GET', 'POST', 'PUT', 'DELETE', 'ANY', 'OPTIONS', 'HEAD', 'PATCH'];
 
 	public static function init(): Route {
 		self::$router = new RouteCollector(new RouteParser());
@@ -117,7 +118,15 @@ class Route {
 	}
 
 	public static function any(string $url, \Closure|array $controller_function, array $filters = []): void {
-		self::executeMethod('any', $url, $controller_function, $filters);
+		if (count($filters) > 0) {
+			self::$router->any(
+				$url,
+				$controller_function,
+				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
+			);
+		} else {
+			self::$router->any($url, $controller_function);
+		}
 	}
 
 	private static function processInput(int $index): string {
@@ -136,14 +145,17 @@ class Route {
 					self::processInput($index)
 				)
 			);
+			exit();
 		} catch (HttpRouteNotFoundException $e) {
 			self::processOutput(
 				['status' => "error", 'message' => "Path not found: {$e->getMessage()}"]
 			);
+			exit();
 		} catch (HttpMethodNotAllowedException $e) {
 			self::processOutput(
-				['status' => "error", 'message' => "Method not allowed: {$e->getMessage()}"]
+				['status' => "error", 'message' => "Method not allowed, {$e->getMessage()}"]
 			);
+			exit();
 		}
 	}
 

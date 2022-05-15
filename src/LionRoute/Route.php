@@ -27,9 +27,9 @@ class Route extends Http {
 			foreach ($middleware as $key => $add) {
 				array_push(self::$addMiddleware, new Middleware($add[0], $add[1], $add[2]));
 			}
-		}
 
-		self::createMiddleware();
+			self::createMiddleware();
+		}
 	}
 
 	private static function createMiddleware(): void {

@@ -61,6 +61,10 @@ Route::post($route, $handler);
 Route::put($route, $handler);
 Route::delete($route, $handler);
 Route::any($route, $handler);
+
+Route::head($route, $handler);
+Route::options($route, $handler);
+Route::patch($route, $handler);
 ```
 
 This method accepts the HTTP method the route must match, the route pattern and a callable handler, which can be a closure, function name or `['ClassName', 'method']`. [more information in...](https://github.com/mrjgreen/phroute#defining-routes)

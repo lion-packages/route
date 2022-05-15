@@ -96,4 +96,16 @@ class Http {
 		}
 	}
 
+	public static function patch(string $url, \Closure|array $controller_function, array $filters = []): void {
+		if (count($filters) > 0) {
+			self::$router->patch(
+				$url,
+				$controller_function,
+				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
+			);
+		} else {
+			self::$router->patch($url, $controller_function);
+		}
+	}
+
 }

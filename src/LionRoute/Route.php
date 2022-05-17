@@ -19,7 +19,7 @@ class Route extends Http {
 	}
 
 	public static function getRoutes(): array {
-		return (array) self::$router;
+		return self::$router->getData()->getStaticRoutes();
 	}
 
 	public static function newMiddleware(array $middleware): void {

@@ -73,6 +73,7 @@ class Route extends Http {
 
 	private static function processOutput($response): void {
 		echo(json_encode($response));
+		exit();
 	}
 
 	public static function dispatch(int $index): void {
@@ -83,17 +84,14 @@ class Route extends Http {
 					self::processInput($index)
 				)
 			);
-			exit();
 		} catch (HttpRouteNotFoundException $e) {
 			self::processOutput(
 				['status' => "error", 'message' => "Path not found: {$e->getMessage()}"]
 			);
-			exit();
 		} catch (HttpMethodNotAllowedException $e) {
 			self::processOutput(
 				['status' => "error", 'message' => "Method not allowed, {$e->getMessage()}"]
 			);
-			exit();
 		}
 	}
 

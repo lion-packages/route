@@ -45,6 +45,10 @@ use LionRoute\Route;
     3 -> example
 */
 Route::init(1);
+```
+
+```php
+Route::init();
 
 Route::any('/', function() {
     return [
@@ -52,7 +56,6 @@ Route::any('/', function() {
         'message' => "Hello world"
     ];
 });
-
 
 Route::dispatch();
 ```

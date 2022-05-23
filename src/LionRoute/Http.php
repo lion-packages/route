@@ -3,10 +3,12 @@
 namespace LionRoute;
 
 use Phroute\Phroute\RouteCollector;
+use LionRoute\Config\RouteConfig;
 
 class Http {
 
 	protected static RouteCollector $router;
+	protected static int $index;
 
 	public function __construct() {
 

@@ -44,29 +44,6 @@ class Route extends Http {
 		}
 	}
 
-	public static function prefix(string $prefix_name, Closure $closure): void {
-		self::$router->group(['prefix' => $prefix_name], function($router) use ($closure) {
-			$closure();
-		});
-	}
-
-	public static function middleware(array $middleware, Closure $closure): void {
-		$count = count($middleware);
-		$list_middleware = [];
-
-		if ($count === 1) {
-			$list_middleware = ['before' => $middleware[0]];
-		} elseif ($count === 2) {
-			$list_middleware = ['before' => $middleware[0], 'after' => $middleware[1]];
-		} elseif ($count >= 3) {
-			$list_middleware = ['before' => $middleware[0], 'after' => $middleware[1], 'prefix' => $middleware[2]];
-		}
-
-		self::$router->group($list_middleware, function($router) use ($closure) {
-			$closure();
-		});
-	}
-
 	public static function dispatch(): void {
 		try {
 			RouteConfig::processOutput(

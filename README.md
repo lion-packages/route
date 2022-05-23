@@ -43,6 +43,7 @@ use LionRoute\Route;
     1 -> auth/signin/example
     2 -> signin/example
     3 -> example
+    4+ ...
 */
 Route::init(1);
 ```

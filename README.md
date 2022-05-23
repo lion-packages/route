@@ -40,7 +40,7 @@ use LionRoute\Route;
 
 /*
     myweb.com/auth/signin/example
-    1 -> auth/signin
+    1 -> auth/signin/example
     2 -> signin/example
     3 -> example
 */

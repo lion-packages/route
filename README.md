@@ -47,6 +47,7 @@ use LionRoute\Route;
 Route::init(1);
 ```
 
+### Defining routes:
 ```php
 Route::init();
 
@@ -59,8 +60,8 @@ Route::any('/', function() {
 
 Route::dispatch();
 ```
+## Definition of route types
 
-### Defining routes:
 ```php
 use LionRoute\Route;
 

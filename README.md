@@ -33,12 +33,16 @@ composer require lion-framework/lion-route
 ```
 
 ## Usage
+Start your development server
+```shell
+php -S localhost:40400
+```
+
+It is recommended to start the development server yourself, since software such as `XAMPP, WampServer, BitNami WAMP Stack, Apache Lounge... etc`, provide directories in which to load your PHP projects, This results in running on the browser routes as `'localhost/MyProject/example'`.
+This generates a conflict since the route obtained comes by default as `'MyProject/example'`, something completely wrong. You can solve it by indicating from which parameter the URL can be obtained from the `Route::init()` method.
+
 Indicate with an integer from which position the URL will be obtained, By default it is initialized to 1.
 ```php
-require_once("vendor/autoload.php");
-
-use LionRoute\Route;
-
 /*
     myweb.com/auth/signin/example
     1 -> auth/signin/example
@@ -51,6 +55,10 @@ Route::init(1);
 
 ### DEFINING ROUTES
 ```php
+require_once("vendor/autoload.php");
+
+use LionRoute\Route;
+
 Route::init();
 
 Route::any('/', function() {

@@ -37,7 +37,14 @@ require_once("vendor/autoload.php");
 
 use LionRoute\Route;
 
-Route::init();
+/*
+    Indicate with an integer from which position the URL will be obtained, By default it is initialized to 1
+    myweb.com/auth/signin/example
+    1 -> auth/signin
+    2 -> signin/example
+    3 -> example
+*/
+Route::init(1);
 
 Route::any('/', function() {
     return [
@@ -46,8 +53,8 @@ Route::any('/', function() {
     ];
 });
 
-// 1 is for production and 2+ for local environment.
-Route::dispatch(2);
+
+Route::dispatch();
 ```
 
 ### Defining routes:
@@ -209,7 +216,6 @@ The second index is optional and points to `after`. <br>
 The third index is optional and indicates a `prefix` to work the middleware in a more dynamic way. <br>
 
 Take into account that if more than 3 parameters are added, these are left over and do not generate internal errors in their operation.
-
 ```php
 use App\Http\Controllers\Home\Example;
 
@@ -259,6 +265,8 @@ Route::prefix('reports', function() {
         Route::post('word', [Example::class, 'wordMethod']);
         Route::post('power-point', [Example::class, 'powerPointMethod']);
     });
+
+    Route::post('pdf', [Example::class, 'pdfMethod']);
 });
 ```
 

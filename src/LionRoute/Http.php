@@ -2,6 +2,7 @@
 
 namespace LionRoute;
 
+use Closure;
 use Phroute\Phroute\RouteCollector;
 use LionRoute\Config\RouteConfig;
 
@@ -14,7 +15,7 @@ class Http {
 
 	}
 
-	public static function get(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function get(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->get(
 				$url,
@@ -26,7 +27,7 @@ class Http {
 		}
 	}
 
-	public static function post(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function post(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->post(
 				$url,
@@ -38,7 +39,7 @@ class Http {
 		}
 	}
 
-	public static function put(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function put(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->put(
 				$url,
@@ -50,7 +51,7 @@ class Http {
 		}
 	}
 
-	public static function delete(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function delete(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->delete(
 				$url,
@@ -62,7 +63,7 @@ class Http {
 		}
 	}
 
-	public static function any(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function any(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->any(
 				$url,
@@ -74,7 +75,7 @@ class Http {
 		}
 	}
 
-	public static function head(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function head(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->head(
 				$url,
@@ -86,7 +87,7 @@ class Http {
 		}
 	}
 
-	public static function options(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function options(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->options(
 				$url,
@@ -98,7 +99,7 @@ class Http {
 		}
 	}
 
-	public static function patch(string $url, \Closure|array $controller_function, array $filters = []): void {
+	public static function patch(string $url, Closure|array $controller_function, array $filters = []): void {
 		if (count($filters) > 0) {
 			self::$router->patch(
 				$url,

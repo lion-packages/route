@@ -34,14 +34,12 @@ class Route extends Http {
 	}
 
 	private static function createMiddleware(): void {
-		if (count(self::$addMiddleware) > 0) {
-			foreach (self::$addMiddleware as $key => $obj) {
-				self::$router->filter($obj->getMiddlewareName(), function() use ($obj) {
-					$objectClass = $obj->getNewObjectClass();
-					$methodClass = $obj->getMethodClass();
-					$objectClass->$methodClass();
-				});
-			}
+		foreach (self::$addMiddleware as $key => $obj) {
+			self::$router->filter($obj->getMiddlewareName(), function() use ($obj) {
+				$objectClass = $obj->getNewObjectClass();
+				$methodClass = $obj->getMethodClass();
+				$objectClass->$methodClass();
+			});
 		}
 	}
 

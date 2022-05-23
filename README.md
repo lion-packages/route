@@ -80,7 +80,7 @@ Route::patch($route, $handler);
 
 This method accepts the HTTP method the route must match, the route pattern and a callable handler, which can be a closure, function name or `['ClassName', 'method']`. [more information in...](https://github.com/mrjgreen/phroute#defining-routes)
 
-### Regex Shortcuts:
+### REGEX SHORTCUTS
 ```
 :i => :/d+                # numbers only
 :a => :[a-zA-Z0-9]+       # alphanumeric

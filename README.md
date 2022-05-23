@@ -1,4 +1,5 @@
-# This library has a quick use of the router with regular expressions based on [mrjgreen phroute](https://github.com/mrjgreen/phroute).
+# This library has a quick use of the router with regular expressions based on [phroute](https://github.com/mrjgreen/phroute).
+
 [![Latest Stable Version](http://poser.pugx.org/lion-framework/lion-route/v)](https://packagist.org/packages/lion-framework/lion-route) [![Total Downloads](http://poser.pugx.org/lion-framework/lion-route/downloads)](https://packagist.org/packages/lion-framework/lion-route) [![Latest Unstable Version](http://poser.pugx.org/lion-framework/lion-route/v/unstable)](https://packagist.org/packages/lion-framework/lion-route) [![License](http://poser.pugx.org/lion-framework/lion-route/license)](https://packagist.org/packages/lion-framework/lion-route) [![PHP Version Require](http://poser.pugx.org/lion-framework/lion-route/require/php)](https://packagist.org/packages/lion-framework/lion-route)
 
 ## Install

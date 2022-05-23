@@ -2,6 +2,7 @@
 
 namespace LionRoute;
 
+use \Closure;
 use Phroute\Phroute\{ RouteCollector, RouteParser, Dispatcher };
 use Phroute\Phroute\Exception\{ HttpRouteNotFoundException, HttpMethodNotAllowedException };
 use LionRoute\Config\RouteConfig;
@@ -43,13 +44,13 @@ class Route extends Http {
 		}
 	}
 
-	public static function prefix(string $prefix_name, \Closure $closure): void {
+	public static function prefix(string $prefix_name, Closure $closure): void {
 		self::$router->group(['prefix' => $prefix_name], function($router) use ($closure) {
 			$closure();
 		});
 	}
 
-	public static function middleware(array $middleware, \Closure $closure): void {
+	public static function middleware(array $middleware, Closure $closure): void {
 		$count = count($middleware);
 		$list_middleware = [];
 

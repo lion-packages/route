@@ -1,4 +1,5 @@
-# This library has a quick use of the router with regular expressions based on [mrjgreen phroute](https://github.com/mrjgreen/phroute).
+# This library has a quick use of the router with regular expressions based on [phroute](https://github.com/mrjgreen/phroute).
+
 [![Latest Stable Version](http://poser.pugx.org/lion-framework/lion-route/v)](https://packagist.org/packages/lion-framework/lion-route) [![Total Downloads](http://poser.pugx.org/lion-framework/lion-route/downloads)](https://packagist.org/packages/lion-framework/lion-route) [![Latest Unstable Version](http://poser.pugx.org/lion-framework/lion-route/v/unstable)](https://packagist.org/packages/lion-framework/lion-route) [![License](http://poser.pugx.org/lion-framework/lion-route/license)](https://packagist.org/packages/lion-framework/lion-route) [![PHP Version Require](http://poser.pugx.org/lion-framework/lion-route/require/php)](https://packagist.org/packages/lion-framework/lion-route)
 
 ## Install
@@ -32,6 +33,27 @@ composer require lion-framework/lion-route
 ```
 
 ## Usage
+Start your development server
+```shell
+php -S localhost:40400
+```
+
+It is recommended to start the development server yourself, since software such as `XAMPP, WampServer, BitNami WAMP Stack, Apache Lounge... etc`, provide directories in which to load your PHP projects, This results in running on the browser routes as `'localhost/MyProject/example'`.
+This generates a conflict since the route obtained comes by default as `'MyProject/example'`, something completely wrong. You can solve it by indicating from which parameter the URL can be obtained from the `Route::init()` method.
+
+Indicate with an integer from which position the URL will be obtained, By default it is initialized to 1.
+```php
+/*
+    myweb.com/auth/signin/example
+    1 -> auth/signin/example
+    2 -> signin/example
+    3 -> example
+    4+ ...
+*/
+Route::init(1);
+```
+
+### DEFINING ROUTES
 ```php
 require_once("vendor/autoload.php");
 
@@ -46,11 +68,10 @@ Route::any('/', function() {
     ];
 });
 
-// 1 is for production and 2+ for local environment.
-Route::dispatch(2);
+Route::dispatch();
 ```
 
-### Defining routes:
+### DEFINITION OF ROUTE TYPES
 ```php
 use LionRoute\Route;
 
@@ -69,7 +90,7 @@ Route::patch($route, $handler);
 
 This method accepts the HTTP method the route must match, the route pattern and a callable handler, which can be a closure, function name or `['ClassName', 'method']`. [more information in...](https://github.com/mrjgreen/phroute#defining-routes)
 
-### Regex Shortcuts:
+### REGEX SHORTCUTS
 ```
 :i => :/d+                # numbers only
 :a => :[a-zA-Z0-9]+       # alphanumeric
@@ -82,7 +103,7 @@ use in routes:
 '/user/{name:a}'
 ```
 
-### Example methods:
+### EXAMPLE METHODS
 #### GET
 ```php
 use App\Http\Controllers\Home\Example;
@@ -153,7 +174,7 @@ Route::any('/example-url', function($id) {
 Route::any('/example-url', [Example::class, 'anyMethod']);
 ```
 
-### ~~Filters~~ Middleware:
+### ~~FILTERS~~ MIDDLEWARE:
 It's identical to filters, we renamed `filter` to `middleware`. `['auth', Auth::class, 'auth']` is the basic syntax for adding a middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the class being referenced and the third parameter the name of the function it belongs to. <br>
 
 ```php
@@ -209,7 +230,6 @@ The second index is optional and points to `after`. <br>
 The third index is optional and indicates a `prefix` to work the middleware in a more dynamic way. <br>
 
 Take into account that if more than 3 parameters are added, these are left over and do not generate internal errors in their operation.
-
 ```php
 use App\Http\Controllers\Home\Example;
 
@@ -242,7 +262,7 @@ Route::post('login', function() {
 Route::post('login', [Example::class, 'postMethod'], ['no-auth']);
 ```
 
-### Prefix Groups:
+### PREFIX GROUPS:
 ```php
 Route::prefix('authenticate', function() {
     Route::post('login', function() {
@@ -259,6 +279,8 @@ Route::prefix('reports', function() {
         Route::post('word', [Example::class, 'wordMethod']);
         Route::post('power-point', [Example::class, 'powerPointMethod']);
     });
+
+    Route::post('pdf', [Example::class, 'pdfMethod']);
 });
 ```
 

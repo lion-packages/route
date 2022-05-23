@@ -32,13 +32,13 @@ composer require lion-framework/lion-route
 ```
 
 ## Usage
+Indicate with an integer from which position the URL will be obtained, By default it is initialized to 1.
 ```php
 require_once("vendor/autoload.php");
 
 use LionRoute\Route;
 
 /*
-    Indicate with an integer from which position the URL will be obtained, By default it is initialized to 1
     myweb.com/auth/signin/example
     1 -> auth/signin
     2 -> signin/example

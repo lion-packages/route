@@ -47,7 +47,7 @@ use LionRoute\Route;
 Route::init(1);
 ```
 
-### Defining routes:
+### DEFINING ROUTES
 ```php
 Route::init();
 
@@ -60,8 +60,8 @@ Route::any('/', function() {
 
 Route::dispatch();
 ```
-## Definition of route types
 
+### DEFINITION OF ROUTE TYPES
 ```php
 use LionRoute\Route;
 
@@ -93,7 +93,7 @@ use in routes:
 '/user/{name:a}'
 ```
 
-### Example methods:
+### EXAMPLE METHODS
 #### GET
 ```php
 use App\Http\Controllers\Home\Example;
@@ -164,7 +164,7 @@ Route::any('/example-url', function($id) {
 Route::any('/example-url', [Example::class, 'anyMethod']);
 ```
 
-### ~~Filters~~ Middleware:
+### ~~FILTERS~~ MIDDLEWARE:
 It's identical to filters, we renamed `filter` to `middleware`. `['auth', Auth::class, 'auth']` is the basic syntax for adding a middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the class being referenced and the third parameter the name of the function it belongs to. <br>
 
 ```php
@@ -252,7 +252,7 @@ Route::post('login', function() {
 Route::post('login', [Example::class, 'postMethod'], ['no-auth']);
 ```
 
-### Prefix Groups:
+### PREFIX GROUPS:
 ```php
 Route::prefix('authenticate', function() {
     Route::post('login', function() {

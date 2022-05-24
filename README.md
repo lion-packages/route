@@ -81,11 +81,12 @@ Route::get($route, $handler);
 Route::post($route, $handler);
 Route::put($route, $handler);
 Route::delete($route, $handler);
-Route::any($route, $handler);
-
 Route::head($route, $handler);
 Route::options($route, $handler);
 Route::patch($route, $handler);
+
+Route::any($route, $handler);
+Route::match($methods, $route, $handler); // beta
 ```
 
 This method accepts the HTTP method the route must match, the route pattern and a callable handler, which can be a closure, function name or `['ClassName', 'method']`. [more information in...](https://github.com/mrjgreen/phroute#defining-routes)
@@ -108,70 +109,85 @@ use in routes:
 ```php
 use App\Http\Controllers\Home\Example;
 
-Route::get('/example-url', function() {
+Route::get('example-url', function() {
     $get = new Example();
     $get->getMethod();
 });
 
 // or
 
-Route::get('/example-url', [Example::class, 'getMethod']);
+Route::get('example-url', [Example::class, 'getMethod']);
 ```
 
 #### POST
 ```php
 use App\Http\Controllers\Home\Example;
 
-Route::post('/example-url', function() {
+Route::post('example-url', function() {
     $post = new Example();
     $post->postMethod();
 });
 
 // or
 
-Route::post('/example-url', [Example::class, 'postMethod']);
+Route::post('example-url', [Example::class, 'postMethod']);
 ```
 
 #### PUT
 ```php
 use App\Http\Controllers\Home\Example;
 
-Route::put('/example-url/{id}', function($id) {
+Route::put('example-url/{id}', function($id) {
     $put = new Example();
     $put->putMethod();
 });
 
 // or
 
-Route::put('/example-url/{id}', [Example::class, 'putMethod']);
+Route::put('example-url/{id}', [Example::class, 'putMethod']);
 ```
 
 #### DELETE
 ```php
 use App\Http\Controllers\Home\Example;
 
-Route::delete('/example-url/{id}', function($id) {
+Route::delete('example-url/{id}', function($id) {
     $delete = new Example();
     $delete->deleteMethod();
 });
 
 // or
 
-Route::delete('/example-url/{id}', [Example::class, 'deleteMethod']);
+Route::delete('example-url/{id}', [Example::class, 'deleteMethod']);
 ```
 
 #### ANY
 ```php
 use App\Http\Controllers\Home\Example;
 
-Route::any('/example-url', function($id) {
+Route::any('example-url', function($id) {
     $any = new Example();
     $any->anyMethod();
 });
 
 // or
 
-Route::any('/example-url', [Example::class, 'anyMethod']);
+Route::any('example-url', [Example::class, 'anyMethod']);
+```
+
+#### MATCH
+Important note: the `match` method is in beta status, currently the `match` method cannot be wrapped by more than one `prefix`, 2 or more will cause an error, which means it cannot find the requested URL, additionally it does not support dynamic parameters such as `'example-url/{search}'`
+```php
+use App\Http\Controllers\Home\Example;
+
+Route::match(['POST', 'PUT'], 'example-url', function() {
+    $obj = new Example();
+    $obj->method();
+});
+
+// or
+
+Route::match(['POST', 'PUT'], 'example-url', [Example::class, 'method']);
 ```
 
 ### ~~FILTERS~~ MIDDLEWARE:

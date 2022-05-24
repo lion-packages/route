@@ -190,7 +190,7 @@ Route::match(['POST', 'PUT'], 'example-url', function() {
 Route::match(['POST', 'PUT'], 'example-url', [Example::class, 'method']);
 ```
 
-### ~~FILTERS~~ MIDDLEWARE:
+### ~~FILTERS~~ MIDDLEWARE
 It's identical to filters, we renamed `filter` to `middleware`. `['auth', Auth::class, 'auth']` is the basic syntax for adding a middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the class being referenced and the third parameter the name of the function it belongs to. <br>
 
 ```php
@@ -278,7 +278,7 @@ Route::post('login', function() {
 Route::post('login', [Example::class, 'postMethod'], ['no-auth']);
 ```
 
-### PREFIX GROUPS:
+### PREFIX GROUPS
 ```php
 Route::prefix('authenticate', function() {
     Route::post('login', function() {

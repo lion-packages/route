@@ -144,8 +144,6 @@ class Http {
 		$path_url = $path_url === "" ? "/" : $path_url;
 		$match = self::$url_match != "" ? (self::$original_url_match . $url) : (self::$url_match . $url);
 
-		var_dump($match);
-
 		if ($path_url === $match) {
 			$union = "";
 			$count = count($methods);

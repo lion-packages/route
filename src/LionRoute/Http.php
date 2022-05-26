@@ -10,7 +10,7 @@ class Http {
 
 	protected static RouteCollector $router;
 	protected static int $index;
-	protected static string $original_url_match;
+	protected static string $original_url_match = "";
 	protected static string $url_match = "";
 
 	public function __construct() {
@@ -18,7 +18,7 @@ class Http {
 	}
 
 	public static function prefix(string $prefix_name, Closure $closure): void {
-		self::$original_url_match = "{$prefix_name}/";
+		self::$original_url_match.= "{$prefix_name}/";
 		self::$url_match.= "{$prefix_name}/";
 
 		self::$router->group(['prefix' => $prefix_name], function($router) use ($closure) {
@@ -185,7 +185,7 @@ class Http {
 			} else {
 				RouteConfig::processOutput([
 					'status' => "error",
-					'message' => "Allow: '{$union}' in '{$url}'"
+					'message' => "Allow: '{$union}' in '{$match}'"
 				]);
 			}
 		}

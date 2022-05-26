@@ -1,6 +1,6 @@
 # This library has a quick use of the router with regular expressions based on [phroute](https://github.com/mrjgreen/phroute).
 
-[![Latest Stable Version](http://poser.pugx.org/lion-framework/lion-route/v)](https://packagist.org/packages/lion-framework/lion-route) [![Total Downloads](http://poser.pugx.org/lion-framework/lion-route/downloads)](https://packagist.org/packages/lion-framework/lion-route) [![Latest Unstable Version](http://poser.pugx.org/lion-framework/lion-route/v/unstable)](https://packagist.org/packages/lion-framework/lion-route) [![License](http://poser.pugx.org/lion-framework/lion-route/license)](https://packagist.org/packages/lion-framework/lion-route) [![PHP Version Require](http://poser.pugx.org/lion-framework/lion-route/require/php)](https://packagist.org/packages/lion-framework/lion-route)
+[![Latest Stable Version](http://poser.pugx.org/lion-framework/lion-route/v)](https://packagist.org/packages/lion-framework/lion-route) [![Total Downloads](http://poser.pugx.org/lion-framework/lion-route/downloads)](https://packagist.org/packages/lion-framework/lion-route) [![License](http://poser.pugx.org/lion-framework/lion-route/license)](https://packagist.org/packages/lion-framework/lion-route) [![PHP Version Require](http://poser.pugx.org/lion-framework/lion-route/require/php)](https://packagist.org/packages/lion-framework/lion-route)
 
 ## Install
 ```
@@ -176,7 +176,7 @@ Route::any('example-url', [Example::class, 'anyMethod']);
 ```
 
 #### MATCH
-Important note: the `match` method is in beta status, currently the `match` method cannot be wrapped by more than one `prefix`, 2 or more will cause an error, which means it cannot find the requested URL, additionally it does not support dynamic parameters such as `'example-url/{search}'`
+Important note: the `match` method is in beta, currently the `match` method works as long as there is no more than one `prefix` created next to it.
 ```php
 use App\Http\Controllers\Home\Example;
 
@@ -188,6 +188,48 @@ Route::match(['POST', 'PUT'], 'example-url', function() {
 // or
 
 Route::match(['POST', 'PUT'], 'example-url', [Example::class, 'method']);
+```
+
+valid example
+```php
+Route::prefix('reports', function() {
+    Route::match(['GET', 'POST'], 'excel', function() {
+        // ...
+    });
+
+    Route::prefix('admin', function() {
+        Route::match(['GET'], 'pdf', function() {
+            // ...
+        });
+    });
+});
+
+Route::prefix('customers', function() {
+    Route::match(['GET'], 'word', function() {
+        // ...
+    });
+});
+```
+
+invalid example
+```php
+Route::prefix('reports', function() {
+    Route::match(['GET', 'POST'], 'excel', function() {
+        // ...
+    });
+
+    Route::prefix('admin', function() {
+        Route::match(['GET'], 'pdf', function() {
+            // ...
+        });
+    });
+
+    Route::prefix('customers', function() {
+        Route::match(['GET'], 'word', function() {
+            // ...
+        });
+    });
+});
 ```
 
 ### ~~FILTERS~~ MIDDLEWARE

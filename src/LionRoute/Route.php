@@ -15,10 +15,9 @@ class Route extends Http {
 
 	protected static array $addMiddleware = [];
 
-	public static function init(int $index = 1): Route {
+	public static function init(int $index = 1): void {
 		self::$index = $index;
 		self::$router = new RouteCollector();
-		return self::getInstance();
 	}
 
 	public static function getRoutes(): array {

@@ -95,7 +95,7 @@ This method accepts the HTTP method the route must match, the route pattern and 
 ```
 :i => :/d+                # numbers only
 :a => :[a-zA-Z0-9]+       # alphanumeric
-:c => :[a-zA-Z0-9+_\-\.]+  # alnumnumeric and + _ - . characters 
+:c => :[a-zA-Z0-9+_\-\.]+  # alnumnumeric and + _ - . characters
 :h => :[a-fA-F0-9]+       # hex
 
 use in routes:
@@ -239,7 +239,9 @@ It's identical to filters, we renamed `filter` to `middleware`. `['auth', Auth::
 use LionRoute\Route;
 use App\Http\Middleware\Auth;
 
-Route::init()->newMiddleware([
+Route::init();
+
+Route::newMiddleware([
     ['auth', Auth::class, 'auth'],
     ['no-auth', Auth::class, 'noAuth']
 ]);

@@ -233,7 +233,7 @@ Route::prefix('reports', function() {
 ```
 
 ### ~~FILTERS~~ MIDDLEWARE
-It's identical to filters, we renamed `filter` to `middleware`. `['auth', Auth::class, 'auth']` is the basic syntax for adding a middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the class being referenced and the third parameter the name of the function it belongs to. <br>
+It is identical to filters, we change the name of filter to middleware. `['name' => 'auth', "method" => 'auth']` is the basic syntax for adding middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the name of the function it belongs to. <br>
 
 ```php
 use LionRoute\Route;

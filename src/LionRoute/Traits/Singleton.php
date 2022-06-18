@@ -1,6 +1,6 @@
 <?php
 
-namespace LionRoute;
+namespace LionRoute\Traits;
 
 trait Singleton {
 

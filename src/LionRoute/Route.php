@@ -6,7 +6,8 @@ use \Closure;
 use Phroute\Phroute\{ RouteCollector, RouteParser, Dispatcher };
 use Phroute\Phroute\Exception\{ HttpRouteNotFoundException, HttpMethodNotAllowedException };
 use LionRoute\Config\RouteConfig;
-use LionRoute\{ Singleton, Http, Middleware };
+use LionRoute\{ Http, Middleware };
+use LionRoute\Traits\Singleton;
 
 class Route extends Http {
 
@@ -14,10 +15,9 @@ class Route extends Http {
 
 	protected static array $addMiddleware = [];
 
-	public static function init(int $index = 1): Route {
+	public static function init(int $index = 1): void {
 		self::$index = $index;
 		self::$router = new RouteCollector();
-		return self::getInstance();
 	}
 
 	public static function getRoutes(): array {
@@ -26,8 +26,10 @@ class Route extends Http {
 
 	public static function newMiddleware(array $middleware): void {
 		if (count($middleware) > 0) {
-			foreach ($middleware as $key => $add) {
-				array_push(self::$addMiddleware, new Middleware($add[0], $add[1], $add[2]));
+			foreach ($middleware as $key => $class) {
+				foreach ($class as $key_class => $add) {
+					array_push(self::$addMiddleware, new Middleware($add['name'], $key, $add['method']));
+				}
 			}
 
 			self::createMiddleware();
@@ -55,12 +57,12 @@ class Route extends Http {
 		} catch (HttpRouteNotFoundException $e) {
 			RouteConfig::processOutput([
 				'status' => "error",
-				'message' => "Path not found: {$e->getMessage()}"
+				'message' => $e->getMessage()
 			]);
 		} catch (HttpMethodNotAllowedException $e) {
 			RouteConfig::processOutput([
 				'status' => "error",
-				'message' => "Method not allowed, {$e->getMessage()}"
+				'message' => $e->getMessage()
 			]);
 		}
 	}

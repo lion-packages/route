@@ -35,7 +35,7 @@ composer require lion-framework/lion-route
 ## Usage
 Start your development server
 ```shell
-php -S localhost:40400
+php -S localhost:8000
 ```
 
 It is recommended to start the development server yourself, since software such as `XAMPP, WampServer, BitNami WAMP Stack, Apache Lounge... etc`, provide directories in which to load your PHP projects, This results in running on the browser routes as `'localhost/MyProject/example'`.
@@ -95,7 +95,7 @@ This method accepts the HTTP method the route must match, the route pattern and 
 ```
 :i => :/d+                # numbers only
 :a => :[a-zA-Z0-9]+       # alphanumeric
-:c => :[a-zA-Z0-9+_\-\.]+  # alnumnumeric and + _ - . characters 
+:c => :[a-zA-Z0-9+_\-\.]+  # alnumnumeric and + _ - . characters
 :h => :[a-fA-F0-9]+       # hex
 
 use in routes:
@@ -233,15 +233,19 @@ Route::prefix('reports', function() {
 ```
 
 ### ~~FILTERS~~ MIDDLEWARE
-It's identical to filters, we renamed `filter` to `middleware`. `['auth', Auth::class, 'auth']` is the basic syntax for adding a middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the class being referenced and the third parameter the name of the function it belongs to. <br>
+It is identical to filters, we change the name of filter to middleware. `['name' => 'auth', "method" => 'auth']` is the basic syntax for adding middleware to our RouteCollector object. Each middleware must be encapsulated in an array, where each middleware carries its information within another array. The first parameter is the name of the middleware. The second parameter is the name of the function it belongs to. <br>
 
 ```php
 use LionRoute\Route;
 use App\Http\Middleware\Auth;
 
-Route::init()->newMiddleware([
-    ['auth', Auth::class, 'auth'],
-    ['no-auth', Auth::class, 'noAuth']
+Route::init();
+
+Route::newMiddleware([
+	Auth::class => [
+		['name' => 'auth', "method" => 'auth'],
+		['name' => 'no-auth', 'method' => 'noAuth']
+	]
 ]);
 ```
 

@@ -26,8 +26,10 @@ class Route extends Http {
 
 	public static function newMiddleware(array $middleware): void {
 		if (count($middleware) > 0) {
-			foreach ($middleware as $key => $add) {
-				array_push(self::$addMiddleware, new Middleware($add[0], $add[1], $add[2]));
+			foreach ($middleware as $key => $class) {
+				foreach ($class as $key_class => $add) {
+					array_push(self::$addMiddleware, new Middleware($add['name'], $key, $add['method']));
+				}
 			}
 
 			self::createMiddleware();

@@ -6,7 +6,8 @@ use \Closure;
 use Phroute\Phroute\{ RouteCollector, RouteParser, Dispatcher };
 use Phroute\Phroute\Exception\{ HttpRouteNotFoundException, HttpMethodNotAllowedException };
 use LionRoute\Config\RouteConfig;
-use LionRoute\{ Singleton, Http, Middleware };
+use LionRoute\{ Http, Middleware };
+use LionRoute\Traits\Singleton;
 
 class Route extends Http {
 

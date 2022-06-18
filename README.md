@@ -242,8 +242,10 @@ use App\Http\Middleware\Auth;
 Route::init();
 
 Route::newMiddleware([
-    ['auth', Auth::class, 'auth'],
-    ['no-auth', Auth::class, 'noAuth']
+	Auth::class => [
+		['name' => 'auth', "method" => 'auth'],
+		['name' => 'no-auth', 'method' => 'noAuth']
+	]
 ]);
 ```
 

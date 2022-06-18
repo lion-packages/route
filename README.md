@@ -35,7 +35,7 @@ composer require lion-framework/lion-route
 ## Usage
 Start your development server
 ```shell
-php -S localhost:40400
+php -S localhost:8000
 ```
 
 It is recommended to start the development server yourself, since software such as `XAMPP, WampServer, BitNami WAMP Stack, Apache Lounge... etc`, provide directories in which to load your PHP projects, This results in running on the browser routes as `'localhost/MyProject/example'`.

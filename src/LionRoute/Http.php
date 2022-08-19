@@ -17,6 +17,10 @@ class Http {
 
 	}
 
+	public static function redirect(string $url): void {
+		header("Location: {$url}");
+	}
+
 	public static function prefix(string $prefix_name, Closure $closure): void {
 		self::$original_url_match.= "{$prefix_name}/";
 		self::$url_match.= "{$prefix_name}/";

@@ -346,6 +346,11 @@ Route::prefix('reports', function() {
 });
 ```
 
+### REDIRECT
+```php
+Route::redirect('http://127.0.0.1:8001/example');
+```
+
 ## Credits
 [PHRoute](https://github.com/mrjgreen/phroute)
 

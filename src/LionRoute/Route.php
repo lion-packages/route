@@ -56,12 +56,12 @@ class Route extends Http {
 			);
 		} catch (HttpRouteNotFoundException $e) {
 			RouteConfig::processOutput([
-				'status' => "error",
+				'status' => "route-error",
 				'message' => $e->getMessage()
 			]);
 		} catch (HttpMethodNotAllowedException $e) {
 			RouteConfig::processOutput([
-				'status' => "error",
+				'status' => "route-error",
 				'message' => $e->getMessage()
 			]);
 		}

@@ -3,106 +3,104 @@
 namespace LionRoute\Class;
 
 use \Closure;
+use GuzzleHttp\Client;
 use Phroute\Phroute\RouteCollector;
 use LionRoute\Interface\iHttp;
 
 class Http implements iHttp {
 
+	protected static ?Client $client;
 	protected static RouteCollector $router;
 
-	public static function get(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->get(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
+	private static function executeRoute(string $type, string $uri, Closure|array|string $function, array $options): void {
+		if (count($options) > 0) {
+			self::$router->$type($uri, $function, isset($options[1])
+				? ['before' => $options[0], 'after' => $options[1]]
+				: ['before' => $options[0]]
 			);
 		} else {
-			self::$router->get($url, $function);
+			self::$router->$type($uri, $function);
 		}
 	}
 
-	public static function post(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->post(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->post($url, $function);
+	private static function executeRequest(string $type, string $uri, string $function, array $options): void {
+		self::$router->$type($uri, function() use ($type, $function, $options) {
+			if (in_array($type, ['delete', 'put', 'patch'])) {
+				$str_params = "";
+				$size = count($options['uri_params']) - 1;
+
+				foreach ($options['uri_params'] as $key => $param) {
+					$str_params .= $key === $size ? "/{$param}" : "/{$param}/";
+				}
+
+				$function .= $str_params;
+			}
+
+			return json_decode(self::$client->$type($function, $options)->getBody());
+		});
+	}
+
+	public static function get(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('get', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('get', $uri, $function, $options);
 		}
 	}
 
-	public static function put(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->put(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->put($url, $function);
+	public static function post(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('post', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('post', $uri, $function, $options);
 		}
 	}
 
-	public static function delete(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->delete(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->delete($url, $function);
+	public static function put(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('put', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('put', $uri, $function, $options);
 		}
 	}
 
-	public static function any(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->any(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->any($url, $function);
+	public static function delete(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('delete', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('delete', $uri, $function, $options);
 		}
 	}
 
-	public static function head(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->head(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->head($url, $function);
+	public static function any(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('any', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('any', $uri, $function, $options);
 		}
 	}
 
-	public static function options(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->options(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->options($url, $function);
+	public static function head(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('head', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('head', $uri, $function, $options);
 		}
 	}
 
-	public static function patch(string $url, Closure|array|string $function, array $filters = []): void {
-		if (count($filters) > 0) {
-			self::$router->patch(
-				$url,
-				$function,
-				isset($filters[1]) ? ['before' => $filters[0], 'after' => $filters[1]] : ['before' => $filters[0]]
-			);
-		} else {
-			self::$router->patch($url, $function);
+	public static function options(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('options', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('options', $uri, $function, $options);
+		}
+	}
+
+	public static function patch(string $uri, Closure|array|string $function, array $options = []): void {
+		if (gettype($function) === 'object' || gettype($function) === 'array') {
+			self::executeRoute('patch', $uri, $function, $options);
+		} elseif (gettype($function) === 'string') {
+			self::executeRequest('patch', $uri, $function, $options);
 		}
 	}
 

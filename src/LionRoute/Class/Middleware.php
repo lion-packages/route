@@ -1,6 +1,6 @@
 <?php
 
-namespace LionRoute;
+namespace LionRoute\Class;
 
 class Middleware {
 
@@ -10,34 +10,34 @@ class Middleware {
 		private ?string $methodClass = null
 	) {}
 
-    public function getNewObjectClass() {
+    public function newObject() {
         $objectClass = $this->getObjectClass();
         return new $objectClass();
     }
 
-    public function getMiddlewareName() {
+    public function getMiddlewareName(): ?string {
         return $this->middlewareName;
     }
 
-    public function setMiddlewareName($middlewareName) {
+    public function setMiddlewareName(?string $middlewareName): Middleware {
         $this->middlewareName = $middlewareName;
         return $this;
     }
 
-    public function getObjectClass() {
+    public function getObjectClass(): ?string {
         return $this->objectClass;
     }
 
-    public function setObjectClass($objectClass) {
+    public function setObjectClass(?string $objectClass): Middleware {
         $this->objectClass = $objectClass;
         return $this;
     }
 
-    public function getMethodClass() {
+    public function getMethodClass(): ?string {
         return $this->methodClass;
     }
 
-    public function setMethodClass($methodClass) {
+    public function setMethodClass(?string $methodClass): Middleware {
         $this->methodClass = $methodClass;
         return $this;
     }

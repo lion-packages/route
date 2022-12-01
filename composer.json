@@ -1,5 +1,5 @@
 {
-    "name": "lion-framework/lion-route",
+    "name": "lion/route",
     "description": "This library has a fast router usage with regular expressions.",
     "type": "library",
     "license": "MIT",

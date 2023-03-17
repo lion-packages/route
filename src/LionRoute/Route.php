@@ -59,8 +59,12 @@ class Route extends Http {
 		return self::$router->getData()->getStaticRoutes();
 	}
 
-	public static function getFilters() {
+	public static function getFilters(): array {
 		return self::$router->getData()->getFilters();
+	}
+
+	public static function getVariables(): array {
+		return self::$router->getData()->getVariableRoutes();
 	}
 
 	public static function addMiddleware(array $middleware): void {

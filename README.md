@@ -9,5 +9,4 @@ composer require lion/route
 ```
 
 ## License
-
-Copyright © 2022 [MIT License](https://github.com/Sleon4/Lion-Security/blob/main/LICENSE)
+The Lion-Route library is open source software licensed under the [MIT License](https://github.com/Sleon4/Lion-Security/blob/main/LICENSE).

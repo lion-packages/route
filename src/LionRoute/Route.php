@@ -41,11 +41,20 @@ class Route extends Http {
 		$list_middleware = [];
 
 		if ($count === 1) {
-			$list_middleware = ['before' => $middleware[0]];
+			$list_middleware = [
+				'before' => $middleware[0]
+			];
 		} elseif ($count === 2) {
-			$list_middleware = ['before' => $middleware[0], 'after' => $middleware[1]];
+			$list_middleware = [
+				'before' => $middleware[0],
+				'after' => $middleware[1]
+			];
 		} elseif ($count >= 3) {
-			$list_middleware = ['before' => $middleware[0], 'after' => $middleware[1], 'prefix' => $middleware[2]];
+			$list_middleware = [
+				'before' => $middleware[0],
+				'after' => $middleware[1],
+				'prefix' => $middleware[2]
+			];
 		}
 
 		self::$router->group($list_middleware, function($router) use ($closure) {

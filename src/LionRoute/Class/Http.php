@@ -24,20 +24,59 @@ class Http implements iHttp {
 	}
 
 	private static function executeRequest(string $type, string $uri, string $function, array $options): void {
-		self::$router->$type($uri, function() use ($type, $function, $options) {
-			if (in_array($type, ['delete', 'put', 'patch'])) {
-				$str_params = "";
-				$size = count($options['uri_params']) - 1;
+		if (isset($options['middleware'])) {
+			$count = count($options['middleware']);
+			$list_middleware = [];
 
-				foreach ($options['uri_params'] as $key => $param) {
-					$str_params .= $key === $size ? "/{$param}" : "/{$param}/";
-				}
-
-				$function .= $str_params;
+			if ($count === 1) {
+				$list_middleware = [
+					'before' => $options['middleware'][0]
+				];
+			} elseif ($count === 2) {
+				$list_middleware = [
+					'before' => $options['middleware'][0],
+					'after' => $options['middleware'][1]
+				];
+			} elseif ($count >= 3) {
+				$list_middleware = [
+					'before' => $options['middleware'][0],
+					'after' => $options['middleware'][1],
+					'prefix' => $options['middleware'][2]
+				];
 			}
 
-			return json_decode(self::$client->$type($function, $options)->getBody());
-		});
+			self::$router->group($list_middleware, function($router) use ($type, $uri, $function, $options) {
+				self::$router->$type($uri, function() use ($type, $function, $options) {
+					if (in_array($type, ['delete', 'put', 'patch'])) {
+						$str_params = "";
+						$size = count($options['uri_params']) - 1;
+
+						foreach ($options['uri_params'] as $key => $param) {
+							$str_params .= $key === $size ? "/{$param}" : "/{$param}/";
+						}
+
+						$function .= $str_params;
+					}
+
+					return json_decode(self::$client->$type($function, $options)->getBody());
+				});
+			});
+		} else {
+			self::$router->$type($uri, function() use ($type, $function, $options) {
+				if (in_array($type, ['delete', 'put', 'patch'])) {
+					$str_params = "";
+					$size = count($options['uri_params']) - 1;
+
+					foreach ($options['uri_params'] as $key => $param) {
+						$str_params .= $key === $size ? "/{$param}" : "/{$param}/";
+					}
+
+					$function .= $str_params;
+				}
+
+				return json_decode(self::$client->$type($function, $options)->getBody());
+			});
+		}
 	}
 
 	public static function get(string $uri, Closure|array|string $function, array $options = []): void {

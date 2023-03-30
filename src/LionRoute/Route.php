@@ -18,6 +18,7 @@ class Route extends Http {
 
 	protected static array $addMiddleware = [];
 	private static int $index;
+	private static bool $active_function = false;
 
 	public static function init(int $index = 1): void {
 		self::$index = $index;
@@ -25,6 +26,10 @@ class Route extends Http {
 	}
 
 	// ---------------------------------------------------------------------------------------------
+
+	public static function addLog(string $function_name): void {
+		self::$active_function = function_exists($function_name) ? true : false;
+	}
 
 	public static function redirect(string $url): void {
 		header("Location: {$url}");
@@ -101,11 +106,19 @@ class Route extends Http {
 				)
 			);
 		} catch (HttpRouteNotFoundException $e) {
+			if (self::$active_function) {
+				logger($e->getMessage(), 'error');
+			}
+
 			Screen::show([
 				'status' => "route-error",
 				'message' => $e->getMessage()
 			]);
 		} catch (HttpMethodNotAllowedException $e) {
+			if (self::$active_function) {
+				logger($e->getMessage(), 'error');
+			}
+
 			Screen::show([
 				'status' => "route-error",
 				'message' => $e->getMessage()

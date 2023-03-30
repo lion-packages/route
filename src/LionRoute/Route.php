@@ -97,14 +97,20 @@ class Route extends Http {
 		}
 	}
 
-	public static function dispatch(): void {
+	public static function dispatch(bool $add_log = true): void {
 		try {
-			Screen::show(
-				(new Dispatcher(self::$router->getData()))->dispatch(
-					$_SERVER['REQUEST_METHOD'],
-					Screen::capture(self::$index)
-				)
+			$response = (new Dispatcher(self::$router->getData()))->dispatch(
+				$_SERVER['REQUEST_METHOD'],
+				Screen::capture(self::$index)
 			);
+
+			if ($add_log) {
+				if (self::$active_function) {
+					logger($response, 'info');
+				}
+			}
+
+			Screen::show($response);
 		} catch (HttpRouteNotFoundException $e) {
 			if (self::$active_function) {
 				logger($e->getMessage(), 'error');

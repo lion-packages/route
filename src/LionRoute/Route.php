@@ -106,7 +106,7 @@ class Route extends Http {
 
 			if ($add_log) {
 				if (self::$active_function) {
-					logger($response, 'info');
+					logger(json_encode($response), 'info');
 				}
 			}
 

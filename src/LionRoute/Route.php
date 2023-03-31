@@ -27,10 +27,6 @@ class Route extends Http {
 
 	// ---------------------------------------------------------------------------------------------
 
-	public static function addLog(string $function_name): void {
-		self::$active_function = function_exists($function_name) ? true : false;
-	}
-
 	public static function redirect(string $url): void {
 		header("Location: {$url}");
 	}
@@ -68,6 +64,10 @@ class Route extends Http {
 	}
 
 	// ---------------------------------------------------------------------------------------------
+
+	public static function addLog(): void {
+		self::$active_function = function_exists("logger") ? true : false;
+	}
 
 	public static function getRoutes(): array {
 		return self::$router->getData()->getStaticRoutes();

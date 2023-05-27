@@ -23,6 +23,7 @@ class Route extends Http {
 	public static function init(int $index = 1): void {
 		self::$index = $index;
 		self::$router = new RouteCollector();
+		$_SERVER['REQUEST_URI'] = explode('?', $_SERVER['REQUEST_URI'])[0];
 	}
 
 	// ---------------------------------------------------------------------------------------------

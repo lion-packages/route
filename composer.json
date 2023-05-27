@@ -8,11 +8,6 @@
             "LionRoute\\": "src/LionRoute/"
         }
     },
-    "authors": [
-        {
-            "name": "Sergio León"
-        }
-    ],
     "require": {
         "php": ">=8.1",
         "phroute/phroute": "^2.2",

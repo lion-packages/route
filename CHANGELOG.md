@@ -1,5 +1,11 @@
 # Release Notes
 
+## [v8.5.0](https://github.com/Sleon4/Lion-Route/compare/v8.4.0...v8.5.0) (2023-06-05)
+
+### Added
+- function has been added to obtain url with the available http methods and filters
+- added middleware imported from http functions
+
 ## [v8.4.0](https://github.com/Sleon4/Lion-Route/compare/v8.3.0...v8.4.0) (2023-05-27)
 
 ### Added

@@ -3,18 +3,16 @@
 namespace LionRoute;
 
 use \Closure;
-use LionRoute\Class\Http;
 use LionRoute\Class\Middleware;
 use LionRoute\Class\Screen;
-use LionRoute\Traits\Singleton;
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\RouteCollector;
 
-class Route extends Http {
+class Route extends \LionRoute\Class\Http {
 
-	use Singleton;
+	use Traits\Singleton;
 
 	protected static array $addMiddleware = [];
 	private static int $index;
@@ -43,30 +41,33 @@ class Route extends Http {
 		self::$prefix = $previousPrefix;
 	}
 
-	public static function middleware(array $middleware, Closure $closure): void {
-		$count = count($middleware);
+	public static function middleware(array $middlewares, Closure $closure): void {
+		array_push(self::$filters, ...$middlewares);
+		$count = count($middlewares);
 		$list_middleware = [];
 
 		if ($count === 1) {
 			$list_middleware = [
-				'before' => $middleware[0]
+				'before' => $middlewares[0]
 			];
 		} elseif ($count === 2) {
 			$list_middleware = [
-				'before' => $middleware[0],
-				'after' => $middleware[1]
+				'before' => $middlewares[0],
+				'after' => $middlewares[1]
 			];
 		} elseif ($count >= 3) {
 			$list_middleware = [
-				'before' => $middleware[0],
-				'after' => $middleware[1],
-				'prefix' => $middleware[2]
+				'before' => $middlewares[0],
+				'after' => $middlewares[1],
+				'prefix' => $middlewares[2]
 			];
 		}
 
 		self::$router->group($list_middleware, function($router) use ($closure) {
 			$closure();
 		});
+
+		self::$filters = [];
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -75,48 +76,12 @@ class Route extends Http {
 		self::$active_function = function_exists("logger") ? true : false;
 	}
 
-	private static function extractParameters() {
-		$urls = array_filter(self::getFullRoutes(), fn($url) => preg_match('/\{.*\}/', $url));
-		$params = [];
-		$arrayUrl = explode('/', $_SERVER['REQUEST_URI']);
-		$sizeUrl = count($arrayUrl);
-
-		foreach ($urls as $position => $uri) {
-			$arrayUri = explode("/", "/{$uri}");
-			$sizeUri = count($arrayUri);
-
-			if ($sizeUrl === $sizeUri) {
-				$newArrayUri = array_filter($arrayUri, fn($url) => !preg_match('/\{.*\}/', $url) && $url != "");
-				$sizeItemUri = 0;
-
-				foreach ($newArrayUri as $key => $itemUri) {
-					if ((bool) preg_match("/" . $itemUri . "/i", $_SERVER['REQUEST_URI'])) {
-						$sizeItemUri++;
-					}
-				}
-
-				if ($sizeItemUri === count($newArrayUri)) {
-					foreach ($arrayUri as $keyPosition => $value) {
-						if ((bool) preg_match('/^\{.*\}$/', $value)) {
-							$split = explode(":", str_replace(['{', '}'], '', $value));
-							$params[$split[0]] = $arrayUrl[$keyPosition];
-						}
-					}
-				}
-			}
-		}
-
-		foreach ($params as $key => $param) {
-			self::$values[$key] = $param;
-		}
-	}
-
 	public static function getValues(): array {
 		return self::$values;
 	}
 
 	public static function getFullRoutes(): array {
-		return array_map(fn($url) => str_replace("//", "/", $url), self::$routes);
+		return self::$routes;
 	}
 
 	public static function getRoutes(): array {
@@ -148,8 +113,6 @@ class Route extends Http {
 	}
 
 	public static function dispatch(bool $add_log = true): void {
-		self::extractParameters();
-
 		try {
 			$response = (new Dispatcher(self::$router->getData()))->dispatch(
 				$_SERVER['REQUEST_METHOD'],

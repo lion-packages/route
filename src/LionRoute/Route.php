@@ -32,10 +32,15 @@ class Route extends Http {
 		header("Location: {$url}");
 	}
 
-	public static function prefix(string $prefix_name, Closure $closure): void {
-		self::$router->group(['prefix' => $prefix_name], function($router) use ($closure) {
+	public static function prefix(string $name, Closure $closure): void {
+		$previousPrefix = self::$prefix;
+		self::$prefix .= "{$name}/";
+
+		self::$router->group(['prefix' => $name], function($router) use ($closure) {
 			$closure();
 		});
+
+		self::$prefix = $previousPrefix;
 	}
 
 	public static function middleware(array $middleware, Closure $closure): void {
@@ -70,6 +75,50 @@ class Route extends Http {
 		self::$active_function = function_exists("logger") ? true : false;
 	}
 
+	private static function extractParameters() {
+		$urls = array_filter(self::getFullRoutes(), fn($url) => preg_match('/\{.*\}/', $url));
+		$params = [];
+		$arrayUrl = explode('/', $_SERVER['REQUEST_URI']);
+		$sizeUrl = count($arrayUrl);
+
+		foreach ($urls as $position => $uri) {
+			$arrayUri = explode("/", "/{$uri}");
+			$sizeUri = count($arrayUri);
+
+			if ($sizeUrl === $sizeUri) {
+				$newArrayUri = array_filter($arrayUri, fn($url) => !preg_match('/\{.*\}/', $url) && $url != "");
+				$sizeItemUri = 0;
+
+				foreach ($newArrayUri as $key => $itemUri) {
+					if ((bool) preg_match("/" . $itemUri . "/i", $_SERVER['REQUEST_URI'])) {
+						$sizeItemUri++;
+					}
+				}
+
+				if ($sizeItemUri === count($newArrayUri)) {
+					foreach ($arrayUri as $keyPosition => $value) {
+						if ((bool) preg_match('/^\{.*\}$/', $value)) {
+							$split = explode(":", str_replace(['{', '}'], '', $value));
+							$params[$split[0]] = $arrayUrl[$keyPosition];
+						}
+					}
+				}
+			}
+		}
+
+		foreach ($params as $key => $param) {
+			self::$values[$key] = $param;
+		}
+	}
+
+	public static function getValues(): array {
+		return self::$values;
+	}
+
+	public static function getFullRoutes(): array {
+		return array_map(fn($url) => str_replace("//", "/", $url), self::$routes);
+	}
+
 	public static function getRoutes(): array {
 		return self::$router->getData()->getStaticRoutes();
 	}
@@ -99,6 +148,8 @@ class Route extends Http {
 	}
 
 	public static function dispatch(bool $add_log = true): void {
+		self::extractParameters();
+
 		try {
 			$response = (new Dispatcher(self::$router->getData()))->dispatch(
 				$_SERVER['REQUEST_METHOD'],
@@ -117,19 +168,13 @@ class Route extends Http {
 				logger($e->getMessage(), 'error');
 			}
 
-			Screen::show([
-				'status' => "route-error",
-				'message' => $e->getMessage()
-			]);
+			Screen::show(['status' => "route-error", 'message' => $e->getMessage()]);
 		} catch (HttpMethodNotAllowedException $e) {
 			if (self::$active_function) {
 				logger($e->getMessage(), 'error');
 			}
 
-			Screen::show([
-				'status' => "route-error",
-				'message' => $e->getMessage()
-			]);
+			Screen::show(['status' => "route-error", 'message' => $e->getMessage()]);
 		}
 	}
 

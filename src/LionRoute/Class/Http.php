@@ -12,6 +12,10 @@ class Http implements iHttp {
 	protected static ?Client $client;
 	protected static RouteCollector $router;
 
+	protected static array $values = [];
+	protected static array $routes = [];
+	protected static string $prefix = "";
+
 	private static function executeRoute(string $type, string $uri, Closure|array|string $function, array $options): void {
 		if (count($options) > 0) {
 			self::$router->$type($uri, $function, isset($options[1])
@@ -80,6 +84,8 @@ class Http implements iHttp {
 	}
 
 	public static function get(string $uri, Closure|array|string $function, array $options = []): void {
+        self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('get', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {
@@ -88,6 +94,8 @@ class Http implements iHttp {
 	}
 
 	public static function post(string $uri, Closure|array|string $function, array $options = []): void {
+		self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('post', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {
@@ -96,6 +104,8 @@ class Http implements iHttp {
 	}
 
 	public static function put(string $uri, Closure|array|string $function, array $options = []): void {
+		self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('put', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {
@@ -104,6 +114,8 @@ class Http implements iHttp {
 	}
 
 	public static function delete(string $uri, Closure|array|string $function, array $options = []): void {
+		self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('delete', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {
@@ -112,6 +124,8 @@ class Http implements iHttp {
 	}
 
 	public static function any(string $uri, Closure|array|string $function, array $options = []): void {
+		self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('any', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {
@@ -120,6 +134,8 @@ class Http implements iHttp {
 	}
 
 	public static function head(string $uri, Closure|array|string $function, array $options = []): void {
+		self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('head', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {
@@ -128,6 +144,8 @@ class Http implements iHttp {
 	}
 
 	public static function options(string $uri, Closure|array|string $function, array $options = []): void {
+		self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('options', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {
@@ -136,6 +154,8 @@ class Http implements iHttp {
 	}
 
 	public static function patch(string $uri, Closure|array|string $function, array $options = []): void {
+		self::$routes[] = self::$prefix . $uri;
+
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('patch', $uri, $function, $options);
 		} elseif (gettype($function) === 'string') {

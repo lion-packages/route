@@ -17,7 +17,7 @@ class Http implements iHttp {
 	protected static array $filters = [];
 	protected static string $prefix = "";
 
-	private static function extractParameters() {
+	protected static function extractParameters() {
 		$urls = array_filter(array_keys(self::$routes), fn($url) => preg_match('/\{.*\}/', $url));
 		$params = [];
 		$arrayUrl = explode('/', $_SERVER['REQUEST_URI']);
@@ -133,8 +133,6 @@ class Http implements iHttp {
 				...self::$filters
 			];
 		}
-
-        self::extractParameters();
 	}
 
 	public static function get(string $uri, Closure|array|string $function, array $options = []): void {

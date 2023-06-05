@@ -113,6 +113,8 @@ class Route extends \LionRoute\Class\Http {
 	}
 
 	public static function dispatch(bool $add_log = true): void {
+		self::extractParameters();
+
 		try {
 			$response = (new Dispatcher(self::$router->getData()))->dispatch(
 				$_SERVER['REQUEST_METHOD'],

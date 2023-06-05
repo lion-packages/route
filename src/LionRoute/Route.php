@@ -76,8 +76,8 @@ class Route extends \LionRoute\Class\Http {
 		self::$active_function = function_exists("logger") ? true : false;
 	}
 
-	public static function getValues(): array {
-		return self::$values;
+	private static function getParams(): array {
+		return self::$params;
 	}
 
 	public static function getFullRoutes(): array {
@@ -113,8 +113,6 @@ class Route extends \LionRoute\Class\Http {
 	}
 
 	public static function dispatch(bool $add_log = true): void {
-		self::extractParameters();
-
 		try {
 			$response = (new Dispatcher(self::$router->getData()))->dispatch(
 				$_SERVER['REQUEST_METHOD'],

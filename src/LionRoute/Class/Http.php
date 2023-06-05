@@ -12,46 +12,10 @@ class Http implements iHttp {
 	protected static ?Client $client;
 	protected static RouteCollector $router;
 
-	protected static array $values = [];
 	protected static array $routes = [];
 	protected static array $filters = [];
+	protected static array $params = [];
 	protected static string $prefix = "";
-
-	protected static function extractParameters() {
-		$urls = array_filter(array_keys(self::$routes), fn($url) => preg_match('/\{.*\}/', $url));
-		$params = [];
-		$arrayUrl = explode('/', $_SERVER['REQUEST_URI']);
-		$sizeUrl = count($arrayUrl);
-
-		foreach ($urls as $position => $uri) {
-			$arrayUri = explode("/", "/{$uri}");
-			$sizeUri = count($arrayUri);
-
-			if ($sizeUrl === $sizeUri) {
-				$newArrayUri = array_filter($arrayUri, fn($url) => !preg_match('/\{.*\}/', $url) && $url != "");
-				$sizeItemUri = 0;
-
-				foreach ($newArrayUri as $key => $itemUri) {
-					if ((bool) preg_match("/" . $itemUri . "/i", $_SERVER['REQUEST_URI'])) {
-						$sizeItemUri++;
-					}
-				}
-
-				if ($sizeItemUri === count($newArrayUri)) {
-					foreach ($arrayUri as $keyPosition => $value) {
-						if ((bool) preg_match('/^\{.*\}$/', $value)) {
-							$split = explode(":", str_replace(['{', '}'], '', $value));
-							$params[$split[0]] = $arrayUrl[$keyPosition];
-						}
-					}
-				}
-			}
-		}
-
-		foreach ($params as $key => $param) {
-			self::$values[$key] = $param;
-		}
-	}
 
 	private static function executeRoute(string $type, string $uri, Closure|array|string $function, array $options): void {
 		if (count($options) > 0) {

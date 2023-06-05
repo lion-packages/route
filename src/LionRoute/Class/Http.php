@@ -95,7 +95,7 @@ class Http implements iHttp {
 						'name' => $function[0],
 						'function' => $function[1],
 					],
-					'callback' => is_array($function) ? false : true,
+					'callback' => is_array($function) ? false : (is_string($function) ? false : true),
 					'request' => !is_string($function) ? false : [
 						'url' => $function
 					]
@@ -113,7 +113,7 @@ class Http implements iHttp {
 					'name' => $function[0],
 					'function' => $function[1],
 				],
-				'callback' => is_array($function) ? false : true,
+				'callback' => is_array($function) ? false : (is_string($function) ? false : true),
 				'request' => !is_string($function) ? false : [
 					'url' => $function
 				]

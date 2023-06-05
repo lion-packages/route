@@ -120,96 +120,89 @@ class Http implements iHttp {
 		}
 	}
 
-	private static function addRoutes(string $uri, $method): void {
+	private static function addRoutes(string $uri, string $method, array $options): void {
 		$new_uri = str_replace("//", "/", (self::$prefix . $uri));
 
 		if (!isset(self::$routes[$new_uri][$method])) {
 			self::$routes[$new_uri][$method] = [
-				'filters' => self::$filters
+				'filters' => [...self::$filters, ...$options]
 			];
 		} else {
 			self::$routes[$new_uri][$method]['filters'] = [
 				...self::$routes[$new_uri][$method]['filters'],
-				...self::$filters
+				...self::$filters,
+				...$options
 			];
 		}
 	}
 
 	public static function get(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "GET");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('get', $uri, $function, $options);
+			self::addRoutes($uri, "GET", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('get', $uri, $function, $options);
 		}
 	}
 
 	public static function post(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "POST");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('post', $uri, $function, $options);
+			self::addRoutes($uri, "POST", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('post', $uri, $function, $options);
 		}
 	}
 
 	public static function put(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "PUT");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('put', $uri, $function, $options);
+			self::addRoutes($uri, "PUT", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('put', $uri, $function, $options);
 		}
 	}
 
 	public static function delete(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "DELETE");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('delete', $uri, $function, $options);
+			self::addRoutes($uri, "DELETE", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('delete', $uri, $function, $options);
 		}
 	}
 
 	public static function any(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "ANY");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('any', $uri, $function, $options);
+			self::addRoutes($uri, "ANY", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('any', $uri, $function, $options);
 		}
 	}
 
 	public static function head(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "HEAD");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('head', $uri, $function, $options);
+			self::addRoutes($uri, "HEAD", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('head', $uri, $function, $options);
 		}
 	}
 
 	public static function options(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "OPTIONS");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('options', $uri, $function, $options);
+			self::addRoutes($uri, "OPTIONS", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('options', $uri, $function, $options);
 		}
 	}
 
 	public static function patch(string $uri, Closure|array|string $function, array $options = []): void {
-		self::addRoutes($uri, "PATCH");
-
 		if (gettype($function) === 'object' || gettype($function) === 'array') {
 			self::executeRoute('patch', $uri, $function, $options);
+			self::addRoutes($uri, "PATCH", $options);
 		} elseif (gettype($function) === 'string') {
 			self::executeRequest('patch', $uri, $function, $options);
 		}

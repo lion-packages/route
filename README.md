@@ -22,4 +22,4 @@ composer require lion/route
 
 ## License
 
-The Lion-Route library is open source software licensed under the [MIT License](https://github.com/Sleon4/Lion-Route/blob/main/LICENSE).
+The <strong>route</strong> library is open source software licensed under the [MIT License](https://github.com/lion-packages/route/blob/main/LICENSE).

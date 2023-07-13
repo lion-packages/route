@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+    app:
+        container_name: lion-route-app
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "8000:8000"
+        volumes:
+            - ./:/var/www/html
+        networks:
+            - lion_route
+networks:
+    lion_route:

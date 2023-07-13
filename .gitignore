@@ -1,6 +1,5 @@
 /vendor/
 /app/
-/routes/
 /public/
 .htaccess
 index.php

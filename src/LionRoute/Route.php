@@ -42,20 +42,26 @@ class Route extends \LionRoute\Class\Http {
 	}
 
 	public static function middleware(array $middlewares, Closure $closure): void {
-		array_push(self::$filters, ...$middlewares);
 		$count = count($middlewares);
 		$list_middleware = [];
 
 		if ($count === 1) {
+			array_push(self::$filters, ...$middlewares);
+
 			$list_middleware = [
 				'before' => $middlewares[0]
 			];
 		} elseif ($count === 2) {
+			array_push(self::$filters, ...$middlewares);
+
 			$list_middleware = [
 				'before' => $middlewares[0],
 				'after' => $middlewares[1]
 			];
 		} elseif ($count >= 3) {
+			array_push(self::$filters, $middlewares[0]);
+			array_push(self::$filters, $middlewares[1]);
+
 			$list_middleware = [
 				'before' => $middlewares[0],
 				'after' => $middlewares[1],

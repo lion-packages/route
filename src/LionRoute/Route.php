@@ -61,6 +61,7 @@ class Route extends \LionRoute\Class\Http {
 		} elseif ($count >= 3) {
 			array_push(self::$filters, $middlewares[0]);
 			array_push(self::$filters, $middlewares[1]);
+			self::$prefix .= "{$middlewares[2]}/";
 
 			$list_middleware = [
 				'before' => $middlewares[0],

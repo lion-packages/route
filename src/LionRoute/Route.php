@@ -42,6 +42,7 @@ class Route extends \LionRoute\Class\Http {
 	}
 
 	public static function middleware(array $middlewares, Closure $closure): void {
+		$previousPrefix = self::$prefix;
 		$count = count($middlewares);
 		$list_middleware = [];
 
@@ -75,6 +76,7 @@ class Route extends \LionRoute\Class\Http {
 		});
 
 		self::$filters = [];
+		self::$prefix = $previousPrefix;
 	}
 
 	// ---------------------------------------------------------------------------------------------

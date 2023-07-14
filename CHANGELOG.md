@@ -1,6 +1,6 @@
 # Release Notes
 
-## [v8.6.0](https://github.com/lion-packages/route/compare/v8.5.0...v8.6.0) (2023-07-13)
+## [v8.6.0](https://github.com/lion-packages/route/compare/v8.5.0...v8.6.0) (2023-07-14)
 
 ### Changed
 - middleware push has been validated in the middleware method of the LionRoute\Route class

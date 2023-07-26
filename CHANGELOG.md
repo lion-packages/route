@@ -1,5 +1,10 @@
 # Release Notes
 
+## [v8.7.0](https://github.com/lion-packages/route/compare/v8.6.0...v8.7.0) (2023-07-26)
+
+## Added
+- added match function to support multiple http methods for routes
+
 ## [v8.6.0](https://github.com/lion-packages/route/compare/v8.5.0...v8.6.0) (2023-07-14)
 
 ### Changed

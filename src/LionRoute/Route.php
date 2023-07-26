@@ -26,6 +26,18 @@ class Route extends \LionRoute\Class\Http {
 
 	// ---------------------------------------------------------------------------------------------
 
+	public static function match(array $methods, string $uri, Closure|array|string $function, array $options = []) {
+		foreach ($methods as $key => $method) {
+			if (gettype($function) === 'object' || gettype($function) === 'array') {
+				self::executeRoute(strtolower($method), $uri, $function, $options);
+				self::addRoutes($uri, strtoupper($method), $function, $options);
+			} elseif (gettype($function) === 'string') {
+				self::executeRequest(strtolower($method), $uri, $function, $options);
+				self::addRoutes($uri, strtoupper($method), $function, isset($options['middleware']) ? $options['middleware'] : $options);
+			}
+		}
+	}
+
 	public static function redirect(string $url): void {
 		header("Location: {$url}");
 	}

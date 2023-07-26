@@ -17,7 +17,7 @@ class Http implements iHttp {
 	protected static array $params = [];
 	protected static string $prefix = "";
 
-	private static function executeRoute(string $type, string $uri, Closure|array|string $function, array $options): void {
+	protected static function executeRoute(string $type, string $uri, Closure|array|string $function, array $options): void {
 		if (count($options) > 0) {
 			self::$router->$type($uri, $function, isset($options[1])
 				? ['before' => $options[0], 'after' => $options[1]]
@@ -28,7 +28,7 @@ class Http implements iHttp {
 		}
 	}
 
-	private static function executeRequest(string $type, string $uri, string $function, array $options): void {
+	protected static function executeRequest(string $type, string $uri, string $function, array $options): void {
 		if (isset($options['middleware'])) {
 			$count = count($options['middleware']);
 			$list_middleware = [];
@@ -84,7 +84,7 @@ class Http implements iHttp {
 		}
 	}
 
-	private static function addRoutes(string $uri, string $method, Closure|array|string $function, array $options): void {
+	protected static function addRoutes(string $uri, string $method, Closure|array|string $function, array $options): void {
 		$new_uri = str_replace("//", "/", (self::$prefix . $uri));
 
 		if (!isset(self::$routes[$new_uri][$method])) {

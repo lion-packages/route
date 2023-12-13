@@ -39,7 +39,7 @@ class Route
 	 * */
 	public static function init(int $index = 1): void
 	{
-		self::$uri = explode('?', $_SERVER['REQUEST_URI'])[0];
+		self::$uri = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
 		self::$index = $index;
 		self::$router = new RouteCollector();
 	}

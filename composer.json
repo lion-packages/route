@@ -8,6 +8,11 @@
             "LionRoute\\": "src/LionRoute/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": ">=8.2",
         "phroute/phroute": "^2.2"

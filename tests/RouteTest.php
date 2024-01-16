@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Lion\Route\Route;
-use LionTest\Test;
+use Lion\Test\Test;
 use Tests\Provider\HttpMethodsProviderTrait;
 
 class RouteTest extends Test

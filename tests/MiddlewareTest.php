@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use LionRoute\Middleware;
+use Lion\Route\Middleware;
 use LionTest\Test;
 
 class MiddlewareTest extends Test

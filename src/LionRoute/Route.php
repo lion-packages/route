@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LionRoute;
+namespace Lion\Route;
 
 use Closure;
-use LionRoute\Middleware;
+use Lion\Route\Middleware;
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;

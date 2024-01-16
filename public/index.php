@@ -4,7 +4,7 @@ require_once(__DIR__ . './../vendor/autoload.php');
 
 header('Content-Type: application/json');
 
-use LionRoute\Route;
+use Lion\Route\Route;
 
 $content = json_decode(file_get_contents("php://input"), true);
 $_POST = $content === null ? $_POST : $content;

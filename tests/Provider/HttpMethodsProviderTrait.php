@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Provider;
 
-use LionRoute\Route;
+use Lion\Route\Route;
 
 trait HttpMethodsProviderTrait
 {

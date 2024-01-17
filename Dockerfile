@@ -8,7 +8,7 @@ RUN apt-get update -y \
     && pecl install ev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install mbstring gd zip \
+RUN docker-php-ext-install mbstring gd pdo_mysql mysqli zip \
     && docker-php-ext-enable gd zip
 
 RUN a2enmod rewrite \

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lion\Route;
 
 use Closure;
+use DI\ContainerBuilder;
 use Lion\Route\Middleware;
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
@@ -22,17 +23,18 @@ class Route
 	const OPTIONS = 'OPTIONS';
 	const PATCH = 'PATCH';
 
-	private const PREFIX = 'prefix';
-	private const AFTER = 'after';
-	private const BEFORE = 'before';
+	protected const PREFIX = 'prefix';
+	protected const AFTER = 'after';
+	protected const BEFORE = 'before';
 
-	private static RouteCollector $router;
+	protected static RouteCollector $router;
+    protected static $null;
 
-	private static string $uri;
-	private static int $index;
-	private static array $routes = [];
-	private static array $filters = [];
-	private static string $prefix = '';
+	protected static string $uri;
+	protected static int $index;
+	protected static array $routes = [];
+	protected static array $filters = [];
+	protected static string $prefix = '';
 
 	/**
 	 * Initialize router settings
@@ -65,7 +67,7 @@ class Route
 	/**
 	 * Add the defined routes to the router
 	 * */
-	private static function addRoutes(string $uri, string $method, Closure|array|string $function, array $options): void
+	private static function addRoutes(string $uri, string $method, Closure|array $function, array $options): void
 	{
 		$newUri = str_replace("//", "/", (self::$prefix . $uri));
 		$callback = is_array($function) ? false : (is_string($function) ? false : true);
@@ -148,11 +150,15 @@ class Route
 	public static function dispatch(): void
 	{
 		try {
-			$response = (new Dispatcher(self::$router->getData()))
-				->dispatch(
-					$_SERVER['REQUEST_METHOD'],
-					implode('/', array_slice(explode('/', self::$uri), self::$index))
-				);
+            $dispatch = new Dispatcher(
+                self::$router->getData(),
+                new RouterResolver((new ContainerBuilder())->useAutowiring(true)->useAttributes(true)->build())
+            );
+
+			$response = $dispatch->dispatch(
+				$_SERVER['REQUEST_METHOD'],
+				implode('/', array_slice(explode('/', self::$uri), self::$index))
+			);
 
 			die(json_encode($response));
 		} catch (HttpRouteNotFoundException $e) {
@@ -165,7 +171,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP GET protocol
 	 * */
-	public static function get(string $uri, Closure|array|string $function, array $options = []): void
+	public static function get(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::GET), $uri, $function, $options);
 		self::addRoutes($uri, self::GET, $function, $options);
@@ -174,7 +180,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP POST protocol
 	 * */
-	public static function post(string $uri, Closure|array|string $function, array $options = []): void
+	public static function post(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::POST), $uri, $function, $options);
 		self::addRoutes($uri, self::POST, $function, $options);
@@ -183,7 +189,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP PUT protocol
 	 * */
-	public static function put(string $uri, Closure|array|string $function, array $options = []): void
+	public static function put(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::PUT), $uri, $function, $options);
 		self::addRoutes($uri, self::PUT, $function, $options);
@@ -192,7 +198,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP DELETE protocol
 	 * */
-	public static function delete(string $uri, Closure|array|string $function, array $options = []): void
+	public static function delete(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::DELETE), $uri, $function, $options);
 		self::addRoutes($uri, self::DELETE, $function, $options);
@@ -201,7 +207,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP HEAD protocol
 	 * */
-	public static function head(string $uri, Closure|array|string $function, array $options = []): void
+	public static function head(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::HEAD), $uri, $function, $options);
 		self::addRoutes($uri, self::HEAD, $function, $options);
@@ -210,7 +216,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP OPTIONS protocol
 	 * */
-	public static function options(string $uri, Closure|array|string $function, array $options = []): void
+	public static function options(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::OPTIONS), $uri, $function, $options);
 		self::addRoutes($uri, self::OPTIONS, $function, $options);
@@ -219,7 +225,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP PATCH protocol
 	 * */
-	public static function patch(string $uri, Closure|array|string $function, array $options = []): void
+	public static function patch(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::PATCH), $uri, $function, $options);
 		self::addRoutes($uri, self::PATCH, $function, $options);
@@ -228,7 +234,7 @@ class Route
 	/**
 	 * Function to declare any route with HTTP protocols
 	 * */
-	public static function any(string $uri, Closure|array|string $function, array $options = []): void
+	public static function any(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::ANY), $uri, $function, $options);
 		self::addRoutes($uri, self::ANY, $function, $options);

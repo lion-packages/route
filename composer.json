@@ -1,6 +1,6 @@
 {
     "name": "lion/route",
-    "description": "This library has a fast router usage with regular expressions.",
+    "description": "This library has quick router usage with regular expressions.",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -15,10 +15,12 @@
     },
     "require": {
         "php": ">=8.2",
-        "phroute/phroute": "^2.2"
+        "phroute/phroute": "^2.2",
+        "php-di/php-di": "^7.0"
     },
     "require-dev": {
         "lion/test": "^1.4",
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5",
+        "guzzlehttp/guzzle": "^7.8"
     }
 }

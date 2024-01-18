@@ -5,6 +5,7 @@ require_once(__DIR__ . './../vendor/autoload.php');
 header('Content-Type: application/json');
 
 use Lion\Route\Route;
+use Tests\Provider\ControllerProvider;
 
 $content = json_decode(file_get_contents("php://input"), true);
 $_POST = $content === null ? $_POST : $content;
@@ -59,6 +60,8 @@ Route::addMiddleware([
 ]);
 
 Route::get('/', fn() => ['isValid' => true]);
+
+Route::get('controller/{middleware}', [ControllerProvider::class, 'getMiddleware']);
 
 Route::middleware(['example-method-1', 'example-method-2'], function() {
 	Route::post('example', function() {

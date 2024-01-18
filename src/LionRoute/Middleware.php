@@ -10,8 +10,7 @@ class Middleware
 		private ?string $middlewareName = null,
 		private ?string $objectClass = null,
 		private ?string $methodClass = null
-	)
-    {}
+	) {}
 
     public function newObject(): mixed
     {

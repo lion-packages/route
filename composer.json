@@ -15,10 +15,12 @@
     },
     "require": {
         "php": ">=8.2",
-        "phroute/phroute": "^2.2"
+        "phroute/phroute": "^2.2",
+        "php-di/php-di": "^7.0"
     },
     "require-dev": {
         "lion/test": "^1.4",
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5",
+        "guzzlehttp/guzzle": "^7.8"
     }
 }

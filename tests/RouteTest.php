@@ -4,41 +4,33 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use GuzzleHttp\Client;
 use Lion\Route\Route;
 use Lion\Test\Test;
+use Tests\Provider\ControllerProvider;
 use Tests\Provider\HttpMethodsProviderTrait;
 
 class RouteTest extends Test
 {
     use HttpMethodsProviderTrait;
 
+    const API = 'http://127.0.0.1:8000/controller/';
     const PREFIX = 'prefix-test';
-    const PREFIX_2 = 'prefix-test-2';
-    const PREFIX_2_2 = 'prefix-test-2-2';
     const URI = 'test';
-    const URI_HTTP = 'test-http';
     const FULL_URI = self::PREFIX . '/' . self::URI;
-    const FULL_URI_PREFIX = self::PREFIX . '/' . self::URI_HTTP;
-    const FULL_URI_2 = self::PREFIX_2 . '/' . self::PREFIX_2_2 . '/' . self::URI;
+    const FULL_URI_SECOND = self::PREFIX . '/' . self::PREFIX . '/' . self::URI;
     const URI_MATCH = 'match-test';
-    const URI_MATCH_2 = 'match-test-2';
-    const URI_MATCH_2_2 = 'match-test-22';
-    const URI_MATCH_3 = 'match-test-3';
-    const PREFIX_MATCH_3 = 'prefix-match-3';
-    const FULL_URI_MATCH_3 = self::PREFIX_MATCH_3 . '/' . self::URI_MATCH_3;
-    const URI_MATCH_4 = 'match-test-4';
-    const PREFIX_MATCH_4 = 'prefix-match-4';
-    const FULL_URI_MATCH_4 = self::PREFIX_MATCH_4 . '/' . self::URI_MATCH_4;
-    const PREFIX_MIDDLEWARE = 'prefix-middleware';
-    const FULL_URI_MIDDLEWARE = self::PREFIX_MIDDLEWARE . '/' . self::URI;
-    const PREFIX_MIDDLEWARE_2 = 'prefix-middleware-2';
-    const FULL_URI_MIDDLEWARE_2 = self::PREFIX_MIDDLEWARE_2 . '/' . self::URI;
     const ARRAY_RESPONSE = ['isValid' => true];
 
-    private $customClass;
+    private Route $route;
+    private Client $client;
+    private object $customClass;
 
     protected function setUp(): void
     {
+        $this->route = new Route();
+        $this->client = new Client();
+
         $this->customClass = new class {
             public function exampleMethod1(): void
             {
@@ -51,24 +43,32 @@ class RouteTest extends Test
             }
         };
 
-        Route::init();
+        $this->route->init();
+        $this->initReflection($this->route);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->setPrivateProperty('routes', []);
+        $this->setPrivateProperty('filters', []);
+        $this->setPrivateProperty('prefix', '');
     }
 
     public function testGetFullRoutes(): void
     {
-        $this->assertIsArray(Route::getFullRoutes());
+        $this->assertIsArray($this->route->getFullRoutes());
     }
 
     public function testGetRoutes(): void
     {
-        $this->assertIsArray(Route::getRoutes());
+        $this->assertIsArray($this->route->getRoutes());
     }
 
     public function testGetFilters(): void
     {
-        Route::addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
 
-        $filters = Route::getFilters();
+        $filters = $this->route->getFilters();
 
         $this->assertIsArray($filters);
         $this->assertArrayHasKey(self::FILTER_NAME_1, $filters);
@@ -77,16 +77,16 @@ class RouteTest extends Test
 
     public function testGetVariables(): void
     {
-        $this->assertIsArray(Route::getVariables());
+        $this->assertIsArray($this->route->getVariables());
     }
 
     public function testAddMiddleware(): void
     {
-        Route::addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
 
-        Route::get('test-add-middleware', fn() => self::ARRAY_RESPONSE, [self::FILTER_NAME_1]);
+        $this->route->get('test-add-middleware', fn() => self::ARRAY_RESPONSE, [self::FILTER_NAME_1]);
 
-        $filters = Route::getFilters();
+        $filters = $this->route->getFilters();
 
         $this->assertIsArray($filters);
         $this->assertArrayHasKey(self::FILTER_NAME_1, $filters);
@@ -98,13 +98,30 @@ class RouteTest extends Test
      * */
     public function testHttpMethods(string $method, string $httpMethod): void
     {
-        Route::$method(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->$method(self::URI, fn() => self::ARRAY_RESPONSE);
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
         $this->assertArrayHasKey(self::URI, $fullRoutes);
         $this->assertArrayHasKey($httpMethod, $fullRoutes[self::URI]);
         $this->assertSame(self::ROUTES[$httpMethod], $fullRoutes[self::URI][$httpMethod]);
+    }
+
+    public function testDependencyInjection(): void
+    {
+        $this->route->get(self::URI, [ControllerProvider::class, 'getMiddleware']);
+
+        $fullRoutes = $this->route->getFullRoutes();
+
+        $this->assertArrayHasKey(self::URI, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI]);
+        $this->assertSame(self::ROUTES_CONTROLLER[Route::GET], $fullRoutes[self::URI][Route::GET]);
+
+        $response = json_decode($this->client->get(self::API . self::URI)->getBody()->getContents(), true);
+
+        $this->assertIsArray($response);
+        $this->assertArrayHasKey('middleware', $response);
+        $this->assertSame(self::URI, $response['middleware']);
     }
 
     /**
@@ -112,15 +129,15 @@ class RouteTest extends Test
      * */
     public function testHttpMethodsWithPrefix(string $method, string $httpMethod): void
     {
-        Route::prefix(self::PREFIX, function() use ($method) {
-            Route::$method(self::URI_HTTP, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function() use ($method) {
+            $this->route->$method(self::URI, fn() => self::ARRAY_RESPONSE);
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::FULL_URI_PREFIX, $fullRoutes);
-        $this->assertArrayHasKey($httpMethod, $fullRoutes[self::FULL_URI_PREFIX]);
-        $this->assertSame(self::ROUTES[$httpMethod], $fullRoutes[self::FULL_URI_PREFIX][$httpMethod]);
+        $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
+        $this->assertArrayHasKey($httpMethod, $fullRoutes[self::FULL_URI]);
+        $this->assertSame(self::ROUTES[$httpMethod], $fullRoutes[self::FULL_URI][$httpMethod]);
     }
 
     /**
@@ -128,22 +145,22 @@ class RouteTest extends Test
      * */
     public function testHttpMethodsWithMiddleware(string $method, string $httpMethod): void
     {
-        Route::middleware(self::FILTERS_MIDDLEWARE, function() use ($method) {
-            Route::$method(self::URI_HTTP, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware(self::FILTERS_MIDDLEWARE, function() use ($method) {
+            $this->route->$method(self::URI, fn() => self::ARRAY_RESPONSE);
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::FULL_URI_PREFIX, $fullRoutes);
-        $this->assertArrayHasKey($httpMethod, $fullRoutes[self::FULL_URI_PREFIX]);
-        $this->assertSame(self::ROUTES[$httpMethod], $fullRoutes[self::FULL_URI_PREFIX][$httpMethod]);
+        $this->assertArrayHasKey(self::URI, $fullRoutes);
+        $this->assertArrayHasKey($httpMethod, $fullRoutes[self::URI]);
+        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::URI][$httpMethod]);
     }
 
     public function testMatch(): void
     {
-        Route::match([Route::GET, Route::POST], self::URI_MATCH, fn() => self::ARRAY_RESPONSE);
+        $this->route->match([Route::GET, Route::POST], self::URI_MATCH, fn() => self::ARRAY_RESPONSE);
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
         $this->assertArrayHasKey(self::URI_MATCH, $fullRoutes);
         $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI_MATCH]);
@@ -154,62 +171,62 @@ class RouteTest extends Test
 
     public function testMultipleMatch(): void
     {
-        Route::match([Route::GET, Route::POST], self::URI_MATCH_2, fn() => self::ARRAY_RESPONSE);
-        Route::match([Route::GET, Route::POST, Route::PUT], self::URI_MATCH_2_2, fn() => self::ARRAY_RESPONSE);
+        $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->match([Route::GET, Route::POST, Route::PUT], self::URI_MATCH, fn() => self::ARRAY_RESPONSE);
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::URI_MATCH_2, $fullRoutes);
-        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI_MATCH_2]);
-        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::URI_MATCH_2][Route::GET]);
-        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::URI_MATCH_2]);
-        $this->assertSame(self::ROUTES[Route::POST], $fullRoutes[self::URI_MATCH_2][Route::POST]);
-        $this->assertArrayHasKey(self::URI_MATCH_2_2, $fullRoutes);
-        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI_MATCH_2_2]);
-        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::URI_MATCH_2_2][Route::GET]);
-        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::URI_MATCH_2_2]);
-        $this->assertSame(self::ROUTES[Route::POST], $fullRoutes[self::URI_MATCH_2_2][Route::POST]);
+        $this->assertArrayHasKey(self::URI, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI]);
+        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::URI][Route::GET]);
+        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::URI]);
+        $this->assertSame(self::ROUTES[Route::POST], $fullRoutes[self::URI][Route::POST]);
+        $this->assertArrayHasKey(self::URI_MATCH, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI_MATCH]);
+        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::URI_MATCH][Route::GET]);
+        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::URI_MATCH]);
+        $this->assertSame(self::ROUTES[Route::POST], $fullRoutes[self::URI_MATCH][Route::POST]);
     }
 
     public function testMatchWithPrefix(): void
     {
-        Route::prefix(self::PREFIX_MATCH_3, function() {
-            Route::match([Route::GET, Route::POST], self::URI_MATCH_3, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function() {
+            $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::FULL_URI_MATCH_3, $fullRoutes);
-        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI_MATCH_3]);
-        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::FULL_URI_MATCH_3][Route::GET]);
-        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::FULL_URI_MATCH_3]);
-        $this->assertSame(self::ROUTES[Route::POST], $fullRoutes[self::FULL_URI_MATCH_3][Route::POST]);
+        $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI]);
+        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::FULL_URI][Route::GET]);
+        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::FULL_URI]);
+        $this->assertSame(self::ROUTES[Route::POST], $fullRoutes[self::FULL_URI][Route::POST]);
     }
 
     public function testMatchWithMiddleware(): void
     {
-        Route::addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
 
-        Route::middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX_MATCH_4], function() {
-            Route::match([Route::GET, Route::POST], self::URI_MATCH_4, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
+            $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::FULL_URI_MATCH_4, $fullRoutes);
-        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI_MATCH_4]);
-        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI_MATCH_4][Route::GET]);
-        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::FULL_URI_MATCH_4]);
-        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI_MATCH_4][Route::POST]);
+        $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI]);
+        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI][Route::GET]);
+        $this->assertArrayHasKey(Route::POST, $fullRoutes[self::FULL_URI]);
+        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI][Route::POST]);
     }
 
     public function testPrefix(): void
     {
-        Route::prefix(self::PREFIX, function() {
-            Route::get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function() {
+            $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
         $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
         $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI]);
@@ -218,50 +235,50 @@ class RouteTest extends Test
 
     public function testMultiplePrefix(): void
     {
-        Route::prefix(self::PREFIX_2, function() {
-            Route::prefix(self::PREFIX_2_2, function() {
-                Route::get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function() {
+            $this->route->prefix(self::PREFIX, function() {
+                $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
             });
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::FULL_URI_2, $fullRoutes);
-        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI_2]);
-        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::FULL_URI_2][Route::GET]);
+        $this->assertArrayHasKey(self::FULL_URI_SECOND, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI_SECOND]);
+        $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::FULL_URI_SECOND][Route::GET]);
     }
 
     public function testMiddleware(): void
     {
-        Route::addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
 
-        Route::middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX_MIDDLEWARE], function() {
-            Route::get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
+            $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::FULL_URI_MIDDLEWARE, $fullRoutes);
-        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI_MIDDLEWARE]);
-        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI_MIDDLEWARE][Route::GET]);
+        $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI]);
+        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI][Route::GET]);
     }
 
     public function testMultipleMiddleware(): void
     {
-        Route::addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
 
-        Route::middleware([self::FILTER_NAME_1], function() {
-            Route::middleware([self::FILTER_NAME_2], function() {
-                Route::prefix(self::PREFIX_MIDDLEWARE_2, function() {
-                    Route::get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware([self::FILTER_NAME_1], function() {
+            $this->route->middleware([self::FILTER_NAME_2], function() {
+                $this->route->prefix(self::PREFIX, function() {
+                    $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
                 });
             });
         });
 
-        $fullRoutes = Route::getFullRoutes();
+        $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertArrayHasKey(self::FULL_URI_MIDDLEWARE_2, $fullRoutes);
-        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI_MIDDLEWARE_2]);
-        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI_MIDDLEWARE_2][Route::GET]);
+        $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
+        $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI]);
+        $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI][Route::GET]);
     }
 }

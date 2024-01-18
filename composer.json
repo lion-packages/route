@@ -1,6 +1,6 @@
 {
     "name": "lion/route",
-    "description": "This library has a fast router usage with regular expressions.",
+    "description": "This library has quick router usage with regular expressions.",
     "type": "library",
     "license": "MIT",
     "autoload": {

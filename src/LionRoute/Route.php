@@ -65,7 +65,7 @@ class Route
 	/**
 	 * Add the defined routes to the router
 	 * */
-	private static function addRoutes(string $uri, string $method, Closure|array|string $function, array $options): void
+	private static function addRoutes(string $uri, string $method, Closure|array $function, array $options): void
 	{
 		$newUri = str_replace("//", "/", (self::$prefix . $uri));
 		$callback = is_array($function) ? false : (is_string($function) ? false : true);
@@ -165,7 +165,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP GET protocol
 	 * */
-	public static function get(string $uri, Closure|array|string $function, array $options = []): void
+	public static function get(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::GET), $uri, $function, $options);
 		self::addRoutes($uri, self::GET, $function, $options);
@@ -174,7 +174,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP POST protocol
 	 * */
-	public static function post(string $uri, Closure|array|string $function, array $options = []): void
+	public static function post(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::POST), $uri, $function, $options);
 		self::addRoutes($uri, self::POST, $function, $options);
@@ -183,7 +183,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP PUT protocol
 	 * */
-	public static function put(string $uri, Closure|array|string $function, array $options = []): void
+	public static function put(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::PUT), $uri, $function, $options);
 		self::addRoutes($uri, self::PUT, $function, $options);
@@ -192,7 +192,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP DELETE protocol
 	 * */
-	public static function delete(string $uri, Closure|array|string $function, array $options = []): void
+	public static function delete(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::DELETE), $uri, $function, $options);
 		self::addRoutes($uri, self::DELETE, $function, $options);
@@ -201,7 +201,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP HEAD protocol
 	 * */
-	public static function head(string $uri, Closure|array|string $function, array $options = []): void
+	public static function head(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::HEAD), $uri, $function, $options);
 		self::addRoutes($uri, self::HEAD, $function, $options);
@@ -210,7 +210,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP OPTIONS protocol
 	 * */
-	public static function options(string $uri, Closure|array|string $function, array $options = []): void
+	public static function options(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::OPTIONS), $uri, $function, $options);
 		self::addRoutes($uri, self::OPTIONS, $function, $options);
@@ -219,7 +219,7 @@ class Route
 	/**
 	 * Function to declare a route with the HTTP PATCH protocol
 	 * */
-	public static function patch(string $uri, Closure|array|string $function, array $options = []): void
+	public static function patch(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::PATCH), $uri, $function, $options);
 		self::addRoutes($uri, self::PATCH, $function, $options);
@@ -228,7 +228,7 @@ class Route
 	/**
 	 * Function to declare any route with HTTP protocols
 	 * */
-	public static function any(string $uri, Closure|array|string $function, array $options = []): void
+	public static function any(string $uri, Closure|array $function, array $options = []): void
 	{
 		self::executeRoute(strtolower(self::ANY), $uri, $function, $options);
 		self::addRoutes($uri, self::ANY, $function, $options);

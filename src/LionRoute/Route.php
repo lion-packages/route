@@ -7,7 +7,7 @@ namespace Lion\Route;
 use Closure;
 use DI\ContainerBuilder;
 use Lion\Route\Middleware;
-use Phroute\Phroute\Dispatcher;
+use Lion\Route\Dispatcher;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\RouteCollector;
@@ -23,18 +23,18 @@ class Route
 	const OPTIONS = 'OPTIONS';
 	const PATCH = 'PATCH';
 
-	protected const PREFIX = 'prefix';
-	protected const AFTER = 'after';
-	protected const BEFORE = 'before';
+	private const PREFIX = 'prefix';
+	private const AFTER = 'after';
+	private const BEFORE = 'before';
 
-	protected static RouteCollector $router;
-    protected static $null;
+	private static RouteCollector $router;
+    private static $null;
 
-	protected static string $uri;
-	protected static int $index;
-	protected static array $routes = [];
-	protected static array $filters = [];
-	protected static string $prefix = '';
+	private static string $uri;
+	private static int $index;
+	private static array $routes = [];
+	private static array $filters = [];
+	private static string $prefix = '';
 
 	/**
 	 * Initialize router settings
@@ -150,10 +150,8 @@ class Route
 	public static function dispatch(): void
 	{
 		try {
-            $dispatch = new Dispatcher(
-                self::$router->getData(),
-                new RouterResolver((new ContainerBuilder())->useAutowiring(true)->useAttributes(true)->build())
-            );
+            $container = (new ContainerBuilder())->useAutowiring(true)->useAttributes(true)->build();
+            $dispatch = new Dispatcher(self::$router->getData(), new RouterResolver($container));
 
 			$response = $dispatch->dispatch(
 				$_SERVER['REQUEST_METHOD'],

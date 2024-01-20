@@ -23,10 +23,24 @@ class ControllerProvider
         ];
     }
 
-    public function getMiddleware(string $middleware): array
+    public function getMiddleware(Middleware $middleware, string $middlewareName = 'test'): array
+    {
+        return [
+            'middleware' => $middleware->setMiddlewareName($middlewareName)->getMiddlewareName()
+        ];
+    }
+
+    public function setMiddleware(string $middleware): array
     {
         return [
             'middleware' => $this->middleware->setMiddlewareName($middleware)->getMiddlewareName()
+        ];
+    }
+
+    public function middleware(Middleware $middleware): array
+    {
+        return [
+            'middleware' => $middleware->getMiddlewareName()
         ];
     }
 }

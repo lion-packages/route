@@ -4,6 +4,7 @@ require_once(__DIR__ . './../vendor/autoload.php');
 
 header('Content-Type: application/json');
 
+use Lion\Route\Middleware;
 use Lion\Route\Route;
 use Tests\Provider\ControllerProvider;
 
@@ -60,8 +61,15 @@ Route::addMiddleware([
 ]);
 
 Route::get('/', fn() => ['isValid' => true]);
+Route::get('controller', [ControllerProvider::class, 'middleware']);
+Route::get('controller/{middleware}', [ControllerProvider::class, 'setMiddleware']);
+Route::get('controller/middleware/get', [ControllerProvider::class, 'getMiddleware']);
 
-Route::get('controller/{middleware}', [ControllerProvider::class, 'getMiddleware']);
+Route::get('controller-index', function(Middleware $middleware, string $name = 'Daniel') {
+    return [
+        'name' => $middleware->setMiddlewareName($name)->getMiddlewareName()
+    ];
+});
 
 Route::middleware(['example-method-1', 'example-method-2'], function() {
 	Route::post('example', function() {

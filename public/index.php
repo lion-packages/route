@@ -55,13 +55,11 @@ $classExample = new class {
 Route::init();
 
 Route::addMiddleware([
-	$classExample::class => [
-		['name' => 'example-method-1', 'method' => 'exampleMethod1'],
-		['name' => 'example-method-2', 'method' => 'exampleMethod2'],
-		['name' => 'example-method-3', 'method' => 'exampleMethod3'],
-		['name' => 'example-method-4', 'method' => 'exampleMethod4'],
-		['name' => 'example-method-5', 'method' => 'exampleMethod5']
-	]
+    new Middleware('example-method-1', $classExample::class, 'exampleMethod1'),
+    new Middleware('example-method-2', $classExample::class, 'exampleMethod2'),
+    new Middleware('example-method-3', $classExample::class, 'exampleMethod3'),
+    new Middleware('example-method-4', $classExample::class, 'exampleMethod4'),
+    new Middleware('example-method-5', $classExample::class, 'exampleMethod5')
 ]);
 
 Route::get('/', fn() => ['isValid' => true]);

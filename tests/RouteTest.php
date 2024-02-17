@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use GuzzleHttp\Client;
+use Lion\Route\Middleware;
 use Lion\Route\Route;
 use Lion\Test\Test;
 use Tests\Provider\ControllerProvider;
@@ -76,7 +77,10 @@ class RouteTest extends Test
 
     public function testGetFilters(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $filters = $this->route->getFilters();
 
@@ -92,7 +96,10 @@ class RouteTest extends Test
 
     public function testAddMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->get('test-add-middleware', fn() => self::ARRAY_RESPONSE, [self::FILTER_NAME_1]);
 
@@ -215,7 +222,10 @@ class RouteTest extends Test
 
     public function testMatchWithMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
             $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
@@ -260,7 +270,10 @@ class RouteTest extends Test
 
     public function testMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
             $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
@@ -280,7 +293,10 @@ class RouteTest extends Test
 
     public function testMultipleMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->middleware([self::FILTER_NAME_1], function() {
             $this->route->middleware([self::FILTER_NAME_2], function() {

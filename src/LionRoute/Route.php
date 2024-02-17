@@ -137,17 +137,13 @@ class Route
 	 * */
 	public static function addMiddleware(array $filters): void
 	{
-		foreach ($filters as $key => $class) {
-			foreach ($class as $item) {
-				$middleware = new Middleware($item['name'], $key, $item['method']);
-
-				self::$router->filter($middleware->getMiddlewareName(), function() use ($middleware) {
-                    self::$container->injectDependenciesMethod(
-                        self::$container->injectDependencies($middleware->newObject()),
-                        $middleware->getMethodClass()
-                    );
-                });
-			}
+		foreach ($filters as $middleware) {
+            self::$router->filter($middleware->getMiddlewareName(), function() use ($middleware) {
+                self::$container->injectDependenciesMethod(
+                    self::$container->injectDependencies($middleware->newObject()),
+                    $middleware->getMethodClass()
+                );
+            });
 		}
 	}
 

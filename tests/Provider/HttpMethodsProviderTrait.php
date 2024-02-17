@@ -29,10 +29,6 @@ trait HttpMethodsProviderTrait
     ];
     const FILTER_NAME_1 = 'example-method-1';
     const FILTER_NAME_2 = 'example-method-2';
-    const FILTERS = [
-        ['name' => self::FILTER_NAME_1, 'method' => 'exampleMethod1'],
-        ['name' => self::FILTER_NAME_2, 'method' => 'exampleMethod2']
-    ];
     const FILTERS_MIDDLEWARE = [self::FILTER_NAME_1, self::FILTER_NAME_2];
     const ROUTES = [
         Route::GET => self::DATA_METHOD,

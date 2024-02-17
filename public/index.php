@@ -12,10 +12,14 @@ $content = json_decode(file_get_contents("php://input"), true);
 $_POST = $content === null ? $_POST : $content;
 
 $classExample = new class {
-	public function exampleMethod1(): void
+	public function exampleMethod1(ControllerProvider $controllerProvider): void
 	{
 		if (!isset($_POST['id'])) {
-			die(json_encode(['message' => 'property is required: id', 'isValid' => false]));
+			die(json_encode([
+                'message' => 'property is required: id',
+                'isValid' => false,
+                'data' => $controllerProvider->createMethod()
+            ]));
 		}
 	}
 
@@ -51,13 +55,11 @@ $classExample = new class {
 Route::init();
 
 Route::addMiddleware([
-	$classExample::class => [
-		['name' => 'example-method-1', 'method' => 'exampleMethod1'],
-		['name' => 'example-method-2', 'method' => 'exampleMethod2'],
-		['name' => 'example-method-3', 'method' => 'exampleMethod3'],
-		['name' => 'example-method-4', 'method' => 'exampleMethod4'],
-		['name' => 'example-method-5', 'method' => 'exampleMethod5']
-	]
+    new Middleware('example-method-1', $classExample::class, 'exampleMethod1'),
+    new Middleware('example-method-2', $classExample::class, 'exampleMethod2'),
+    new Middleware('example-method-3', $classExample::class, 'exampleMethod3'),
+    new Middleware('example-method-4', $classExample::class, 'exampleMethod4'),
+    new Middleware('example-method-5', $classExample::class, 'exampleMethod5')
 ]);
 
 Route::get('/', fn() => ['isValid' => true]);
@@ -65,7 +67,7 @@ Route::get('controller', [ControllerProvider::class, 'middleware']);
 Route::get('controller/{middleware}', [ControllerProvider::class, 'setMiddleware']);
 Route::get('controller/middleware/get', [ControllerProvider::class, 'getMiddleware']);
 
-Route::get('controller-index', function(Middleware $middleware, string $name = 'Daniel') {
+Route::get('controller-index', function(Middleware $middleware, string $name = 'Lion') {
     return [
         'name' => $middleware->setMiddlewareName($name)->getMiddlewareName()
     ];
@@ -87,12 +89,13 @@ Route::middleware(['example-method-1', 'example-method-2'], function() {
 			return ['isValid' => true];
 		});
 
-		Route::match([
-			...[Route::GET, Route::POST, Route::PUT, Route::DELETE],
-			...[Route::HEAD, Route::PATCH, Route::OPTIONS]
-		], 'example-4', function() {
-			return ['isValid' => true];
-		});
+		Route::match(
+            [Route::GET, Route::POST, Route::PUT, Route::DELETE, Route::HEAD, Route::PATCH, Route::OPTIONS],
+            'example-4',
+            function() {
+    			return ['isValid' => true];
+    		}
+        );
 
 		Route::any('example-5', function() {
 			return ['isValid' => true];

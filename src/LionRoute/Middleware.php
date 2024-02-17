@@ -8,15 +8,13 @@ class Middleware
 {
 	public function __construct(
 		private ?string $middlewareName = null,
-		private ?string $objectClass = null,
+		private ?string $class = null,
 		private ?string $methodClass = null
 	) {}
 
     public function newObject(): mixed
     {
-        $objectClass = $this->getObjectClass();
-
-        return new $objectClass();
+        return new ($this->getClass())();
     }
 
     public function getMiddlewareName(): ?string
@@ -31,14 +29,14 @@ class Middleware
         return $this;
     }
 
-    public function getObjectClass(): ?string
+    public function getClass(): ?string
     {
-        return $this->objectClass;
+        return $this->class;
     }
 
-    public function setObjectClass(?string $objectClass): Middleware
+    public function setClass(?string $class): Middleware
     {
-        $this->objectClass = $objectClass;
+        $this->class = $class;
 
         return $this;
     }

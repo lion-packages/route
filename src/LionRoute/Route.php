@@ -6,6 +6,7 @@ namespace Lion\Route;
 
 use Closure;
 use DI\ContainerBuilder;
+use Lion\DependencyInjection\Container;
 use Lion\Route\Middleware;
 use Lion\Route\Dispatcher;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
@@ -28,7 +29,7 @@ class Route
 	private const BEFORE = 'before';
 
 	private static RouteCollector $router;
-    private static $null;
+    private static Container $container;
 
 	private static string $uri;
 	private static int $index;
@@ -44,6 +45,7 @@ class Route
 		self::$uri = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
 		self::$index = $index;
 		self::$router = new RouteCollector();
+        self::$container = new Container();
 	}
 
 	/**
@@ -132,15 +134,18 @@ class Route
 
 	/**
 	 * Add the defined filters to the router
+     *
+     * @param array<Middleware> $filters
 	 * */
 	public static function addMiddleware(array $filters): void
 	{
-		foreach ($filters as $key => $class) {
-			foreach ($class as $item) {
-				$obj = new Middleware($item['name'], $key, $item['method']);
-
-				self::$router->filter($obj->getMiddlewareName(), fn() => $obj->newObject()->{$obj->getMethodClass()}());
-			}
+		foreach ($filters as $middleware) {
+            self::$router->filter($middleware->getMiddlewareName(), function() use ($middleware) {
+                self::$container->injectDependenciesMethod(
+                    self::$container->injectDependencies($middleware->newObject()),
+                    $middleware->getMethodClass()
+                );
+            });
 		}
 	}
 
@@ -151,7 +156,7 @@ class Route
 	{
 		try {
             $container = (new ContainerBuilder())->useAutowiring(true)->useAttributes(true)->build();
-            $dispatch = new Dispatcher(self::$router->getData(), new RouterResolver($container));
+            $dispatch = new Dispatcher(self::$router->getData(), new RouterResolver($container), self::$container);
 
 			$response = $dispatch->dispatch(
 				$_SERVER['REQUEST_METHOD'],

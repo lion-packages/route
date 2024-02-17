@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use GuzzleHttp\Client;
+use Lion\Route\Middleware;
 use Lion\Route\Route;
 use Lion\Test\Test;
 use Tests\Provider\ControllerProvider;
@@ -14,13 +15,23 @@ class RouteTest extends Test
 {
     use HttpMethodsProviderTrait;
 
-    const API = 'http://127.0.0.1:8000/controller/';
+    const HOST = 'http://127.0.0.1:8000';
+    const API_CONTROLLER = self::HOST . '/controller/';
+    const API_TEST = self::HOST . '/example';
     const PREFIX = 'prefix-test';
     const URI = 'test';
     const FULL_URI = self::PREFIX . '/' . self::URI;
     const FULL_URI_SECOND = self::PREFIX . '/' . self::PREFIX . '/' . self::URI;
     const URI_MATCH = 'match-test';
     const ARRAY_RESPONSE = ['isValid' => true];
+    const JSON_RESPONSE = [
+        'message' => 'property is required: id',
+        'isValid' => false,
+        'data' => [
+            'status' => 'success',
+            'message' => 'controller provider'
+        ]
+    ];
 
     private Route $route;
     private Client $client;
@@ -66,7 +77,10 @@ class RouteTest extends Test
 
     public function testGetFilters(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $filters = $this->route->getFilters();
 
@@ -82,7 +96,10 @@ class RouteTest extends Test
 
     public function testAddMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->get('test-add-middleware', fn() => self::ARRAY_RESPONSE, [self::FILTER_NAME_1]);
 
@@ -117,7 +134,7 @@ class RouteTest extends Test
         $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI]);
         $this->assertSame(self::ROUTES_CONTROLLER[Route::GET], $fullRoutes[self::URI][Route::GET]);
 
-        $response = json_decode($this->client->get(self::API . self::URI)->getBody()->getContents(), true);
+        $response = json_decode($this->client->get(self::API_CONTROLLER . self::URI)->getBody()->getContents(), true);
 
         $this->assertIsArray($response);
         $this->assertArrayHasKey('middleware', $response);
@@ -205,7 +222,10 @@ class RouteTest extends Test
 
     public function testMatchWithMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
             $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
@@ -250,7 +270,10 @@ class RouteTest extends Test
 
     public function testMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
             $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
@@ -263,9 +286,17 @@ class RouteTest extends Test
         $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI][Route::GET]);
     }
 
+    public function testMiddlewareAPI(): void
+    {
+        $this->assertJsonContent($this->client->post(self::API_TEST)->getBody()->getContents(), self::JSON_RESPONSE);
+    }
+
     public function testMultipleMiddleware(): void
     {
-        $this->route->addMiddleware([$this->customClass::class => self::FILTERS]);
+        $this->route->addMiddleware([
+            new Middleware(self::FILTER_NAME_1, $this->customClass::class, 'exampleMethod1'),
+            new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
+        ]);
 
         $this->route->middleware([self::FILTER_NAME_1], function() {
             $this->route->middleware([self::FILTER_NAME_2], function() {

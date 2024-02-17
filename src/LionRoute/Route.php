@@ -134,6 +134,8 @@ class Route
 
 	/**
 	 * Add the defined filters to the router
+     *
+     * @param array<Middleware> $filters
 	 * */
 	public static function addMiddleware(array $filters): void
 	{

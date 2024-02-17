@@ -34,7 +34,7 @@ class MiddlewareTest extends Test
         $middleware = new Middleware();
 
         $this->assertNull($middleware->getMiddlewareName());
-        $this->assertNull($middleware->getObjectClass());
+        $this->assertNull($middleware->getClass());
         $this->assertNull($middleware->getMethodClass());
     }
 
@@ -58,18 +58,18 @@ class MiddlewareTest extends Test
         $this->assertSame(self::MIDDLEWARE_NAME_TEST, $this->middleware->getMiddlewareName());
     }
 
-    public function testGetObjectClass(): void
+    public function testGetClass(): void
     {
-        $this->assertSame($this->customClass::class, $this->middleware->getObjectClass());
+        $this->assertSame($this->customClass::class, $this->middleware->getClass());
     }
 
-    public function testSetObjectClass(): void
+    public function testSetClass(): void
     {
         $newCustomClass = new class {};
 
-        $this->assertInstanceOf($this->middleware::class, $this->middleware->setObjectClass($newCustomClass::class));
+        $this->assertInstanceOf($this->middleware::class, $this->middleware->setClass($newCustomClass::class));
 
-        $this->assertSame($newCustomClass::class, $this->middleware->getObjectClass());
+        $this->assertSame($newCustomClass::class, $this->middleware->getClass());
     }
 
     public function testGetMethodClass(): void

@@ -12,10 +12,14 @@ $content = json_decode(file_get_contents("php://input"), true);
 $_POST = $content === null ? $_POST : $content;
 
 $classExample = new class {
-	public function exampleMethod1(): void
+	public function exampleMethod1(ControllerProvider $controllerProvider): void
 	{
 		if (!isset($_POST['id'])) {
-			die(json_encode(['message' => 'property is required: id', 'isValid' => false]));
+			die(json_encode([
+                'message' => 'property is required: id',
+                'isValid' => false,
+                'data' => $controllerProvider->createMethod()
+            ]));
 		}
 	}
 
@@ -65,7 +69,7 @@ Route::get('controller', [ControllerProvider::class, 'middleware']);
 Route::get('controller/{middleware}', [ControllerProvider::class, 'setMiddleware']);
 Route::get('controller/middleware/get', [ControllerProvider::class, 'getMiddleware']);
 
-Route::get('controller-index', function(Middleware $middleware, string $name = 'Daniel') {
+Route::get('controller-index', function(Middleware $middleware, string $name = 'Lion') {
     return [
         'name' => $middleware->setMiddlewareName($name)->getMiddlewareName()
     ];
@@ -87,12 +91,13 @@ Route::middleware(['example-method-1', 'example-method-2'], function() {
 			return ['isValid' => true];
 		});
 
-		Route::match([
-			...[Route::GET, Route::POST, Route::PUT, Route::DELETE],
-			...[Route::HEAD, Route::PATCH, Route::OPTIONS]
-		], 'example-4', function() {
-			return ['isValid' => true];
-		});
+		Route::match(
+            [Route::GET, Route::POST, Route::PUT, Route::DELETE, Route::HEAD, Route::PATCH, Route::OPTIONS],
+            'example-4',
+            function() {
+    			return ['isValid' => true];
+    		}
+        );
 
 		Route::any('example-5', function() {
 			return ['isValid' => true];

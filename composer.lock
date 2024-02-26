@@ -68,16 +68,16 @@
         },
         {
             "name": "lion/dependency-injection",
-            "version": "v1.3.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/lion-packages/dependency-injection.git",
-                "reference": "89d68870ea1ff2e8e7908e2dd0cd309828c68520"
+                "url": "https://github.com/Sleon4/dependency-injection.git",
+                "reference": "72a0aca3e249b515d3dd8e56e180f858bb9ebcb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lion-packages/dependency-injection/zipball/89d68870ea1ff2e8e7908e2dd0cd309828c68520",
-                "reference": "89d68870ea1ff2e8e7908e2dd0cd309828c68520",
+                "url": "https://api.github.com/repos/Sleon4/dependency-injection/zipball/72a0aca3e249b515d3dd8e56e180f858bb9ebcb9",
+                "reference": "72a0aca3e249b515d3dd8e56e180f858bb9ebcb9",
                 "shasum": ""
             },
             "require": {
@@ -101,10 +101,10 @@
             ],
             "description": "Container for dependency injection with DI-PHP",
             "support": {
-                "issues": "https://github.com/lion-packages/dependency-injection/issues",
-                "source": "https://github.com/lion-packages/dependency-injection/tree/v1.3.0"
+                "issues": "https://github.com/Sleon4/dependency-injection/issues",
+                "source": "https://github.com/Sleon4/dependency-injection/tree/v1.3.1"
             },
-            "time": "2024-01-19T23:29:39+00:00"
+            "time": "2024-02-25T23:46:02+00:00"
         },
         {
             "name": "lion/helpers",
@@ -798,16 +798,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.0.0",
+            "version": "v5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "4a21235f7e56e713259a6f76bf4b5ea08502b9dc"
+                "reference": "2218c2252c874a4624ab2f613d86ac32d227bc69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/4a21235f7e56e713259a6f76bf4b5ea08502b9dc",
-                "reference": "4a21235f7e56e713259a6f76bf4b5ea08502b9dc",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/2218c2252c874a4624ab2f613d86ac32d227bc69",
+                "reference": "2218c2252c874a4624ab2f613d86ac32d227bc69",
                 "shasum": ""
             },
             "require": {
@@ -850,9 +850,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.0.0"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.0.1"
             },
-            "time": "2024-01-07T17:17:35+00:00"
+            "time": "2024-02-21T19:24:10+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -1288,16 +1288,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.10",
+            "version": "10.5.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "50b8e314b6d0dd06521dc31d1abffa73f25f850c"
+                "reference": "0d968f6323deb3dbfeba5bfd4929b9415eb7a9a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/50b8e314b6d0dd06521dc31d1abffa73f25f850c",
-                "reference": "50b8e314b6d0dd06521dc31d1abffa73f25f850c",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0d968f6323deb3dbfeba5bfd4929b9415eb7a9a4",
+                "reference": "0d968f6323deb3dbfeba5bfd4929b9415eb7a9a4",
                 "shasum": ""
             },
             "require": {
@@ -1369,7 +1369,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.10"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.11"
             },
             "funding": [
                 {
@@ -1385,7 +1385,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-04T09:07:51+00:00"
+            "time": "2024-02-25T14:05:00+00:00"
         },
         {
             "name": "psr/http-client",

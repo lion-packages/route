@@ -48,7 +48,7 @@ class Middleware
     /**
      * Rename the middleware
      *
-     * @param string $middlewareName [Middleware name]
+     * @param string|null $middlewareName [Middleware name]
      *
      * @return Middleware
      */
@@ -72,7 +72,7 @@ class Middleware
     /**
      * Change the namespace of the class that is invoked
      *
-     * @param string $class [Class that invokes the middleware]
+     * @param string|null $class [Class that invokes the middleware]
      *
      * @return Middleware
      */
@@ -96,7 +96,7 @@ class Middleware
     /**
      * Change the name of the method that is invoked from the middleware class
      *
-     * @param string $methodClass [Name of the method that is invoked in
+     * @param string|null $methodClass [Name of the method that is invoked in
      * the middleware class]
      *
      * @return Middleware

@@ -155,10 +155,13 @@ class Route
      */
 	public static function init(int $index = 1): void
 	{
-		self::$uri = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
-		self::$index = $index;
-		self::$router = new RouteCollector();
+        self::$router = new RouteCollector();
+
         self::$container = new Container();
+
+		self::$uri = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
+
+		self::$index = $index;
 	}
 
 	/**
@@ -199,8 +202,11 @@ class Route
 	private static function addRoutes(string $uri, string $method, Closure|array $function, array $options): void
 	{
 		$newUri = str_replace("//", "/", (self::$prefix . $uri));
+
 		$callback = is_array($function) ? false : (is_string($function) ? false : true);
+
 		$request = !is_string($function) ? false : ['url' => $function];
+
 		$controller = !is_array($function) ? false : ['name' => $function[0], 'function' => $function[1]];
 
 		if (!isset(self::$routes[$newUri][$method])) {
@@ -460,8 +466,11 @@ class Route
 	public static function prefix(string $name, Closure $closure): void
 	{
 		$previousPrefix = self::$prefix;
+
 		self::$prefix .= "{$name}/";
+
 		self::$router->group([self::PREFIX => $name], $closure);
+
 		self::$prefix = $previousPrefix;
 	}
 
@@ -476,28 +485,40 @@ class Route
 	public static function middleware(array $filters, Closure $closure): void
 	{
 	    $originalFilters = self::$filters;
+
 	    $parentFilters = self::$filters;
+
 	    self::$filters = [];
+
 	    $listMiddleware = [];
+
 	    $count = count($filters);
 
 	    if ($count === 1) {
 	        self::$filters = [...self::$filters, ...$filters];
+
 	        $listMiddleware = [self::BEFORE => $filters[0]];
 
 	        array_unshift(self::$filters, ...$parentFilters);
+
 		    self::$router->group($listMiddleware, $closure);
+
 		    self::$filters = $originalFilters;
 	    } elseif ($count === 2) {
 	        self::$filters = [...self::$filters, ...$filters];
+
 	        $listMiddleware = [self::BEFORE => $filters[0], self::AFTER => $filters[1]];
 
 	        array_unshift(self::$filters, ...$parentFilters);
+
 		    self::$router->group($listMiddleware, $closure);
+
 		    self::$filters = $originalFilters;
 	    } elseif ($count >= 3) {
 	        self::$filters = [...self::$filters, $filters[0], $filters[1]];
+
 	        $previousPrefix = self::$prefix;
+
 	        self::$prefix .= "{$filters[2]}/";
 
 	        $listMiddleware = [
@@ -507,8 +528,11 @@ class Route
 	        ];
 
 	        array_unshift(self::$filters, ...$parentFilters);
+
 		    self::$router->group($listMiddleware, $closure);
+
 		    self::$filters = $originalFilters;
+
 		    self::$prefix = $previousPrefix;
 	    }
 	}

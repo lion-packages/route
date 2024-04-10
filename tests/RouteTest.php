@@ -42,15 +42,16 @@ class RouteTest extends Test
         $this->route = new Route();
         $this->client = new Client();
 
-        $this->customClass = new class {
+        $this->customClass = new class
+        {
             public function exampleMethod1(): void
             {
-                echo('TESTING');
+                echo ('TESTING');
             }
 
             public function exampleMethod2(): void
             {
-                echo('TESTING');
+                echo ('TESTING');
             }
         };
 
@@ -101,7 +102,7 @@ class RouteTest extends Test
             new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
         ]);
 
-        $this->route->get('test-add-middleware', fn() => self::ARRAY_RESPONSE, [self::FILTER_NAME_1]);
+        $this->route->get('test-add-middleware', fn () => self::ARRAY_RESPONSE, [self::FILTER_NAME_1]);
 
         $filters = $this->route->getFilters();
 
@@ -115,7 +116,7 @@ class RouteTest extends Test
      * */
     public function testHttpMethods(string $method, string $httpMethod): void
     {
-        $this->route->$method(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->$method(self::URI, fn () => self::ARRAY_RESPONSE);
 
         $fullRoutes = $this->route->getFullRoutes();
 
@@ -134,7 +135,13 @@ class RouteTest extends Test
         $this->assertArrayHasKey(Route::GET, $fullRoutes[self::URI]);
         $this->assertSame(self::ROUTES_CONTROLLER[Route::GET], $fullRoutes[self::URI][Route::GET]);
 
-        $response = json_decode($this->client->get(self::API_CONTROLLER . self::URI)->getBody()->getContents(), true);
+        $response = json_decode(
+            $this->client
+                ->get(self::API_CONTROLLER . self::URI)
+                ->getBody()
+                ->getContents(),
+            true
+        );
 
         $this->assertIsArray($response);
         $this->assertArrayHasKey('middleware', $response);
@@ -146,8 +153,8 @@ class RouteTest extends Test
      * */
     public function testHttpMethodsWithPrefix(string $method, string $httpMethod): void
     {
-        $this->route->prefix(self::PREFIX, function() use ($method) {
-            $this->route->$method(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function () use ($method) {
+            $this->route->$method(self::URI, fn () => self::ARRAY_RESPONSE);
         });
 
         $fullRoutes = $this->route->getFullRoutes();
@@ -162,8 +169,8 @@ class RouteTest extends Test
      * */
     public function testHttpMethodsWithMiddleware(string $method, string $httpMethod): void
     {
-        $this->route->middleware(self::FILTERS_MIDDLEWARE, function() use ($method) {
-            $this->route->$method(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware(self::FILTERS_MIDDLEWARE, function () use ($method) {
+            $this->route->$method(self::URI, fn () => self::ARRAY_RESPONSE);
         });
 
         $fullRoutes = $this->route->getFullRoutes();
@@ -175,7 +182,7 @@ class RouteTest extends Test
 
     public function testMatch(): void
     {
-        $this->route->match([Route::GET, Route::POST], self::URI_MATCH, fn() => self::ARRAY_RESPONSE);
+        $this->route->match([Route::GET, Route::POST], self::URI_MATCH, fn () => self::ARRAY_RESPONSE);
 
         $fullRoutes = $this->route->getFullRoutes();
 
@@ -188,8 +195,8 @@ class RouteTest extends Test
 
     public function testMultipleMatch(): void
     {
-        $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
-        $this->route->match([Route::GET, Route::POST, Route::PUT], self::URI_MATCH, fn() => self::ARRAY_RESPONSE);
+        $this->route->match([Route::GET, Route::POST], self::URI, fn () => self::ARRAY_RESPONSE);
+        $this->route->match([Route::GET, Route::POST, Route::PUT], self::URI_MATCH, fn () => self::ARRAY_RESPONSE);
 
         $fullRoutes = $this->route->getFullRoutes();
 
@@ -207,8 +214,8 @@ class RouteTest extends Test
 
     public function testMatchWithPrefix(): void
     {
-        $this->route->prefix(self::PREFIX, function() {
-            $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function () {
+            $this->route->match([Route::GET, Route::POST], self::URI, fn () => self::ARRAY_RESPONSE);
         });
 
         $fullRoutes = $this->route->getFullRoutes();
@@ -227,8 +234,8 @@ class RouteTest extends Test
             new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
         ]);
 
-        $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
-            $this->route->match([Route::GET, Route::POST], self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function () {
+            $this->route->match([Route::GET, Route::POST], self::URI, fn () => self::ARRAY_RESPONSE);
         });
 
         $fullRoutes = $this->route->getFullRoutes();
@@ -242,8 +249,8 @@ class RouteTest extends Test
 
     public function testPrefix(): void
     {
-        $this->route->prefix(self::PREFIX, function() {
-            $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function () {
+            $this->route->get(self::URI, fn () => self::ARRAY_RESPONSE);
         });
 
         $fullRoutes = $this->route->getFullRoutes();
@@ -255,9 +262,9 @@ class RouteTest extends Test
 
     public function testMultiplePrefix(): void
     {
-        $this->route->prefix(self::PREFIX, function() {
-            $this->route->prefix(self::PREFIX, function() {
-                $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->prefix(self::PREFIX, function () {
+            $this->route->prefix(self::PREFIX, function () {
+                $this->route->get(self::URI, fn () => self::ARRAY_RESPONSE);
             });
         });
 
@@ -275,8 +282,8 @@ class RouteTest extends Test
             new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
         ]);
 
-        $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function() {
-            $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware([self::FILTER_NAME_1, self::FILTER_NAME_2, self::PREFIX], function () {
+            $this->route->get(self::URI, fn () => self::ARRAY_RESPONSE);
         });
 
         $fullRoutes = $this->route->getFullRoutes();
@@ -298,10 +305,10 @@ class RouteTest extends Test
             new Middleware(self::FILTER_NAME_2, $this->customClass::class, 'exampleMethod2')
         ]);
 
-        $this->route->middleware([self::FILTER_NAME_1], function() {
-            $this->route->middleware([self::FILTER_NAME_2], function() {
-                $this->route->prefix(self::PREFIX, function() {
-                    $this->route->get(self::URI, fn() => self::ARRAY_RESPONSE);
+        $this->route->middleware([self::FILTER_NAME_1], function () {
+            $this->route->middleware([self::FILTER_NAME_2], function () {
+                $this->route->prefix(self::PREFIX, function () {
+                    $this->route->get(self::URI, fn () => self::ARRAY_RESPONSE);
                 });
             });
         });

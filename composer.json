@@ -17,7 +17,7 @@
         "php": ">=8.2",
         "phroute/phroute": "^2.2",
         "php-di/php-di": "^7.0",
-        "lion/dependency-injection": "^1.1"
+        "lion/dependency-injection": "^1.5"
     },
     "require-dev": {
         "lion/test": "^1.4",

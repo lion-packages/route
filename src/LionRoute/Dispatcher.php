@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lion\Route;
 
-use Lion\DependencyInjection\Container;
+use Lion\Dependency\Injection\Container;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\HandlerResolver;
@@ -58,7 +58,7 @@ class Dispatcher
         list($handler, $filters, $vars) = $this->dispatchRoute($httpMethod, trim($uri, '/'));
         list($beforeFilter, $afterFilter) = $this->parseFilters($filters);
 
-        if(($response = $this->dispatchFilters($beforeFilter)) !== null) {
+        if (($response = $this->dispatchFilters($beforeFilter)) !== null) {
             return $response;
         }
 
@@ -85,10 +85,10 @@ class Dispatcher
      */
     private function dispatchFilters($filters, $response = null): mixed
     {
-        while($filter = array_shift($filters)) {
+        while ($filter = array_shift($filters)) {
             $handler = $this->handlerResolver->resolve($filter);
 
-            if(($filteredResponse = call_user_func($handler, $response)) !== null) {
+            if (($filteredResponse = call_user_func($handler, $response)) !== null) {
                 return $filteredResponse;
             }
         }
@@ -108,11 +108,11 @@ class Dispatcher
         $beforeFilter = array();
         $afterFilter = array();
 
-        if(isset($filters[Route::BEFORE])) {
+        if (isset($filters[Route::BEFORE])) {
             $beforeFilter = array_intersect_key($this->filters, array_flip((array) $filters[Route::BEFORE]));
         }
 
-        if(isset($filters[Route::AFTER])) {
+        if (isset($filters[Route::AFTER])) {
             $afterFilter = array_intersect_key($this->filters, array_flip((array) $filters[Route::AFTER]));
         }
 
@@ -169,12 +169,12 @@ class Dispatcher
     {
         $additional = array(Route::ANY);
 
-        if($httpMethod === Route::HEAD) {
+        if ($httpMethod === Route::HEAD) {
             $additional[] = Route::GET;
         }
 
-        foreach($additional as $method) {
-            if(isset($routes[$method])) {
+        foreach ($additional as $method) {
+            if (isset($routes[$method])) {
                 return $method;
             }
         }
@@ -202,7 +202,7 @@ class Dispatcher
 
             $count = count($matches);
 
-            while(!isset($data['routeMap'][$count++]));
+            while (!isset($data['routeMap'][$count++]));
 
             $routes = $data['routeMap'][$count - 1];
 
@@ -211,7 +211,7 @@ class Dispatcher
             }
 
             foreach (array_values($routes[$httpMethod][2]) as $i => $varName) {
-                if(!isset($matches[$i + 1]) || $matches[$i + 1] === '') {
+                if (!isset($matches[$i + 1]) || $matches[$i + 1] === '') {
                     unset($routes[$httpMethod][2][$varName]);
                 } else {
                     $routes[$httpMethod][2][$varName] = $matches[$i + 1];

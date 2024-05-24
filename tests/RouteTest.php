@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Lion\Route\Middleware;
 use Lion\Route\Route;
 use Lion\Test\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Provider\ControllerProvider;
 use Tests\Provider\HttpMethodsProviderTrait;
 
@@ -40,6 +41,7 @@ class RouteTest extends Test
     protected function setUp(): void
     {
         $this->route = new Route();
+
         $this->client = new Client();
 
         $this->customClass = new class
@@ -56,6 +58,7 @@ class RouteTest extends Test
         };
 
         $this->route->init();
+
         $this->initReflection($this->route);
     }
 
@@ -111,9 +114,7 @@ class RouteTest extends Test
         $this->assertArrayHasKey(self::FILTER_NAME_2, $filters);
     }
 
-    /**
-     * @dataProvider httpMethodsProvider
-     * */
+    #[DataProvider('httpMethodsProvider')]
     public function testHttpMethods(string $method, string $httpMethod): void
     {
         $this->route->$method(self::URI, fn () => self::ARRAY_RESPONSE);
@@ -148,9 +149,7 @@ class RouteTest extends Test
         $this->assertSame(self::URI, $response['middleware']);
     }
 
-    /**
-     * @dataProvider httpMethodsProvider
-     * */
+    #[DataProvider('httpMethodsProvider')]
     public function testHttpMethodsWithPrefix(string $method, string $httpMethod): void
     {
         $this->route->prefix(self::PREFIX, function () use ($method) {
@@ -164,9 +163,7 @@ class RouteTest extends Test
         $this->assertSame(self::ROUTES[$httpMethod], $fullRoutes[self::FULL_URI][$httpMethod]);
     }
 
-    /**
-     * @dataProvider httpMethodsProvider
-     * */
+    #[DataProvider('httpMethodsProvider')]
     public function testHttpMethodsWithMiddleware(string $method, string $httpMethod): void
     {
         $this->route->middleware(self::FILTERS_MIDDLEWARE, function () use ($method) {

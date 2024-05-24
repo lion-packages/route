@@ -7,6 +7,12 @@ namespace Lion\Route;
 /**
  * Construct a Middleware object for web routes
  *
+ * @property string|null $middlewareName [Middleware name]
+ * @property string|null $class [Class that invokes the middleware]
+ * @property string|null $methodClass [Name of the method that is invoked in the
+ * middleware class]
+ * @property array<string, mixed>|null $params [List of defined parameters]
+ *
  * @package Lion\Route
  */
 class Middleware
@@ -18,19 +24,24 @@ class Middleware
      * @param string|null $class [Class that invokes the middleware]
      * @param string|null $methodClass [Name of the method that is invoked in
      * the middleware class]
+     * @param array<string, mixed>|null $params [List of defined parameters]
      */
-	public function __construct(
-		private ?string $middlewareName = null,
-		private ?string $class = null,
-		private ?string $methodClass = null
-	) {}
+    public function __construct(
+        private ?string $middlewareName = null,
+        private ?string $class = null,
+        private ?string $methodClass = null,
+        private ?array $params = null
+    ) {
+    }
 
     /**
      * Create a new object of the middleware class
      *
-     * @return object
+     * @return mixed
+     *
+     * @internal
      */
-    public function newObject(): object
+    public function newObject(): mixed
     {
         return new ($this->getClass())();
     }
@@ -39,6 +50,8 @@ class Middleware
      * Returns the name of the middleware
      *
      * @return string|null
+     *
+     * @internal
      */
     public function getMiddlewareName(): ?string
     {
@@ -51,6 +64,8 @@ class Middleware
      * @param string|null $middlewareName [Middleware name]
      *
      * @return Middleware
+     *
+     * @internal
      */
     public function setMiddlewareName(?string $middlewareName): Middleware
     {
@@ -63,6 +78,8 @@ class Middleware
      * Returns the namespace of the class being invoked
      *
      * @return string|null
+     *
+     * @internal
      */
     public function getClass(): ?string
     {
@@ -75,6 +92,8 @@ class Middleware
      * @param string|null $class [Class that invokes the middleware]
      *
      * @return Middleware
+     *
+     * @internal
      */
     public function setClass(?string $class): Middleware
     {
@@ -87,6 +106,8 @@ class Middleware
      * Returns the method that is invoked from the middleware class
      *
      * @return string|null
+     *
+     * @internal
      */
     public function getMethodClass(): ?string
     {
@@ -100,10 +121,41 @@ class Middleware
      * the middleware class]
      *
      * @return Middleware
+     *
+     * @internal
      */
     public function setMethodClass(?string $methodClass): Middleware
     {
         $this->methodClass = $methodClass;
+
+        return $this;
+    }
+
+    /**
+     * Returns the list of parameters defined for the middleware
+     *
+     * @return array<string, mixed>
+     *
+     * @internal
+     */
+    public function getParams(): ?array
+    {
+        return $this->params;
+    }
+
+    /**
+     * Change the parameters of the method that is invoked from the middleware
+     * class
+     *
+     * @param array<string, mixed>|null $params [List of defined parameters]
+     *
+     * @return Middleware
+     *
+     * @internal
+     */
+    public function setParams(array $params): Middleware
+    {
+        $this->params = $params;
 
         return $this;
     }

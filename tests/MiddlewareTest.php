@@ -9,24 +9,32 @@ use Lion\Test\Test;
 
 class MiddlewareTest extends Test
 {
-    const MIDDLEWARE_NAME = 'custom-class';
-    const MIDDLEWARE_NAME_TEST = 'custom-class-test';
-    const EXAMPLE_METHOD = 'exampleMethod';
-    const EXAMPLE_METHOD_TEST = 'exampleMethodTest';
+    const string MIDDLEWARE_NAME = 'custom-class';
+    const string MIDDLEWARE_NAME_TEST = 'custom-class-test';
+    const string EXAMPLE_METHOD = 'exampleMethod';
+    const string EXAMPLE_METHOD_TEST = 'exampleMethodTest';
+    const array EXAMPLE_PARAMS = ['key' => 'value'];
+    const array EXAMPLE_PARAMS_TEST = ['key' => 'value2'];
 
     private Middleware $middleware;
     private $customClass;
 
     protected function setUp(): void
     {
-        $this->customClass = new class {
+        $this->customClass = new class
+        {
             public function exampleMethod(): void
             {
-                echo('TESTING');
+                echo ('TESTING');
             }
         };
 
-        $this->middleware = new Middleware(self::MIDDLEWARE_NAME, $this->customClass::class, self::EXAMPLE_METHOD);
+        $this->middleware = new Middleware(
+            self::MIDDLEWARE_NAME,
+            $this->customClass::class,
+            self::EXAMPLE_METHOD,
+            self::EXAMPLE_PARAMS
+        );
     }
 
     public function testConstruct(): void
@@ -50,11 +58,7 @@ class MiddlewareTest extends Test
 
     public function testSetMiddlewareName(): void
     {
-        $this->assertInstanceOf(
-            $this->middleware::class,
-            $this->middleware->setMiddlewareName(self::MIDDLEWARE_NAME_TEST)
-        );
-
+        $this->assertInstanceOf(Middleware::class, $this->middleware->setMiddlewareName(self::MIDDLEWARE_NAME_TEST));
         $this->assertSame(self::MIDDLEWARE_NAME_TEST, $this->middleware->getMiddlewareName());
     }
 
@@ -65,10 +69,11 @@ class MiddlewareTest extends Test
 
     public function testSetClass(): void
     {
-        $newCustomClass = new class {};
+        $newCustomClass = new class
+        {
+        };
 
-        $this->assertInstanceOf($this->middleware::class, $this->middleware->setClass($newCustomClass::class));
-
+        $this->assertInstanceOf(Middleware::class, $this->middleware->setClass($newCustomClass::class));
         $this->assertSame($newCustomClass::class, $this->middleware->getClass());
     }
 
@@ -79,8 +84,18 @@ class MiddlewareTest extends Test
 
     public function testSetMethodClass(): void
     {
-        $this->assertInstanceOf($this->middleware::class, $this->middleware->setMethodClass(self::EXAMPLE_METHOD_TEST));
-
+        $this->assertInstanceOf(Middleware::class, $this->middleware->setMethodClass(self::EXAMPLE_METHOD_TEST));
         $this->assertSame(self::EXAMPLE_METHOD_TEST, $this->middleware->getMethodClass());
+    }
+
+    public function testGetParams(): void
+    {
+        $this->assertSame(self::EXAMPLE_PARAMS, $this->middleware->getParams());
+    }
+
+    public function testSetParams(): void
+    {
+        $this->assertInstanceOf(Middleware::class, $this->middleware->setParams(self::EXAMPLE_PARAMS_TEST));
+        $this->assertSame(self::EXAMPLE_PARAMS_TEST, $this->middleware->getParams());
     }
 }

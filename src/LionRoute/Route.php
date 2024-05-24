@@ -276,7 +276,7 @@ class Route
     /**
      * Add the defined filters to the router
      *
-     * @param array<Middleware> $filters [List of defined filters]
+     * @param array<int, Middleware> $filters [List of defined filters]
      *
      * @return void
      * */

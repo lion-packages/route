@@ -20,8 +20,8 @@
         "lion/dependency-injection": "^1.5"
     },
     "require-dev": {
-        "lion/test": "^1.4",
-        "phpunit/phpunit": "^10.5",
-        "guzzlehttp/guzzle": "^7.8"
+        "guzzlehttp/guzzle": "^7.8",
+        "lion/test": "^2.0",
+        "phpunit/phpunit": "^11.1"
     }
 }

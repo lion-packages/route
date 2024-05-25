@@ -134,7 +134,7 @@ class Middleware
     /**
      * Returns the list of parameters defined for the middleware
      *
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null
      *
      * @internal
      */

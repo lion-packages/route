@@ -10,26 +10,35 @@ trait HttpMethodsProviderTrait
 {
     const DATA_METHOD = [
         'filters' => [],
-        'handler' => ['controller' => false, 'callback' => true, 'request' => false]
+        'handler' => [
+            'controller' => false,
+            'callback' => true,
+        ]
     ];
     const DATA_METHOD_MIDDLEWARE = [
-        'filters' => ['example-method-1', 'example-method-2'],
-        'handler' => ['controller' => false, 'callback' => true, 'request' => false]
+        'filters' => [
+            'example-method-1',
+            'example-method-2',
+        ],
+        'handler' => [
+            'controller' => false,
+            'callback' => true,
+        ],
     ];
     const DATA_METHOD_CONTROLLER = [
         'filters' => [],
         'handler' => [
             'controller' => [
                 'name' => ControllerProvider::class,
-                'function' => 'getMiddleware'
+                'function' => 'getMiddleware',
             ],
             'callback' => false,
-            'request' => false
-        ]
+        ],
     ];
     const FILTER_NAME_1 = 'example-method-1';
     const FILTER_NAME_2 = 'example-method-2';
-    const FILTERS_MIDDLEWARE = [self::FILTER_NAME_1, self::FILTER_NAME_2];
+    const FILTER_NAME_3 = 'example-method-3';
+    const FILTERS_MIDDLEWARE = [self::FILTER_NAME_1, self::FILTER_NAME_2, self::FILTER_NAME_3];
     const ROUTES = [
         Route::GET => self::DATA_METHOD,
         Route::POST => self::DATA_METHOD,
@@ -56,35 +65,35 @@ trait HttpMethodsProviderTrait
         return [
             [
                 'method' => 'get',
-                'httpMethod' => Route::GET
+                'httpMethod' => Route::GET,
             ],
             [
                 'method' => 'post',
-                'httpMethod' => Route::POST
+                'httpMethod' => Route::POST,
             ],
             [
                 'method' => 'put',
-                'httpMethod' => Route::PUT
+                'httpMethod' => Route::PUT,
             ],
             [
                 'method' => 'delete',
-                'httpMethod' => Route::DELETE
+                'httpMethod' => Route::DELETE,
             ],
             [
                 'method' => 'head',
-                'httpMethod' => Route::HEAD
+                'httpMethod' => Route::HEAD,
             ],
             [
                 'method' => 'options',
-                'httpMethod' => Route::OPTIONS
+                'httpMethod' => Route::OPTIONS,
             ],
             [
                 'method' => 'patch',
-                'httpMethod' => Route::PATCH
+                'httpMethod' => Route::PATCH,
             ],
             [
                 'method' => 'any',
-                'httpMethod' => Route::ANY
+                'httpMethod' => Route::ANY,
             ]
         ];
     }

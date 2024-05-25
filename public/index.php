@@ -140,4 +140,10 @@ Route::get('no-content', function () {
     ];
 });
 
+Route::post('simple-middleware', function () {
+    return [
+        'status' => 'success',
+    ];
+}, ['example-method-1', 'example-method-2', 'example-method-3', 'example-method-4', 'example-method-5']);
+
 Route::dispatch();

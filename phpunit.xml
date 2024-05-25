@@ -13,7 +13,7 @@
     stopOnFailure="true"
     stopOnWarning="true"
     bootstrap="vendor/autoload.php"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.1/phpunit.xsd"
     backupStaticProperties="false"
     displayDetailsOnIncompleteTests="true"
     displayDetailsOnSkippedTests="true"
@@ -29,9 +29,29 @@
         <ini name="memory_limit" value="2048M" />
     </php>
 
+    <extensions>
+        <bootstrap class="RobinIngelbrecht\PHPUnitPrettyPrint\PhpUnitExtension">
+            <parameter name="enableByDefault" value="true" />
+            <parameter name="displayProfiling" value="true" />
+            <parameter name="useCompactMode" value="true" />
+        </bootstrap>
+    </extensions>
+
+    <source>
+        <include>
+            <directory suffix=".php">src/LionRoute</directory>
+        </include>
+
+        <exclude>
+            <directory suffix=".php">tests/build</directory>
+            <directory suffix=".php">tests/Provider</directory>
+        </exclude>
+    </source>
+
     <testsuites>
         <testsuite name="All-Test">
-            <directory>tests/</directory>
+            <file>tests/MiddlewareTest.php</file>
+            <file>tests/RouteTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

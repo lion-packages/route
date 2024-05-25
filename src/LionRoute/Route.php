@@ -16,6 +16,14 @@ use Phroute\Phroute\RouteCollector;
 /**
  * Class to define web routes
  *
+ * @property RouteCollector $router [Collector class object]
+ * @property Container $container [Container class object]
+ * @property string $uri [Defines the URI]
+ * @property int $index [defines the Index from which the route is obtained]
+ * @property array $routes [Route list]
+ * @property array $filters [Filter List]
+ * @property string $prefix [Current group]
+ *
  * @package Lion\Route
  */
 class Route
@@ -25,77 +33,77 @@ class Route
      *
      * @const ANY
      */
-    const ANY = 'ANY';
+    const string ANY = 'ANY';
 
     /**
      * [Constant to define the HTTP POST protocol]
      *
      * @const POST
      */
-    const POST = 'POST';
+    const string POST = 'POST';
 
     /**
      * [Constant to define the HTTP GET protocol]
      *
      * @const GET
      */
-    const GET = 'GET';
+    const string GET = 'GET';
 
     /**
      * [Constant to define the HTTP PUT protocol]
      *
      * @const PUT
      */
-    const PUT = 'PUT';
+    const string PUT = 'PUT';
 
     /**
      * [Constant to define the HTTP DELETE protocol]
      *
      * @const DELETE
      */
-    const DELETE = 'DELETE';
+    const string DELETE = 'DELETE';
 
     /**
      * [Constant to define the HTTP HEAD protocol]
      *
      * @const HEAD
      */
-    const HEAD = 'HEAD';
+    const string HEAD = 'HEAD';
 
     /**
      * [Constant to define the HTTP OPTIONS protocol]
      *
      * @const OPTIONS
      */
-    const OPTIONS = 'OPTIONS';
+    const string OPTIONS = 'OPTIONS';
 
     /**
      * [Constant to define the HTTP PATCH protocol]
      *
      * @const PATCH
      */
-    const PATCH = 'PATCH';
+    const string PATCH = 'PATCH';
 
     /**
      * [Constant to define the 'prefix' property]
      *
      * @const PREFIX
      */
-    private const PREFIX = 'prefix';
+    private const string PREFIX = 'prefix';
 
     /**
      * [Constant to define the 'after' property]
      *
-     * @const PREFIX
+     * @const AFTER
      */
-    private const AFTER = 'after';
+    private const string AFTER = 'after';
 
     /**
      * [Constant to define the 'before' property]
      *
-     * @const PREFIX
+     * @const BEFORE
      */
-    private const BEFORE = 'before';
+    private const string BEFORE = 'before';
 
     /**
      * [Collector class object]
@@ -167,10 +175,10 @@ class Route
     /**
      * Run the defined route configuration
      *
-     * @param  string $type [Function that is executed]
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $type [Function that is executed]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
@@ -194,8 +202,8 @@ class Route
      *
      * @param string $uri [URI for HTTP route]
      * @param string $method [HTTP protocol]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
@@ -203,19 +211,17 @@ class Route
     {
         $newUri = str_replace("//", "/", (self::$prefix . $uri));
 
-        $callback = is_array($function) ? false : (is_string($function) ? false : true);
-
-        $request = !is_string($function) ? false : ['url' => $function];
-
         $controller = !is_array($function) ? false : ['name' => $function[0], 'function' => $function[1]];
 
         if (!isset(self::$routes[$newUri][$method])) {
             self::$routes[$newUri][$method] = [
-                'filters' => [...self::$filters, ...$options],
+                'filters' => [
+                    ...self::$filters,
+                    ...$options
+                ],
                 'handler' => [
                     'controller' => $controller,
-                    'callback' => $callback,
-                    'request' => $request
+                    'callback' => is_callable($function),
                 ]
             ];
         } else {
@@ -227,8 +233,7 @@ class Route
 
             self::$routes[$newUri][$method]['handler'] = [
                 'controller' => $controller,
-                'callback' => $callback,
-                'request' => $request
+                'callback' => is_callable($function),
             ];
         }
     }
@@ -276,17 +281,24 @@ class Route
     /**
      * Add the defined filters to the router
      *
-     * @param array<Middleware> $filters [List of defined filters]
+     * @param array<int, Middleware> $filters [List of defined filters]
      *
      * @return void
-     * */
+     */
     public static function addMiddleware(array $filters): void
     {
         foreach ($filters as $middleware) {
-            self::$router->filter($middleware->getMiddlewareName(), function () use ($middleware) {
+            self::$router->filter($middleware->getMiddlewareName(), function () use ($middleware): void {
+                $params = [];
+
+                if (is_array($middleware->getParams())) {
+                    $params = [...$middleware->getParams()];
+                }
+
                 self::$container->injectDependenciesMethod(
                     self::$container->injectDependencies($middleware->newObject()),
-                    $middleware->getMethodClass()
+                    $middleware->getMethodClass(),
+                    $params
                 );
             });
         }
@@ -296,143 +308,185 @@ class Route
      * Dispatch the data obtained from the router in JSON format
      *
      * @return void
+     *
+     * @throws HttpRouteNotFoundException
+     * @throws HttpMethodNotAllowedException
      */
     public static function dispatch(): void
     {
         try {
-            $container = (new ContainerBuilder())->useAutowiring(true)->useAttributes(true)->build();
+            $container = (new ContainerBuilder())
+                ->useAutowiring(true)
+                ->useAttributes(true)
+                ->build();
+
             $dispatch = new Dispatcher(self::$router->getData(), new RouterResolver($container), self::$container);
 
-            $response = $dispatch->dispatch(
-                $_SERVER['REQUEST_METHOD'],
-                implode('/', array_slice(explode('/', self::$uri), self::$index))
-            );
+            $response = $dispatch
+                ->dispatch(
+                    $_SERVER['REQUEST_METHOD'],
+                    implode('/', array_slice(explode('/', self::$uri), self::$index))
+                );
+
+            $noContentStatusCodes = [
+                100, // Continue
+                101, // Switching Protocols
+                102, // Processing (WebDAV)
+                103, // Early Hints
+                204, // No Content
+                205, // Reset Content
+                304, // Not Modified
+            ];
+
+            if (is_object($response) && !empty($response->code) && in_array($response->code, $noContentStatusCodes)) {
+                exit;
+            }
 
             die(json_encode($response));
         } catch (HttpRouteNotFoundException $e) {
-            die(json_encode(['status' => 'route-error', 'message' => $e->getMessage()]));
+            http_response_code(404);
+
+            die(json_encode([
+                'code' => 404,
+                'status' => 'route-error',
+                'message' => $e->getMessage()
+            ]));
         } catch (HttpMethodNotAllowedException $e) {
-            die(json_encode(['status' => 'route-error', 'message' => $e->getMessage()]));
+            http_response_code(405);
+
+            die(json_encode([
+                'code' => 405,
+                'status' => 'route-error',
+                'message' => $e->getMessage()
+            ]));
         }
     }
 
     /**
      * Function to declare a route with the HTTP GET protocol
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function get(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::GET), $uri, $function, $options);
+
         self::addRoutes($uri, self::GET, $function, $options);
     }
 
     /**
      * Function to declare a route with the HTTP POST protocol
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function post(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::POST), $uri, $function, $options);
+
         self::addRoutes($uri, self::POST, $function, $options);
     }
 
     /**
      * Function to declare a route with the HTTP PUT protocol
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function put(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::PUT), $uri, $function, $options);
+
         self::addRoutes($uri, self::PUT, $function, $options);
     }
 
     /**
      * Function to declare a route with the HTTP DELETE protocol
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function delete(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::DELETE), $uri, $function, $options);
+
         self::addRoutes($uri, self::DELETE, $function, $options);
     }
 
     /**
      * Function to declare a route with the HTTP HEAD protocol
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function head(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::HEAD), $uri, $function, $options);
+
         self::addRoutes($uri, self::HEAD, $function, $options);
     }
 
     /**
      * Function to declare a route with the HTTP OPTIONS protocol
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function options(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::OPTIONS), $uri, $function, $options);
+
         self::addRoutes($uri, self::OPTIONS, $function, $options);
     }
 
     /**
      * Function to declare a route with the HTTP PATCH protocol
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function patch(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::PATCH), $uri, $function, $options);
+
         self::addRoutes($uri, self::PATCH, $function, $options);
     }
 
     /**
      * Function to declare any route with HTTP protocols
      *
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
     public static function any(string $uri, Closure|array $function, array $options = []): void
     {
         self::executeRoute(strtolower(self::ANY), $uri, $function, $options);
+
         self::addRoutes($uri, self::ANY, $function, $options);
     }
 
@@ -440,10 +494,10 @@ class Route
      * Function to declare any route with HTTP protocols or to define the
      * route with certain HTTP protocols
      *
-     * @param array<string> $methods [List of HTTP protocols for routes]
-     * @param  string $uri [URI for HTTP route]
-     * @param  array $function [Function that executes]
-     * @param  array $options [Filter options]
+     * @param array<int, string> $methods [List of HTTP protocols for routes]
+     * @param string $uri [URI for HTTP route]
+     * @param array $function [Function that executes]
+     * @param array $options [Filter options]
      *
      * @return void
      */
@@ -451,6 +505,7 @@ class Route
     {
         foreach ($methods as $method) {
             self::executeRoute(strtolower(trim($method)), $uri, $function, $options);
+
             self::addRoutes($uri, strtoupper(trim($method)), $function, $options);
         }
     }
@@ -458,8 +513,8 @@ class Route
     /**
      * Defines the group to group the defined routes
      *
-     * @param  string $name [Route group name]
-     * @param  Closure $closure [Function that executes]
+     * @param string $name [Route group name]
+     * @param Closure $closure [Function that executes]
      *
      * @return void
      */
@@ -477,8 +532,8 @@ class Route
     /**
      * Defines filters to group defined routes
      *
-     * @param  array $filters [Defined filters]
-     * @param  Closure $closure [Function that executes]
+     * @param array $filters [Defined filters]
+     * @param Closure $closure [Function that executes]
      *
      * @return void
      */
@@ -490,50 +545,60 @@ class Route
 
         self::$filters = [];
 
-        $listMiddleware = [];
+        $createGroup = function (array $filters, Closure $closure) use (&$createGroup): void {
+            if (empty($filters)) {
+                $closure();
 
-        $count = count($filters);
+                return;
+            }
 
-        if ($count === 1) {
-            self::$filters = [...self::$filters, ...$filters];
+            self::$router->group(
+                [self::BEFORE => array_shift($filters)],
+                function () use ($filters, $closure, $createGroup): void {
+                    $createGroup($filters, $closure);
+                }
+            );
+        };
 
-            $listMiddleware = [self::BEFORE => $filters[0]];
+        if (isset($filters['prefix'])) {
+            $customPrefix = $filters['prefix'];
 
-            array_unshift(self::$filters, ...$parentFilters);
-
-            self::$router->group($listMiddleware, $closure);
-
-            self::$filters = $originalFilters;
-        } elseif ($count === 2) {
-            self::$filters = [...self::$filters, ...$filters];
-
-            $listMiddleware = [self::BEFORE => $filters[0], self::AFTER => $filters[1]];
-
-            array_unshift(self::$filters, ...$parentFilters);
-
-            self::$router->group($listMiddleware, $closure);
-
-            self::$filters = $originalFilters;
-        } elseif ($count >= 3) {
-            self::$filters = [...self::$filters, $filters[0], $filters[1]];
+            unset($filters['prefix']);
 
             $previousPrefix = self::$prefix;
 
-            self::$prefix .= "{$filters[2]}/";
+            self::$prefix .= "{$customPrefix}/";
 
-            $listMiddleware = [
-                self::BEFORE => $filters[0],
-                self::AFTER => $filters[1],
-                self::PREFIX => $filters[2]
+            self::$filters = [
+                ...self::$filters,
+                ...$filters
             ];
 
             array_unshift(self::$filters, ...$parentFilters);
 
-            self::$router->group($listMiddleware, $closure);
+            self::$router->group(
+                [self::PREFIX => $customPrefix],
+                function () use ($createGroup, $filters, $closure): void {
+                    $createGroup($filters, $closure);
+                }
+            );
 
             self::$filters = $originalFilters;
 
             self::$prefix = $previousPrefix;
+        } else {
+            self::$filters = [
+                ...self::$filters,
+                ...$filters
+            ];
+
+            array_unshift(self::$filters, ...$parentFilters);
+
+            $createGroup($filters, $closure);
+
+            self::$filters = $originalFilters;
         }
+
+        self::$filters = $originalFilters;
     }
 }

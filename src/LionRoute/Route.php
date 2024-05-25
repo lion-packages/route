@@ -178,22 +178,22 @@ class Route
      * @param string $type [Function that is executed]
      * @param string $uri [URI for HTTP route]
      * @param array $function [Function that executes]
-     * @param array $options [Filter options]
+     * @param array<int, string> $options [Filter options]
      *
      * @return void
      */
-    private static function executeRoute(string $type, string $uri, Closure|array $function, array $options): void
+    private static function executeRoute(string $type, string $uri, Closure|array $function, array $options = []): void
     {
-        if (count($options) > 0) {
-            $middleware = [self::BEFORE => $options[0]];
-
-            if (isset($options[1])) {
-                $middleware[self::AFTER] = $options[1];
+        if (empty($options)) {
+            self::$router->$type($uri, $function);
+        } else {
+            if (isset($options['prefix'])) {
+                unset($options['prefix']);
             }
 
-            self::$router->$type($uri, $function, $middleware);
-        } else {
-            self::$router->$type($uri, $function);
+            self::middleware($options, function () use ($type, $uri, $function): void {
+                self::$router->$type($uri, $function);
+            });
         }
     }
 

@@ -84,6 +84,7 @@ Route::get('/', fn () => ['isValid' => true]);
 Route::get('controller', [ControllerProvider::class, 'middleware']);
 Route::get('controller/{middleware}', [ControllerProvider::class, 'setMiddleware']);
 Route::get('controller/middleware/get', [ControllerProvider::class, 'getMiddleware']);
+Route::post('rules', [ControllerProvider::class, 'testAttributes']);
 
 Route::get('controller-index', function (Middleware $middleware, string $name = 'Lion') {
     return [

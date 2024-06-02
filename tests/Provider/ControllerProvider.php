@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Provider;
 
+use Lion\Route\Attributes\Rules;
 use Lion\Route\Middleware;
+use Tests\Provider\Rules\IdRuleProvider;
+use Tests\Provider\Rules\NameRuleProvider;
 
 class ControllerProvider
 {
@@ -41,6 +44,14 @@ class ControllerProvider
     {
         return [
             'middleware' => $middleware->getMiddlewareName()
+        ];
+    }
+
+    #[Rules(IdRuleProvider::class, NameRuleProvider::class)]
+    public function testAttributes(): array
+    {
+        return [
+            'isValid' => true,
         ];
     }
 }

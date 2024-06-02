@@ -24,6 +24,8 @@
         "lion/test": "^2.0",
         "phpunit/phpunit": "^11.1",
         "lion/exceptions": "^1.1",
-        "robiningelbrecht/phpunit-pretty-print": "^1.3"
+        "robiningelbrecht/phpunit-pretty-print": "^1.3",
+        "lion/request": "^6.8",
+        "lion/security": "^9.1"
     }
 }

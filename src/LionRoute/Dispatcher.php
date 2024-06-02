@@ -5,37 +5,54 @@ declare(strict_types=1);
 namespace Lion\Route;
 
 use Lion\Dependency\Injection\Container;
+use Lion\Route\Attributes\Rules;
+use Lion\Route\Exceptions\RulesException;
+use Lion\Route\Kernel\Http;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\HandlerResolver;
 use Phroute\Phroute\HandlerResolverInterface;
 use Phroute\Phroute\Route;
 use Phroute\Phroute\RouteDataInterface;
+use ReflectionMethod;
 
 class Dispatcher
 {
+    /**
+     * [Container to generate dependency injection]
+     *
+     * @var Container $container
+     */
     private Container $container;
+
     private $staticRouteMap;
+
     private $variableRouteData;
+
     private $filters;
+
     private $handlerResolver;
+
     public $matchedRoute;
 
     /**
-     * Create a new route dispatcher.
+     * Create a new route dispatcher
      *
-     * @param RouteDataInterface $data
+     * @param Container $container [Container to generate dependency injection]
+     * @param RouteDataInterface $data [Interface RouteDataInterface]
      * @param HandlerResolverInterface $resolver
-     * @param Container $container
      */
     public function __construct(
+        Container $container,
         RouteDataInterface $data,
-        HandlerResolverInterface $resolver = null,
-        Container $container
+        HandlerResolverInterface $resolver = null
     ) {
         $this->container = $container;
+
         $this->staticRouteMap = $data->getStaticRoutes();
+
         $this->variableRouteData = $data->getVariableRoutes();
+
         $this->filters = $data->getFilters();
 
         if ($resolver === null) {
@@ -46,16 +63,38 @@ class Dispatcher
     }
 
     /**
+     * Dispatches all rules defined by attributes in the method
+     *
+     * @param object $classInstance [Class instance]
+     * @param string $methodName [Class method]
+     *
+     * @return void
+     *
+     * @throws RulesException
+     */
+    private function dispatchRules($classInstance, $methodName): void
+    {
+        $attributes = (new ReflectionMethod($classInstance, $methodName))->getAttributes(Rules::class);
+
+        if (!empty($attributes)) {
+            (new Http())
+                ->setContainer($this->container)
+                ->validateRules($attributes[0]->newInstance()->getRules());
+        }
+    }
+
+    /**
      * Dispatch a route for the given HTTP Method / URI.
      *
-     * @param $httpMethod
-     * @param $uri
+     * @param string $httpMethod
+     * @param string $uri
      *
-     * @return mixed|null
+     * @return mixed
      */
-    public function dispatch($httpMethod, $uri): mixed
+    public function dispatch(string $httpMethod, string $uri): mixed
     {
         list($handler, $filters, $vars) = $this->dispatchRoute($httpMethod, trim($uri, '/'));
+
         list($beforeFilter, $afterFilter) = $this->parseFilters($filters);
 
         if (($response = $this->dispatchFilters($beforeFilter)) !== null) {
@@ -65,11 +104,13 @@ class Dispatcher
         $resolvedHandler = $this->handlerResolver->resolve($handler);
 
         if (is_array($resolvedHandler)) {
-            return $this->container->injectDependenciesMethod(
-                $this->container->injectDependencies(reset($resolvedHandler), $vars),
-                end($resolvedHandler),
-                $vars
-            );
+            $classInstance = $this->container->injectDependencies(reset($resolvedHandler), $vars);
+
+            $methodName = end($resolvedHandler);
+
+            $this->dispatchRules($classInstance, $methodName);
+
+            return $this->container->injectDependenciesMethod($classInstance, $methodName, $vars);
         }
 
         return $this->container->injectDependenciesCallback($resolvedHandler, $vars);

@@ -311,6 +311,8 @@ class Route
      *
      * @throws HttpRouteNotFoundException
      * @throws HttpMethodNotAllowedException
+     *
+     * @codeCoverageIgnore
      */
     public static function dispatch(): void
     {
@@ -320,7 +322,7 @@ class Route
                 ->useAttributes(true)
                 ->build();
 
-            $dispatch = new Dispatcher(self::$router->getData(), new RouterResolver($container), self::$container);
+            $dispatch = new Dispatcher(self::$container, self::$router->getData(), new RouterResolver($container));
 
             $response = $dispatch
                 ->dispatch(

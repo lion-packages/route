@@ -50,6 +50,9 @@
 
     <testsuites>
         <testsuite name="All-Test">
+            <directory suffix=".php">tests/Attributes</directory>
+            <directory suffix=".php">tests/Helpers</directory>
+            <directory suffix=".php">tests/Kernel</directory>
             <file>tests/MiddlewareTest.php</file>
             <file>tests/RouteTest.php</file>
         </testsuite>

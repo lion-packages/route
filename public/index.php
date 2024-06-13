@@ -86,37 +86,37 @@ Route::get('controller/{middleware}', [ControllerProvider::class, 'setMiddleware
 Route::get('controller/middleware/get', [ControllerProvider::class, 'getMiddleware']);
 Route::post('rules', [ControllerProvider::class, 'testAttributes']);
 
-Route::get('controller-index', function (Middleware $middleware, string $name = 'Lion') {
+Route::get('controller-index', function (Middleware $middleware, string $name = 'Lion'): array {
     return [
         'name' => $middleware->setMiddlewareName($name)->getMiddlewareName()
     ];
 });
 
-Route::middleware(['example-method-1', 'example-method-2'], function () {
-    Route::middleware(['example-method-4', 'example-method-5', 'prefix' => 'custom-prefix'], function () {
-        Route::post('example-3', function () {
+Route::middleware(['example-method-1', 'example-method-2'], function (): void {
+    Route::middleware(['example-method-4', 'example-method-5', 'prefix' => 'custom-prefix'], function (): void {
+        Route::post('example-3', function (): array {
             return ['isValid' => true];
         });
 
         Route::match(
             [Route::GET, Route::POST, Route::PUT, Route::DELETE, Route::HEAD, Route::PATCH, Route::OPTIONS],
             'example-4',
-            function () {
+            function (): array {
                 return ['isValid' => true];
             }
         );
 
-        Route::any('example-5', function () {
+        Route::any('example-5', function (): array {
             return ['isValid' => true];
         });
     });
 
-    Route::post('example', function () {
+    Route::post('example', function (): array {
         return ['isValid' => true];
     });
 
-    Route::middleware(['example-method-3', 'example-method-4'], function () {
-        Route::post('example-2', function () {
+    Route::middleware(['example-method-3', 'example-method-4'], function (): void {
+        Route::post('example-2', function (): array {
             return [
                 'isValid' => true,
                 'filters' => Route::getFilters()
@@ -125,15 +125,15 @@ Route::middleware(['example-method-1', 'example-method-2'], function () {
     });
 });
 
-Route::get('get-routes', function () {
+Route::get('get-routes', function (): array {
     return Route::getRoutes();
 });
 
-Route::get('get-full-routes', function () {
+Route::get('get-full-routes', function (): array {
     return Route::getFullRoutes();
 });
 
-Route::get('no-content', function () {
+Route::get('no-content', function (): array {
     http_response_code(204);
 
     return (object) [
@@ -141,10 +141,26 @@ Route::get('no-content', function () {
     ];
 });
 
-Route::post('simple-middleware', function () {
+Route::post('simple-middleware', function (): array {
     return [
         'status' => 'success',
     ];
 }, ['example-method-1', 'example-method-2', 'example-method-3', 'example-method-4', 'example-method-5']);
+
+Route::controller(ControllerProvider::class, function (): void {
+    Route::get('todo', 'middleware');
+    Route::get('todo/{id:i}', 'middleware');
+    Route::post('todo', 'middleware');
+    Route::put('todo/{id:i}', 'middleware');
+    Route::delete('todo/{id:i}', 'middleware');
+});
+
+Route::controller(ControllerProvider::class, function (): void {
+    Route::get('post', 'middleware');
+    Route::get('post/{id:i}', 'middleware');
+    Route::post('post', 'middleware');
+    Route::put('post/{id:i}', 'middleware');
+    Route::delete('post/{id:i}', 'middleware');
+});
 
 Route::dispatch();

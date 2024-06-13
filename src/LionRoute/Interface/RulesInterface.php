@@ -7,7 +7,7 @@ namespace Lion\Route\Interface;
 /**
  * Defines the configuration for validation of the defined rules
  *
- * @package Lion\Bundle\Interface
+ * @package Lion\Route\Interface
  */
 interface RulesInterface
 {

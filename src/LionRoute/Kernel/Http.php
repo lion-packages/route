@@ -16,7 +16,7 @@ use Lion\Route\Interface\RulesInterface;
  *
  * @property Container $container [Container to generate dependency injection]
  *
- * @package Lion\Bundle\Kernel
+ * @package Lion\Route\Kernel
  */
 class Http
 {

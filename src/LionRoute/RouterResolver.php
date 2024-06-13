@@ -10,12 +10,14 @@ use Phroute\Phroute\HandlerResolverInterface;
 /**
  * Class that resolves dependencies on the class's constructor
  *
+ * @property Container $container [Dependency Injection Container]
+ *
  * @package Lion\Route
  */
 class RouterResolver implements HandlerResolverInterface
 {
     /**
-     * [Container class object]
+     * [Dependency Injection Container]
      *
      * @var Container $container
      */
@@ -24,7 +26,7 @@ class RouterResolver implements HandlerResolverInterface
     /**
      * Class constructor
      *
-     * @param Container $container [Container class object]
+     * @param Container $container [Dependency Injection Container]
      */
     public function __construct(Container $container)
     {
@@ -35,11 +37,11 @@ class RouterResolver implements HandlerResolverInterface
      * Resolves the dependencies of the constructor method of the class being
      * invoked
      *
-     * @param  mixed $handler
+     * @param mixed $handler
      */
-    public function resolve($handler)
+    public function resolve($handler): mixed
     {
-        if(is_array($handler) and is_string($handler[0])) {
+        if (is_array($handler) and is_string($handler[0])) {
             $handler[0] = $this->container->get($handler[0]);
         }
 

@@ -16,7 +16,7 @@ use Lion\Security\Validation;
  * request and modify headers]
  * @property array $responses [Array containing all answers]
  *
- * @package Lion\Bundle\Helpers
+ * @package Lion\Route\Helpers
  */
 abstract class Rules
 {

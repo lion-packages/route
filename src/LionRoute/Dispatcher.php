@@ -16,6 +16,18 @@ use Phroute\Phroute\Route;
 use Phroute\Phroute\RouteDataInterface;
 use ReflectionMethod;
 
+/**
+ * Is responsible for dispatching HTTP web routes
+ *
+ * @property Container $container [Container to generate dependency injection]
+ * @property $staticRouteMap
+ * @property $variableRouteData
+ * @property $filters
+ * @property $handlerResolver
+ * @property $matchedRoute
+ *
+ * @package Lion\Route
+ */
 class Dispatcher
 {
     /**
@@ -74,7 +86,8 @@ class Dispatcher
      */
     private function dispatchRules($classInstance, $methodName): void
     {
-        $attributes = (new ReflectionMethod($classInstance, $methodName))->getAttributes(Rules::class);
+        $attributes = (new ReflectionMethod($classInstance, $methodName))
+            ->getAttributes(Rules::class);
 
         if (!empty($attributes)) {
             (new Http())
@@ -84,7 +97,7 @@ class Dispatcher
     }
 
     /**
-     * Dispatch a route for the given HTTP Method / URI.
+     * Dispatch a route for the given HTTP Method / URI
      *
      * @param string $httpMethod
      * @param string $uri
@@ -117,7 +130,7 @@ class Dispatcher
     }
 
     /**
-     * Dispatch a route filter.
+     * Dispatch a route filter
      *
      * @param $filters
      * @param null $response
@@ -138,7 +151,8 @@ class Dispatcher
     }
 
     /**
-     * Normalise the array filters attached to the route and merge with any global filters.
+     * Normalise the array filters attached to the route and merge with any
+     * global filters
      *
      * @param $filters
      *
@@ -161,7 +175,8 @@ class Dispatcher
     }
 
     /**
-     * Perform the route dispatching. Check static routes first followed by variable routes.
+     * Perform the route dispatching. Check static routes first followed by
+     * variable routes
      *
      * @param $httpMethod
      * @param $uri
@@ -178,14 +193,14 @@ class Dispatcher
     }
 
     /**
-     * Handle the dispatching of static routes.
+     * Handle the dispatching of static routes
      *
      * @param $httpMethod
      * @param $uri
      *
      * @return mixed
      *
-     * @throws Exception\HttpMethodNotAllowedException
+     * @throws HttpMethodNotAllowedException
      */
     private function dispatchStaticRoute($httpMethod, $uri): mixed
     {
@@ -199,12 +214,13 @@ class Dispatcher
     }
 
     /**
-     * Check fallback routes: HEAD for GET requests followed by the ANY attachment.
+     * Check fallback routes: HEAD for GET requests followed by the ANY
+     * attachment
      *
      * @param $routes
      * @param $httpMethod
      *
-     * @throws Exception\HttpMethodNotAllowedException
+     * @throws HttpMethodNotAllowedException
      */
     private function checkFallbacks($routes, $httpMethod): mixed
     {
@@ -226,13 +242,13 @@ class Dispatcher
     }
 
     /**
-     * Handle the dispatching of variable routes.
+     * Handle the dispatching of variable routes
      *
      * @param $httpMethod
      * @param $uri
      *
-     * @throws Exception\HttpMethodNotAllowedException
-     * @throws Exception\HttpRouteNotFoundException
+     * @throws HttpMethodNotAllowedException
+     * @throws HttpRouteNotFoundException
      */
     private function dispatchVariableRoute($httpMethod, $uri): mixed
     {

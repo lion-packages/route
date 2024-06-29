@@ -31,8 +31,7 @@ class Middleware
         private ?string $class = null,
         private ?string $methodClass = null,
         private ?array $params = null
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new object of the middleware class

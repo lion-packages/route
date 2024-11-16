@@ -67,11 +67,7 @@ class Dispatcher
 
         $this->filters = $data->getFilters();
 
-        if ($resolver === null) {
-            $this->handlerResolver = new HandlerResolver();
-        } else {
-            $this->handlerResolver = $resolver;
-        }
+        $this->handlerResolver = null === $resolver ? new HandlerResolver() : $resolver;
     }
 
     /**

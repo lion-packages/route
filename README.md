@@ -1,23 +1,24 @@
 <p align="center">
   <a href="https://lion-client.vercel.app/" target="_blank">
     <img
-         src="https://user-images.githubusercontent.com/56183278/230516080-096130be-e474-4f3a-a78a-44d3973ff715.png"
+         src="https://github.com/lion-packages/mailer/assets/132396080/b4a5f07a-0035-4f07-b998-ef3adb32eaec"
          width="300"
-         alt="Lion-Framework"
+         alt="Lion-Framework Logo"
     >
   </a>
 </p>
 
 <p align="center">
-  <img src="http://poser.pugx.org/lion/route/v" alt="Latest Stable Version">
-  <img src="http://poser.pugx.org/lion/route/downloads" alt="Total Downloads">
-  <img src="http://poser.pugx.org/lion/route/license" alt="License">
-  <img src="http://poser.pugx.org/lion/route/require/php" alt="PHP Version Require">
+  <img src="https://poser.pugx.org/lion/route/v" alt="Latest Stable Version">
+  <img src="https://poser.pugx.org/lion/route/downloads" alt="Total Downloads">
+  <img src="https://poser.pugx.org/lion/route/license" alt="License">
+  <img src="https://poser.pugx.org/lion/route/require/php" alt="PHP Version Require">
 </p>
 
 ## Install
-```shell
-composer require lion/route
+
+```bash
+composer require lion/route lion/security lion/request lion/exceptions lion/dependency-injection
 ```
 
 ## License

@@ -15,8 +15,7 @@
     },
     "require": {
         "php": ">=8.3",
-        "phroute/phroute": "^2.2",
-        "php-di/php-di": "^7.0"
+        "phroute/phroute": "^2.2"
     },
     "require-dev": {
         "guzzlehttp/guzzle": "^7.8",
@@ -24,8 +23,8 @@
         "phpunit/phpunit": "^11.1",
         "robiningelbrecht/phpunit-pretty-print": "^1.3",
         "lion/security": "^9.1",
-        "lion/dependency-injection": "^2.0",
         "lion/request": "^6.9",
-        "lion/exceptions": "^1.2"
+        "lion/exceptions": "^1.2",
+        "lion/dependency-injection": "^3.0"
     }
 }

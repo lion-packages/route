@@ -1,5 +1,7 @@
 <?php
 
+define('LION_START', microtime(true));
+
 require_once(__DIR__ . './../vendor/autoload.php');
 
 header('Content-Type: application/json');
@@ -7,6 +9,7 @@ header('Content-Type: application/json');
 use Lion\Exceptions\Serialize;
 use Lion\Route\Middleware;
 use Lion\Route\Route;
+use Tests\Provider\AppControllerProvider;
 use Tests\Provider\ControllerProvider;
 
 (new Serialize())
@@ -133,7 +136,7 @@ Route::get('get-full-routes', function (): array {
     return Route::getFullRoutes();
 });
 
-Route::get('no-content', function (): array {
+Route::get('no-content', function (): object {
     http_response_code(204);
 
     return (object) [

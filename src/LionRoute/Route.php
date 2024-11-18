@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Lion\Route;
 
 use Closure;
-use DI\ContainerBuilder;
+use Exception;
 use Lion\Dependency\Injection\Container;
-use Lion\Route\Middleware;
-use Lion\Route\Dispatcher;
+use Lion\Request\Http;
+use Lion\Request\Response;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\RouteCollector;
@@ -18,6 +18,8 @@ use Phroute\Phroute\RouteCollector;
  *
  * @property RouteCollector $router [Collector class object]
  * @property Container $container [Container class object]
+ * @property Response $response [Allows you to manage custom or already defined
+ * response objects]
  * @property string $uri [Defines the URI]
  * @property int $index [defines the Index from which the route is obtained]
  * @property array $routes [Route list]
@@ -121,6 +123,13 @@ class Route
     private static Container $container;
 
     /**
+     * [Allows you to manage custom or already defined response objects]
+     *
+     * @var Response $response
+     */
+    private static Response $response;
+
+    /**
      * [Defines the URI]
      *
      * @var string $uri
@@ -165,7 +174,7 @@ class Route
     /**
      * Initialize router settings
      *
-     * @param  int $index [Index from which the route is obtained]
+     * @param int $index [Index from which the route is obtained]
      *
      * @return void
      */
@@ -174,6 +183,8 @@ class Route
         self::$router = new RouteCollector();
 
         self::$container = new Container();
+
+        self::$response = new Response();
 
         self::$uri = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
 
@@ -186,7 +197,7 @@ class Route
      * @param Closure|array|string $function [Resource to execute the HTTP
      * route, such as a function or a controller]
      *
-     * @return [type] [description]
+     * @return Closure|array
      */
     private static function buildResource(Closure|array|string $function): Closure|array
     {
@@ -314,11 +325,9 @@ class Route
     {
         foreach ($filters as $middleware) {
             self::$router->filter($middleware->getMiddlewareName(), function () use ($middleware): void {
-                self::$container->injectDependenciesMethod(
-                    self::$container->injectDependencies($middleware->newObject()),
-                    $middleware->getMethodClass(),
-                    is_array($middleware->getParams()) ? $middleware->getParams() : []
-                );
+                $object = self::$container->resolve($middleware->getClass());
+
+                self::$container->callMethod($object, $middleware->getMethodClass(), $middleware->getParams());
             });
         }
     }
@@ -336,18 +345,12 @@ class Route
     public static function dispatch(): void
     {
         try {
-            $container = (new ContainerBuilder())
-                ->useAutowiring(true)
-                ->useAttributes(true)
-                ->build();
+            $dispatcher = new Dispatcher(self::$container, self::$router->getData());
 
-            $dispatch = new Dispatcher(self::$container, self::$router->getData(), new RouterResolver($container));
-
-            $response = $dispatch
-                ->dispatch(
-                    $_SERVER['REQUEST_METHOD'],
-                    implode('/', array_slice(explode('/', self::$uri), self::$index))
-                );
+            $response = $dispatcher->dispatch(
+                $_SERVER['REQUEST_METHOD'],
+                implode('/', array_slice(explode('/', self::$uri), self::$index))
+            );
 
             $noContentStatusCodes = [
                 100, // Continue
@@ -363,23 +366,11 @@ class Route
                 exit;
             }
 
-            die(json_encode($response));
+            self::$response->finish($response);
         } catch (HttpRouteNotFoundException $e) {
-            http_response_code(404);
-
-            die(json_encode([
-                'code' => 404,
-                'status' => 'route-error',
-                'message' => $e->getMessage()
-            ]));
+            self::$response->finish(self::$response->custom('route-error', $e->getMessage(), Http::NOT_FOUND));
         } catch (HttpMethodNotAllowedException $e) {
-            http_response_code(405);
-
-            die(json_encode([
-                'code' => 405,
-                'status' => 'route-error',
-                'message' => $e->getMessage()
-            ]));
+            self::$response->finish(self::$response->custom('route-error', $e->getMessage(), Http::METHOD_NOT_ALLOWED));
         }
     }
 

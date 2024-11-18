@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Lion\Route;
 
-use DI\Container;
+use Lion\Dependency\Injection\Container;
 use Phroute\Phroute\HandlerResolverInterface;
 
 /**
  * Class that resolves dependencies on the class's constructor
  *
- * @property Container $container [Dependency Injection Container]
+ * @property Container $container [Dependency Injection Container Wrapper]
  *
  * @package Lion\Route
  */
 class RouterResolver implements HandlerResolverInterface
 {
     /**
-     * [Dependency Injection Container]
+     * [Dependency Injection Container Wrapper]
      *
      * @var Container $container
      */
@@ -26,7 +26,7 @@ class RouterResolver implements HandlerResolverInterface
     /**
      * Class constructor
      *
-     * @param Container $container [Dependency Injection Container]
+     * @param Container $container [Dependency Injection Container Wrapper]
      */
     public function __construct(Container $container)
     {
@@ -41,8 +41,8 @@ class RouterResolver implements HandlerResolverInterface
      */
     public function resolve($handler): mixed
     {
-        if (is_array($handler) and is_string($handler[0])) {
-            $handler[0] = $this->container->get($handler[0]);
+        if (is_array($handler) && is_string($handler[0])) {
+            $handler[0] = $this->container->resolve($handler[0]);
         }
 
         return $handler;

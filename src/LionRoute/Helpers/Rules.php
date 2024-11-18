@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lion\Route\Helpers;
 
 use Closure;
+use DI\Attribute\Inject;
 use Lion\Request\Request;
 use Lion\Security\Validation;
 
@@ -41,17 +42,13 @@ abstract class Rules
      */
     protected array $responses;
 
-    /**
-     * @required
-     */
+    #[Inject]
     public function setValidation(Validation $validation): void
     {
         $this->validation = $validation;
     }
 
-    /**
-     * @required
-     */
+    #[Inject]
     public function setRequest(Request $request): void
     {
         $this->request = $request;

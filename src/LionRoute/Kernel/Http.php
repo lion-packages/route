@@ -7,7 +7,7 @@ namespace Lion\Route\Kernel;
 use Lion\Dependency\Injection\Container;
 use Lion\Request\Http as RequestHttp;
 use Lion\Request\Status;
-use Lion\Route\Exceptions\RulesException as ExceptionsRulesException;
+use Lion\Route\Exceptions\RulesException;
 use Lion\Route\Helpers\Rules;
 use Lion\Route\Interface\RulesInterface;
 
@@ -21,21 +21,13 @@ use Lion\Route\Interface\RulesInterface;
 class Http
 {
     /**
-     * [Container to generate dependency injection]
+     * Class constructor
      *
-     * @var Container $container
+     * @param Container $container [Container to generate dependency injection]
      */
-    private Container $container;
-
-    /**
-     * @required
-     */
-    public function setContainer(Container $container): Http
-    {
-        $this->container = $container;
-
-        return $this;
-    }
+    public function __construct(
+        private readonly Container $container
+    ) {}
 
     /**
      * Check URL patterns to validate if a URL matches or is identical
@@ -78,7 +70,7 @@ class Http
 
         foreach ($rules as $rule) {
             /** @var RulesInterface|Rules $ruleClass */
-            $ruleClass = $this->container->injectDependencies(new $rule);
+            $ruleClass = $this->container->resolve($rule);
 
             $ruleClass->passes();
 
@@ -92,14 +84,9 @@ class Http
         }
 
         if (count($errors) > 0) {
-            throw new ExceptionsRulesException(
-                'parameter error',
-                Status::RULE_ERROR,
-                RequestHttp::INTERNAL_SERVER_ERROR,
-                [
-                    'rules-error' => $errors,
-                ]
-            );
+            throw new RulesException('parameter error', Status::RULE_ERROR, RequestHttp::INTERNAL_SERVER_ERROR, [
+                'rules-error' => $errors,
+            ]);
         }
     }
 }

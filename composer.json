@@ -21,7 +21,6 @@
         "guzzlehttp/guzzle": "^7.8",
         "lion/test": "^2.0",
         "phpunit/phpunit": "^11.1",
-        "robiningelbrecht/phpunit-pretty-print": "^1.3",
         "lion/security": "^9.1",
         "lion/request": "^6.9",
         "lion/exceptions": "^1.2",

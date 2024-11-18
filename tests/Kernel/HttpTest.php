@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Kernel;
 
 use Lion\Dependency\Injection\Container;
+use Lion\Exceptions\Exception;
 use Lion\Request\Http;
 use Lion\Request\Status;
 use Lion\Route\Exceptions\RulesException;
@@ -13,6 +14,7 @@ use Lion\Route\Interface\RulesInterface;
 use Lion\Route\Kernel\Http as KernelHttp;
 use Lion\Test\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test as Testing;
 use Tests\Provider\HttpProviderTrait;
 use Valitron\Validator;
 
@@ -20,14 +22,17 @@ class HttpTest extends Test
 {
     use HttpProviderTrait;
 
-    const MESSAGE = 'parameter error';
-    const URI = '/api/test';
+    private const string MESSAGE = 'parameter error';
+    private const string URI = '/api/test';
 
     private KernelHttp $kernelHttp;
+    private Container $container;
 
     protected function setUp(): void
     {
-        $this->kernelHttp = (new Container())->injectDependencies(new KernelHttp());
+        $this->container = new Container();
+
+        $this->kernelHttp = $this->container->resolve(KernelHttp::class);
     }
 
     protected function tearDown(): void
@@ -39,17 +44,22 @@ class HttpTest extends Test
         $this->rmdirRecursively('./app/');
     }
 
+    #[Testing]
     #[DataProvider('checkUrlProvider')]
-    public function testCheckUrl(string $requestUri, string $uri, bool $response): void
+    public function checkUrl(string $requestUri, string $uri, bool $response): void
     {
         $_SERVER['REQUEST_URI'] = $requestUri;
 
         $this->assertSame($response, $this->kernelHttp->checkUrl($uri));
     }
 
-    public function testValidateRules(): void
+    /**
+     * @throws Exception
+     */
+    #[Testing]
+    public function validateRules(): void
     {
-        $idRule = (new Container())->injectDependencies(new class extends Rules implements RulesInterface
+        $rule = new class extends Rules implements RulesInterface
         {
             /**
              * {@inheritdoc}
@@ -62,9 +72,9 @@ class HttpTest extends Test
                         ->message("the 'id' property is optional");
                 });
             }
-        });
+        };
 
-        $nameRule = (new Container())->injectDependencies(new class extends Rules implements RulesInterface
+        $rule2 = new class extends Rules implements RulesInterface
         {
             /**
              * {@inheritdoc}
@@ -77,7 +87,11 @@ class HttpTest extends Test
                         ->message("the 'name' property is optional");
                 });
             }
-        });
+        };
+
+        $idRule = $this->container->resolve($rule::class);
+
+        $nameRule = $this->container->resolve($rule2::class);
 
         $this
             ->exception(RulesException::class)

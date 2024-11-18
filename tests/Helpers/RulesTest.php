@@ -8,35 +8,51 @@ use Closure;
 use Lion\Dependency\Injection\Container;
 use Lion\Route\Helpers\Rules;
 use Lion\Test\Test;
+use PHPUnit\Framework\Attributes\Test as Testing;
+use ReflectionException;
 use Valitron\Validator;
 
 class RulesTest extends Test
 {
-    private object $rules;
+    private Container $container;
 
+    private object $rule;
+
+    /**
+     * @throws ReflectionException
+     */
     protected function setUp(): void
     {
-        $this->rules = (new Container())
-            ->injectDependencies(new class extends Rules
+        $rule = new class extends Rules
+        {
+            public function validate(Closure $validateFunction): void
             {
-                public function validate(Closure $validateFunction): void
-                {
-                    parent::validate($validateFunction);
-                }
-            });
+                parent::validate($validateFunction);
+            }
+        };
 
-        $this->initReflection($this->rules);
+        $this->container = new Container();
+
+        $this->rule = $this->container->resolve($rule::class);
+
+        $this->initReflection($this->rule);
     }
 
-    public function testValidate(): void
+    /**
+     * @throws ReflectionException
+     */
+    #[Testing]
+    public function validate(): void
     {
         $_POST['id'] = '';
 
-        $this->rules->validate(function (Validator $validator): void {
-            $validator
-                ->rule('required', 'id')
-                ->message('custom message');
-        });
+        $this->container->callMethod($this->rule, 'validate', [
+            'validateFunction' => function (Validator $validator): void {
+                $validator
+                    ->rule('required', 'id')
+                    ->message('custom message');
+            },
+        ]);
 
         $errors = $this->getPrivateProperty('responses');
 
@@ -49,17 +65,18 @@ class RulesTest extends Test
         $this->assertArrayNotHasKey('id', $_POST);
     }
 
-    public function testGetErrors(): void
+    #[Testing]
+    public function getErrors(): void
     {
         $_POST['id'] = '';
 
-        $this->rules->validate(function (Validator $validator): void {
+        $this->rule->validate(function (Validator $validator): void {
             $validator
                 ->rule('required', 'id')
                 ->message('custom message');
         });
 
-        $errors = $this->rules->getErrors();
+        $errors = $this->rule->getErrors();
 
         $this->assertIsArray($errors);
         $this->assertArrayHasKey('id', $errors);

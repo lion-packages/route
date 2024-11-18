@@ -11,12 +11,9 @@ use Tests\Provider\Rules\NameRuleProvider;
 
 class ControllerProvider
 {
-    private Middleware $middleware;
-
-    public function __construct(Middleware $middleware)
-    {
-        $this->middleware = $middleware;
-    }
+    public function __construct(
+        private Middleware $middleware,
+    ) {}
 
     public function createMethod(): array
     {
@@ -43,7 +40,7 @@ class ControllerProvider
     public function middleware(Middleware $middleware): array
     {
         return [
-            'middleware' => $middleware->getMiddlewareName()
+            'middleware' => $middleware->getMiddlewareName(),
         ];
     }
 

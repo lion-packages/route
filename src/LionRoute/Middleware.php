@@ -30,20 +30,8 @@ class Middleware
         private ?string $middlewareName = null,
         private ?string $class = null,
         private ?string $methodClass = null,
-        private ?array $params = null
+        private ?array $params = []
     ) {}
-
-    /**
-     * Create a new object of the middleware class
-     *
-     * @return mixed
-     *
-     * @internal
-     */
-    public function newObject(): mixed
-    {
-        return new ($this->getClass())();
-    }
 
     /**
      * Returns the name of the middleware

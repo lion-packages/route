@@ -10,7 +10,6 @@ use Lion\Route\Exceptions\RulesException;
 use Lion\Route\Kernel\Http;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
-use Phroute\Phroute\HandlerResolver;
 use Phroute\Phroute\HandlerResolverInterface;
 use Phroute\Phroute\Route;
 use Phroute\Phroute\RouteDataInterface;
@@ -24,7 +23,6 @@ use ReflectionMethod;
  * @property $variableRouteData
  * @property $filters
  * @property $handlerResolver
- * @property $matchedRoute
  *
  * @package Lion\Route
  */
@@ -37,28 +35,22 @@ class Dispatcher
      */
     private Container $container;
 
-    private $staticRouteMap;
+    private array $staticRouteMap;
 
-    private $variableRouteData;
+    private array $variableRouteData;
 
-    private $filters;
+    private array $filters;
 
-    private $handlerResolver;
-
-    public $matchedRoute;
+    private HandlerResolverInterface|RouterResolver $handlerResolver;
 
     /**
      * Create a new route dispatcher
      *
      * @param Container $container [Container to generate dependency injection]
      * @param RouteDataInterface $data [Interface RouteDataInterface]
-     * @param HandlerResolverInterface $resolver
      */
-    public function __construct(
-        Container $container,
-        RouteDataInterface $data,
-        HandlerResolverInterface $resolver = null
-    ) {
+    public function __construct(Container $container, RouteDataInterface $data)
+    {
         $this->container = $container;
 
         $this->staticRouteMap = $data->getStaticRoutes();
@@ -67,7 +59,7 @@ class Dispatcher
 
         $this->filters = $data->getFilters();
 
-        $this->handlerResolver = null === $resolver ? new HandlerResolver() : $resolver;
+        $this->handlerResolver = new RouterResolver($this->container);
     }
 
     /**
@@ -99,6 +91,9 @@ class Dispatcher
      * @param string $uri
      *
      * @return mixed
+     *
+     * @throws HttpMethodNotAllowedException
+     * @throws HttpRouteNotFoundException
      */
     public function dispatch(string $httpMethod, string $uri): mixed
     {
@@ -113,16 +108,12 @@ class Dispatcher
         $resolvedHandler = $this->handlerResolver->resolve($handler);
 
         if (is_array($resolvedHandler)) {
-            $classInstance = $this->container->injectDependencies(reset($resolvedHandler), $vars);
+            // $this->dispatchRules($resolvedHandler[0], $resolvedHandler[1]);
 
-            $methodName = end($resolvedHandler);
-
-            $this->dispatchRules($classInstance, $methodName);
-
-            return $this->container->injectDependenciesMethod($classInstance, $methodName, $vars);
+            return $this->container->callMethod($resolvedHandler[0], $resolvedHandler[1], $vars);
         }
 
-        return $this->container->injectDependenciesCallback($resolvedHandler, $vars);
+        return $this->container->callCallback($resolvedHandler, $vars);
     }
 
     /**
@@ -177,9 +168,12 @@ class Dispatcher
      * @param $httpMethod
      * @param $uri
      *
-     * @throws Exception\HttpRouteNotFoundException
+     * @return mixed
+     *
+     * @throws HttpMethodNotAllowedException
+     * @throws HttpRouteNotFoundException
      */
-    private function dispatchRoute($httpMethod, $uri)
+    private function dispatchRoute($httpMethod, $uri): mixed
     {
         if (isset($this->staticRouteMap[$uri])) {
             return $this->dispatchStaticRoute($httpMethod, $uri);

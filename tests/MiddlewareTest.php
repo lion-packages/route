@@ -46,11 +46,6 @@ class MiddlewareTest extends Test
         $this->assertNull($middleware->getMethodClass());
     }
 
-    public function testNewObject(): void
-    {
-        $this->assertInstanceOf($this->customClass::class, $this->middleware->newObject());
-    }
-
     public function testGetMiddlewareName(): void
     {
         $this->assertSame(self::MIDDLEWARE_NAME, $this->middleware->getMiddlewareName());

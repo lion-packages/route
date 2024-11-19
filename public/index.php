@@ -9,7 +9,6 @@ header('Content-Type: application/json');
 use Lion\Exceptions\Serialize;
 use Lion\Route\Middleware;
 use Lion\Route\Route;
-use Tests\Provider\AppControllerProvider;
 use Tests\Provider\ControllerProvider;
 
 (new Serialize())

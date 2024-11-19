@@ -13,16 +13,20 @@ use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\HandlerResolverInterface;
 use Phroute\Phroute\Route;
 use Phroute\Phroute\RouteDataInterface;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
  * Is responsible for dispatching HTTP web routes
  *
  * @property Container $container [Container to generate dependency injection]
+ * @property Http $http [Kernel for HTTP requests]
  * @property $staticRouteMap
  * @property $variableRouteData
  * @property $filters
- * @property $handlerResolver
+ * @property array<int, string> $reflectionCache [Rules stored in their
+ * execution]
+ * @property $matchedRoute
  *
  * @package Lion\Route
  */
@@ -35,11 +39,27 @@ class Dispatcher
      */
     private Container $container;
 
+    /**
+     * [Kernel for HTTP requests]
+     *
+     * @var Http $http
+     */
+    private Http $http;
+
     private array $staticRouteMap;
 
     private array $variableRouteData;
 
     private array $filters;
+
+    /**
+     * [Rules stored in their execution]
+     *
+     * @var array<int, string> $reflectionCache
+     */
+    private array $reflectionCache = [];
+
+    private $matchedRoute;
 
     private HandlerResolverInterface|RouterResolver $handlerResolver;
 
@@ -52,6 +72,8 @@ class Dispatcher
     public function __construct(Container $container, RouteDataInterface $data)
     {
         $this->container = $container;
+
+        $this->http = new Http($this->container);
 
         $this->staticRouteMap = $data->getStaticRoutes();
 
@@ -71,16 +93,21 @@ class Dispatcher
      * @return void
      *
      * @throws RulesException
+     * @throws ReflectionException
      */
-    private function dispatchRules($classInstance, $methodName): void
+    private function dispatchRules(object $classInstance, string $methodName): void
     {
-        $attributes = (new ReflectionMethod($classInstance, $methodName))
-            ->getAttributes(Rules::class);
+        $cacheKey = get_class($classInstance) . '::' . $methodName;
+
+        if (!isset($this->reflectionCache[$cacheKey])) {
+            $this->reflectionCache[$cacheKey] = (new ReflectionMethod($classInstance, $methodName))
+                ->getAttributes(Rules::class);
+        }
+
+        $attributes = $this->reflectionCache[$cacheKey];
 
         if (!empty($attributes)) {
-            (new Http())
-                ->setContainer($this->container)
-                ->validateRules($attributes[0]->newInstance()->getRules());
+            $this->http->validateRules($attributes[0]->newInstance()->getRules());
         }
     }
 
@@ -94,6 +121,8 @@ class Dispatcher
      *
      * @throws HttpMethodNotAllowedException
      * @throws HttpRouteNotFoundException
+     * @throws ReflectionException
+     * @throws RulesException
      */
     public function dispatch(string $httpMethod, string $uri): mixed
     {
@@ -108,7 +137,7 @@ class Dispatcher
         $resolvedHandler = $this->handlerResolver->resolve($handler);
 
         if (is_array($resolvedHandler)) {
-            // $this->dispatchRules($resolvedHandler[0], $resolvedHandler[1]);
+            $this->dispatchRules($resolvedHandler[0], $resolvedHandler[1]);
 
             return $this->container->callMethod($resolvedHandler[0], $resolvedHandler[1], $vars);
         }

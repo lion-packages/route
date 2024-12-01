@@ -1,4 +1,4 @@
-FROM php:8.3-apache
+FROM php:8.4-apache
 
 ARG DEBIAN_FRONTEND=noninteractive
 # ----------------------------------------------------------------------------------------------------------------------
@@ -9,8 +9,7 @@ RUN useradd -m lion && echo 'lion:lion' | chpasswd && usermod -aG sudo lion && u
 
 # Dependencies
 RUN apt-get update -y \
-    && apt-get install -y sudo nano zsh git default-mysql-client curl wget unzip cron sendmail golang-go \
-    && apt-get install -y libpng-dev libzip-dev zlib1g-dev libonig-dev supervisor libevent-dev libssl-dev \
+    && apt-get install -y sudo nano zsh git curl wget unzip golang-go libpng-dev libzip-dev zlib1g-dev libonig-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

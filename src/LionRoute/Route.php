@@ -91,21 +91,14 @@ class Route
      *
      * @public const PREFIX
      */
-    private public const string PREFIX = 'prefix';
-
-    /**
-     * [public constant to define the 'after' property]
-     *
-     * @public const AFTER
-     */
-    private public const string AFTER = 'after';
+    private const string PREFIX = 'prefix';
 
     /**
      * [public constant to define the 'before' property]
      *
      * @public const BEFORE
      */
-    private public const string BEFORE = 'before';
+    private const string BEFORE = 'before';
 
     /**
      * [Collector class object]

@@ -112,7 +112,7 @@ jobs:
           docker ps -aq | xargs -r docker rm
 
       - name: Build the Docker image
-        run: docker build -t test-app .
+        run: docker build -t route-app .
 
       - name: Start services using Docker Compose
         run: |
@@ -121,7 +121,7 @@ jobs:
           COMPOSE_PROJECT_NAME: test
 
       - name: Install Composer dependencies
-        run: docker exec test-app composer install
+        run: docker exec route-app composer install
 
       - name: Run PHP Tests
-        run: docker exec test-app php vendor/bin/phpunit
+        run: docker exec route-app php vendor/bin/phpunit

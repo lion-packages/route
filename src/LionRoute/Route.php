@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lion\Route;
 
 use Closure;
-use Exception;
 use Lion\Dependency\Injection\Container;
 use Lion\Request\Http;
 use Lion\Request\Response;
@@ -32,81 +31,81 @@ use Phroute\Phroute\RouteCollector;
 class Route
 {
     /**
-     * [Constant to define any type of HTTP protocol]
+     * [public constant to define any type of HTTP protocol]
      *
-     * @const ANY
+     * @public const ANY
      */
-    const string ANY = 'ANY';
+    public const string ANY = 'ANY';
 
     /**
-     * [Constant to define the HTTP POST protocol]
+     * [public constant to define the HTTP POST protocol]
      *
-     * @const POST
+     * @public const POST
      */
-    const string POST = 'POST';
+    public const string POST = 'POST';
 
     /**
-     * [Constant to define the HTTP GET protocol]
+     * [public constant to define the HTTP GET protocol]
      *
-     * @const GET
+     * @public const GET
      */
-    const string GET = 'GET';
+    public const string GET = 'GET';
 
     /**
-     * [Constant to define the HTTP PUT protocol]
+     * [public constant to define the HTTP PUT protocol]
      *
-     * @const PUT
+     * @public const PUT
      */
-    const string PUT = 'PUT';
+    public const string PUT = 'PUT';
 
     /**
-     * [Constant to define the HTTP DELETE protocol]
+     * [public constant to define the HTTP DELETE protocol]
      *
-     * @const DELETE
+     * @public const DELETE
      */
-    const string DELETE = 'DELETE';
+    public const string DELETE = 'DELETE';
 
     /**
-     * [Constant to define the HTTP HEAD protocol]
+     * [public constant to define the HTTP HEAD protocol]
      *
-     * @const HEAD
+     * @public const HEAD
      */
-    const string HEAD = 'HEAD';
+    public const string HEAD = 'HEAD';
 
     /**
-     * [Constant to define the HTTP OPTIONS protocol]
+     * [public constant to define the HTTP OPTIONS protocol]
      *
-     * @const OPTIONS
+     * @public const OPTIONS
      */
-    const string OPTIONS = 'OPTIONS';
+    public const string OPTIONS = 'OPTIONS';
 
     /**
-     * [Constant to define the HTTP PATCH protocol]
+     * [public constant to define the HTTP PATCH protocol]
      *
-     * @const PATCH
+     * @public const PATCH
      */
-    const string PATCH = 'PATCH';
+    public const string PATCH = 'PATCH';
 
     /**
-     * [Constant to define the 'prefix' property]
+     * [public constant to define the 'prefix' property]
      *
-     * @const PREFIX
+     * @public const PREFIX
      */
-    private const string PREFIX = 'prefix';
+    private public const string PREFIX = 'prefix';
 
     /**
-     * [Constant to define the 'after' property]
+     * [public constant to define the 'after' property]
      *
-     * @const AFTER
+     * @public const AFTER
      */
-    private const string AFTER = 'after';
+    private public const string AFTER = 'after';
 
     /**
-     * [Constant to define the 'before' property]
+     * [public constant to define the 'before' property]
      *
-     * @const BEFORE
+     * @public const BEFORE
      */
-    private const string BEFORE = 'before';
+    private public const string BEFORE = 'before';
 
     /**
      * [Collector class object]

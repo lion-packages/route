@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Lion\Route;
 
+use Closure;
 use Lion\Dependency\Injection\Container;
-use Phroute\Phroute\HandlerResolverInterface;
+use Lion\Route\Interface\HandlerResolverInterface;
 
 /**
  * Class that resolves dependencies on the class's constructor
@@ -34,14 +35,11 @@ class RouterResolver implements HandlerResolverInterface
     }
 
     /**
-     * Resolves the dependencies of the constructor method of the class being
-     * invoked
-     *
-     * @param mixed $handler
+     * {@inheritDoc}
      */
-    public function resolve($handler): mixed
+    public function resolve(array|Closure $handler): array|Closure
     {
-        if (is_array($handler) && is_string($handler[0])) {
+        if (is_array($handler) && isset($handler[0]) && is_string($handler[0])) {
             $handler[0] = $this->container->resolve($handler[0]);
         }
 

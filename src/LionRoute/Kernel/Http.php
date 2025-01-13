@@ -27,7 +27,8 @@ class Http
      */
     public function __construct(
         private readonly Container $container
-    ) {}
+    ) {
+    }
 
     /**
      * Check URL patterns to validate if a URL matches or is identical

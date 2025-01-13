@@ -1,4 +1,4 @@
-name: Lion-Test (CI Workflow)
+name: Lion-Route (CI Workflow)
 
 on:
   push:

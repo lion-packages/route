@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Lion\Route\Middleware;
 use Lion\Route\Route;
 use Lion\Test\Test;
@@ -15,18 +16,18 @@ class RouteTest extends Test
 {
     use HttpMethodsProviderTrait;
 
-    const string HOST = 'http://127.0.0.1:8000';
-    const string API_CONTROLLER = self::HOST . '/controller/';
-    const string API_TEST = self::HOST . '/example';
-    const string PREFIX = 'prefix-test';
-    const string URI = 'test';
-    const string FULL_URI = self::PREFIX . '/' . self::URI;
-    const string FULL_URI_SECOND = self::PREFIX . '/' . self::PREFIX . '/' . self::URI;
-    const string URI_MATCH = 'match-test';
-    const array ARRAY_RESPONSE = [
+    private const string HOST = 'http://127.0.0.1:8000';
+    private const string API_CONTROLLER = self::HOST . '/controller/';
+    private const string API_TEST = self::HOST . '/example';
+    private const string PREFIX = 'prefix-test';
+    private const string URI = 'test';
+    private const string FULL_URI = self::PREFIX . '/' . self::URI;
+    private const string FULL_URI_SECOND = self::PREFIX . '/' . self::PREFIX . '/' . self::URI;
+    private const string URI_MATCH = 'match-test';
+    private const array ARRAY_RESPONSE = [
         'isValid' => true,
     ];
-    const array JSON_RESPONSE = [
+    private const array JSON_RESPONSE = [
         'message' => 'property is required: id',
         'isValid' => false,
         'data' => [
@@ -77,16 +78,6 @@ class RouteTest extends Test
         $this->setPrivateProperty('prefix', '');
     }
 
-    public function testGetFullRoutes(): void
-    {
-        $this->assertIsArray($this->route->getFullRoutes());
-    }
-
-    public function testGetRoutes(): void
-    {
-        $this->assertIsArray($this->route->getRoutes());
-    }
-
     public function testGetFilters(): void
     {
         $this->route->addMiddleware([
@@ -96,14 +87,8 @@ class RouteTest extends Test
 
         $filters = $this->route->getFilters();
 
-        $this->assertIsArray($filters);
         $this->assertArrayHasKey(self::FILTER_NAME_1, $filters);
         $this->assertArrayHasKey(self::FILTER_NAME_2, $filters);
-    }
-
-    public function testGetVariables(): void
-    {
-        $this->assertIsArray($this->route->getVariables());
     }
 
     public function testAddMiddleware(): void
@@ -118,7 +103,6 @@ class RouteTest extends Test
 
         $filters = $this->route->getFilters();
 
-        $this->assertIsArray($filters);
         $this->assertArrayHasKey(self::FILTER_NAME_1, $filters);
         $this->assertArrayHasKey(self::FILTER_NAME_2, $filters);
     }
@@ -130,7 +114,6 @@ class RouteTest extends Test
 
         $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertIsArray($fullRoutes);
         $this->assertArrayHasKey(self::URI, $fullRoutes);
         $this->assertArrayHasKey($httpMethod, $fullRoutes[self::URI]);
         $this->assertSame(self::ROUTES[$httpMethod], $fullRoutes[self::URI][$httpMethod]);
@@ -293,12 +276,14 @@ class RouteTest extends Test
 
         $fullRoutes = $this->route->getFullRoutes();
 
-        $this->assertIsArray($fullRoutes);
         $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
         $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI]);
         $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI][Route::GET]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function testMiddlewareAPI(): void
     {
         $this->assertJsonContent($this->client->post(self::API_TEST)->getBody()->getContents(), self::JSON_RESPONSE);

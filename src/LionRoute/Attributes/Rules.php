@@ -17,14 +17,14 @@ class Rules
     /**
      * [List of rules]
      *
-     * @var array<int, string> $rules
+     * @var string[] $rules $rules
      */
     private array $rules;
 
     /**
      * Class constructor
      *
-     * @param string[] $rules [List of rules]
+     * @param string ...$rules [List of rules]
      */
     public function __construct(string ...$rules)
     {
@@ -34,7 +34,7 @@ class Rules
     /**
      * Returns a list with the namespaces of the rules
      *
-     * @return array<int, string>
+     * @return string[] $rules
      */
     public function getRules(): array
     {

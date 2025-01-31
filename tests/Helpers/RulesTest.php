@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Closure;
+use DI\DependencyException;
+use DI\NotFoundException;
 use Lion\Dependency\Injection\Container;
 use Lion\Route\Helpers\Rules;
 use Lion\Test\Test;
@@ -15,27 +16,23 @@ use Valitron\Validator;
 class RulesTest extends Test
 {
     private Container $container;
-
-    private object $rule;
+    private Rules $rules;
 
     /**
+     * @throws DependencyException
+     * @throws NotFoundException
      * @throws ReflectionException
      */
     protected function setUp(): void
     {
-        $rule = new class extends Rules
-        {
-            public function validate(Closure $validateFunction): void
-            {
-                parent::validate($validateFunction);
-            }
-        };
-
         $this->container = new Container();
 
-        $this->rule = $this->container->resolve($rule::class);
+        /** @var Rules $rule */
+        $rule = $this->container->resolve(Rules::class);
 
-        $this->initReflection($this->rule);
+        $this->rules = $rule;
+
+        $this->initReflection($this->rules);
     }
 
     /**
@@ -46,7 +43,7 @@ class RulesTest extends Test
     {
         $_POST['id'] = '';
 
-        $this->container->callMethod($this->rule, 'validate', [
+        $this->getPrivateMethod('validate', [
             'validateFunction' => function (Validator $validator): void {
                 $validator
                     ->rule('required', 'id')
@@ -65,20 +62,24 @@ class RulesTest extends Test
         $this->assertArrayNotHasKey('id', $_POST);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     #[Testing]
     public function getErrors(): void
     {
         $_POST['id'] = '';
 
-        $this->rule->validate(function (Validator $validator): void {
-            $validator
-                ->rule('required', 'id')
-                ->message('custom message');
-        });
+        $this->getPrivateMethod('validate', [
+            'validateFunction' => function (Validator $validator): void {
+                $validator
+                    ->rule('required', 'id')
+                    ->message('custom message');
+            },
+        ]);
 
-        $errors = $this->rule->getErrors();
+        $errors = $this->rules->getErrors();
 
-        $this->assertIsArray($errors);
         $this->assertArrayHasKey('id', $errors);
         $this->assertSame(['id' => ['custom message']], $errors);
 

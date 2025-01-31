@@ -9,15 +9,15 @@ use Lion\Test\Test;
 
 class MiddlewareTest extends Test
 {
-    const string MIDDLEWARE_NAME = 'custom-class';
-    const string MIDDLEWARE_NAME_TEST = 'custom-class-test';
-    const string EXAMPLE_METHOD = 'exampleMethod';
-    const string EXAMPLE_METHOD_TEST = 'exampleMethodTest';
-    const array EXAMPLE_PARAMS = ['key' => 'value'];
-    const array EXAMPLE_PARAMS_TEST = ['key' => 'value2'];
+    private const string MIDDLEWARE_NAME = 'custom-class';
+    private const string MIDDLEWARE_NAME_TEST = 'custom-class-test';
+    private const string EXAMPLE_METHOD = 'exampleMethod';
+    private const string EXAMPLE_METHOD_TEST = 'exampleMethodTest';
+    private const array EXAMPLE_PARAMS = ['key' => 'value'];
+    private const array EXAMPLE_PARAMS_TEST = ['key' => 'value2'];
 
     private Middleware $middleware;
-    private $customClass;
+    private object $customClass;
 
     protected function setUp(): void
     {

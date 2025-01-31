@@ -8,23 +8,15 @@ use Closure;
 use Lion\Dependency\Injection\Container;
 use Lion\Request\Http;
 use Lion\Request\Response;
+use Lion\Request\Status;
+use Lion\Route\Exceptions\RulesException;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\RouteCollector;
+use ReflectionException;
 
 /**
  * Class to define web routes
- *
- * @property RouteCollector $router [Collector class object]
- * @property Container $container [Container class object]
- * @property Response $response [Allows you to manage custom or already defined
- * response objects]
- * @property string $uri [Defines the URI]
- * @property int $index [defines the Index from which the route is obtained]
- * @property array $routes [Route list]
- * @property array $filters [Filter List]
- * @property string $prefix [Current group]
- * @property string $controller [Controller class]
  *
  * @package Lion\Route
  */
@@ -138,14 +130,26 @@ class Route
     /**
      * [Route list]
      *
-     * @var array $routes
+     * @var array<
+     *     string,
+     *     array<
+     *         string,
+     *         array<
+     *             string,
+     *             array<
+     *                 int|string,
+     *                 array<string, string>|bool|string
+     *             >
+     *         >
+     *     >
+     * > $routes
      */
     private static array $routes = [];
 
     /**
      * [Filter List]
      *
-     * @var array $filters
+     * @var array<int|string, string> $filters
      */
     private static array $filters = [];
 
@@ -178,7 +182,10 @@ class Route
 
         self::$response = new Response();
 
-        self::$uri = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
+        /** @var string $requestUri */
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+        self::$uri = explode('?', $requestUri)[0];
 
         self::$index = $index;
     }
@@ -186,10 +193,10 @@ class Route
     /**
      * Build the resource to nest a controller to a route group
      *
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
      *
-     * @return Closure|array
+     * @return Closure|array<int, string>
      */
     private static function buildResource(Closure|array|string $function): Closure|array
     {
@@ -205,8 +212,8 @@ class Route
      *
      * @param string $type [Function that is executed]
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array $function [Function that executes]
-     * @param array<int, string> $options [Filter options]
+     * @param Closure|array<int, string> $function [Function that executes]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -230,8 +237,8 @@ class Route
      *
      * @param string $uri [URI for HTTP route]
      * @param string $method [HTTP protocol]
-     * @param Closure|array $function [Function that executes]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string> $function [Function that executes]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -269,7 +276,9 @@ class Route
     /**
      * Get all routes along with the configuration data of the defined routes
      *
-     * @return array
+     * @return array<string, array<string, array<string, array<int|string, array<string, string>|bool|string>>>>
+     *
+     * @codeCoverageIgnore
      */
     public static function getFullRoutes(): array
     {
@@ -277,33 +286,35 @@ class Route
     }
 
     /**
-     * Get all routes captured with the router (phroute)
+     * Get all routes captured with the router (PHRoute)
      *
-     * @return array
+     * @return array<string, array<string, array<int, array<int|string, string>>>>
+     *
+     * @codeCoverageIgnore
      */
     public static function getRoutes(): array
     {
-        return self::$router->getData()->getStaticRoutes();
+        /** @var array<string, array<string, array<int, array<int|string, string>>>> $routes */
+        $routes = self::$router
+            ->getData()
+            ->getStaticRoutes();
+
+        return $routes;
     }
 
     /**
-     * Get all filters captured with the router (phroute)
+     * Get all filters captured with the router (PHRoute)
      *
-     * @return array
+     * @return array<string, array<int|string, string>>
      */
     public static function getFilters(): array
     {
-        return self::$router->getData()->getFilters();
-    }
+        /** @var array<string, array<int|string, string>> $filters */
+        $filters = self::$router
+            ->getData()
+            ->getFilters();
 
-    /**
-     * Get all variables captured with the router (phroute)
-     *
-     * @return array
-     */
-    public static function getVariables(): array
-    {
-        return self::$router->getData()->getVariableRoutes();
+        return $filters;
     }
 
     /**
@@ -317,9 +328,19 @@ class Route
     {
         foreach ($filters as $middleware) {
             self::$router->filter($middleware->getMiddlewareName(), function () use ($middleware): void {
-                $object = self::$container->resolve($middleware->getClass());
+                /** @var string $class */
+                $class = $middleware->getClass();
 
-                self::$container->callMethod($object, $middleware->getMethodClass(), $middleware->getParams());
+                /** @var string $classMiddleware */
+                $classMiddleware = $middleware->getMethodClass();
+
+                /** @var array<string, mixed> $params */
+                $params = $middleware->getParams();
+
+                /** @var object $object */
+                $object = self::$container->resolve($class);
+
+                self::$container->callMethod($object, $classMiddleware, $params);
             });
         }
     }
@@ -329,18 +350,18 @@ class Route
      *
      * @return void
      *
-     * @throws HttpRouteNotFoundException
-     * @throws HttpMethodNotAllowedException
-     *
      * @codeCoverageIgnore
      */
     public static function dispatch(): void
     {
         try {
+            /** @var string $requestMethod */
+            $requestMethod = $_SERVER['REQUEST_METHOD'];
+
             $dispatcher = new Dispatcher(self::$container, self::$router->getData());
 
             $response = $dispatcher->dispatch(
-                $_SERVER['REQUEST_METHOD'],
+                $requestMethod,
                 implode('/', array_slice(explode('/', self::$uri), self::$index))
             );
 
@@ -360,9 +381,19 @@ class Route
 
             self::$response->finish($response);
         } catch (HttpRouteNotFoundException $e) {
-            self::$response->finish(self::$response->custom('route-error', $e->getMessage(), Http::NOT_FOUND));
+            self::$response->finish(self::$response->custom(Status::ROUTE_ERROR, $e->getMessage(), Http::NOT_FOUND));
         } catch (HttpMethodNotAllowedException $e) {
-            self::$response->finish(self::$response->custom('route-error', $e->getMessage(), Http::METHOD_NOT_ALLOWED));
+            self::$response->finish(
+                self::$response->custom(Status::ROUTE_ERROR, $e->getMessage(), Http::METHOD_NOT_ALLOWED)
+            );
+        } catch (RulesException $e) {
+            self::$response->finish(
+                self::$response->custom(Status::RULE_ERROR, $e->getMessage(), Http::INTERNAL_SERVER_ERROR)
+            );
+        } catch (ReflectionException $e) {
+            self::$response->finish(
+                self::$response->custom(Status::ERROR, $e->getMessage(), Http::INTERNAL_SERVER_ERROR)
+            );
         }
     }
 
@@ -370,9 +401,9 @@ class Route
      * Function to declare a route with the HTTP GET protocol
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -389,9 +420,9 @@ class Route
      * Function to declare a route with the HTTP POST protocol
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -408,9 +439,9 @@ class Route
      * Function to declare a route with the HTTP PUT protocol
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -427,9 +458,9 @@ class Route
      * Function to declare a route with the HTTP DELETE protocol
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -446,9 +477,9 @@ class Route
      * Function to declare a route with the HTTP HEAD protocol
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -465,9 +496,9 @@ class Route
      * Function to declare a route with the HTTP OPTIONS protocol
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -484,9 +515,9 @@ class Route
      * Function to declare a route with the HTTP PATCH protocol
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -503,9 +534,9 @@ class Route
      * Function to declare any route with HTTP protocols
      *
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -524,9 +555,9 @@ class Route
      *
      * @param array<int, string> $methods [List of HTTP protocols for routes]
      * @param string $uri [URI for HTTP route]
-     * @param Closure|array|string $function [Resource to execute the HTTP
-     * route, such as a function or a controller]
-     * @param array $options [Filter options]
+     * @param Closure|array<int, string>|string $function [Resource to execute
+     * the HTTP route, such as a function or a controller]
+     * @param array<int|string, string> $options [Filter options]
      *
      * @return void
      */
@@ -563,7 +594,7 @@ class Route
     /**
      * Defines filters to group defined routes
      *
-     * @param array $filters [Defined filters]
+     * @param array<int|string, string> $filters [Defined filters]
      * @param Closure $closure [Function that executes]
      *
      * @return void

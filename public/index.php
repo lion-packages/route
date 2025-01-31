@@ -121,7 +121,7 @@ Route::middleware(['example-method-1', 'example-method-2'], function (): void {
         Route::post('example-2', function (): array {
             return [
                 'isValid' => true,
-                'filters' => Route::getFilters()
+                'filters' => Route::getFilters(),
             ];
         });
     });

@@ -33,11 +33,6 @@
         <include>
             <directory suffix=".php">src/LionRoute</directory>
         </include>
-
-        <exclude>
-            <directory suffix=".php">tests/build</directory>
-            <directory suffix=".php">tests/Provider</directory>
-        </exclude>
     </source>
 
     <testsuites>

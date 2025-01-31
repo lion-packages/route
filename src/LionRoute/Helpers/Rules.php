@@ -15,11 +15,11 @@ use Lion\Security\Validation;
  * @property Validation $validation [Validation class object]
  * @property Request $request [Allows you to obtain data captured in an HTTP
  * request and modify headers]
- * @property array $responses [Array containing all answers]
+ * @property array<int|string, string> $responses [Array containing all answers]
  *
  * @package Lion\Route\Helpers
  */
-abstract class Rules
+class Rules
 {
     /**
      * [Validation class object]
@@ -38,9 +38,9 @@ abstract class Rules
     /**
      * [Array containing all answers]
      *
-     * @var array $responses
+     * @var array<int|string, string> $responses
      */
-    protected array $responses;
+    protected array $responses = [];
 
     #[Inject]
     public function setValidation(Validation $validation): void
@@ -64,19 +64,23 @@ abstract class Rules
      */
     protected function validate(Closure $validateFunction): void
     {
-        $response = $this->validation->validate((array) $this->request->capture(), $validateFunction);
+        /** @var array<string, mixed> $rows */
+        $rows = (array) $this->request->capture();
 
-        if (isset($response->status) && 'error' === $response->status) {
-            $this->responses = $response->messages;
-        } else {
-            $this->responses = [];
+        $response = $this->validation->validate($rows, $validateFunction);
+
+        if ('error' === $response->status) {
+            /** @var array<int|string, string> $errorMessages */
+            $errorMessages = $response->messages;
+
+            $this->responses = $errorMessages;
         }
     }
 
     /**
      * Gets the list of rule errors
      *
-     * @return array
+     * @return array<int|string, string>
      */
     public function getErrors(): array
     {

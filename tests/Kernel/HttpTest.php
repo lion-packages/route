@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Kernel;
 
+use DI\DependencyException;
+use DI\NotFoundException;
 use Lion\Dependency\Injection\Container;
 use Lion\Exceptions\Exception;
 use Lion\Request\Http;
@@ -23,16 +25,22 @@ class HttpTest extends Test
     use HttpProviderTrait;
 
     private const string MESSAGE = 'parameter error';
-    private const string URI = '/api/test';
 
     private KernelHttp $kernelHttp;
     private Container $container;
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     protected function setUp(): void
     {
         $this->container = new Container();
 
-        $this->kernelHttp = $this->container->resolve(KernelHttp::class);
+        /** @var KernelHttp $kernelHttp */
+        $kernelHttp = $this->container->resolve(KernelHttp::class);
+
+        $this->kernelHttp = $kernelHttp;
     }
 
     protected function tearDown(): void
@@ -55,6 +63,8 @@ class HttpTest extends Test
 
     /**
      * @throws Exception
+     * @throws DependencyException
+     * @throws NotFoundException
      */
     #[Testing]
     public function validateRules(): void
@@ -89,8 +99,10 @@ class HttpTest extends Test
             }
         };
 
+        /** @var Rules|RulesInterface $idRule */
         $idRule = $this->container->resolve($rule::class);
 
+        /** @var Rules|RulesInterface $nameRule */
         $nameRule = $this->container->resolve($rule2::class);
 
         $this

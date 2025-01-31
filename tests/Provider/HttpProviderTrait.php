@@ -6,6 +6,9 @@ namespace Tests\Provider;
 
 trait HttpProviderTrait
 {
+    /**
+     * @return array<int, array<string, bool|string>>
+     */
     public static function checkUrlProvider(): array
     {
         return [

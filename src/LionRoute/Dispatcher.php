@@ -19,16 +19,9 @@ use ReflectionMethod;
 /**
  * Is responsible for dispatching HTTP web routes
  *
- * @property Container $container [Container to generate dependency injection]
- * @property Http $http [Kernel for HTTP requests]
- * @property $staticRouteMap
- * @property $variableRouteData
- * @property $filters
- * @property array<int, string> $reflectionCache [Rules stored in their
- * execution]
- * @property $matchedRoute
- *
  * @package Lion\Route
+ *
+ * @codeCoverageIgnore
  */
 class Dispatcher
 {
@@ -87,7 +80,7 @@ class Dispatcher
     /**
      * Dispatches all rules defined by attributes in the method
      *
-     * @param object $classInstance [Class instance]
+     * @param mixed $classInstance [Class instance]
      * @param string $methodName [Class method]
      *
      * @return void
@@ -95,7 +88,7 @@ class Dispatcher
      * @throws RulesException
      * @throws ReflectionException
      */
-    private function dispatchRules(object $classInstance, string $methodName): void
+    private function dispatchRules(mixed $classInstance, string $methodName): void
     {
         $cacheKey = get_class($classInstance) . '::' . $methodName;
 

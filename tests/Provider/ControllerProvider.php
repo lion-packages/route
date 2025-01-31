@@ -13,8 +13,12 @@ class ControllerProvider
 {
     public function __construct(
         private Middleware $middleware,
-    ) {}
+    ) {
+    }
 
+    /**
+     * @return array<string, string>
+     */
     public function createMethod(): array
     {
         return [
@@ -23,6 +27,9 @@ class ControllerProvider
         ];
     }
 
+    /**
+     * @return array<string, string|null>
+     */
     public function getMiddleware(Middleware $middleware, string $middlewareName = 'test'): array
     {
         return [
@@ -30,6 +37,9 @@ class ControllerProvider
         ];
     }
 
+    /**
+     * @return array<string, string|null>
+     */
     public function setMiddleware(string $middleware): array
     {
         return [
@@ -37,6 +47,9 @@ class ControllerProvider
         ];
     }
 
+    /**
+     * @return array<string, string|null>
+     */
     public function middleware(Middleware $middleware): array
     {
         return [
@@ -44,6 +57,9 @@ class ControllerProvider
         ];
     }
 
+    /**
+     * @return array<string, bool>
+     */
     #[Rules(IdRuleProvider::class, NameRuleProvider::class)]
     public function testAttributes(): array
     {

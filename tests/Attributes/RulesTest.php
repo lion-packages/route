@@ -6,19 +6,22 @@ namespace Tests\Attributes;
 
 use Lion\Route\Attributes\Rules;
 use Lion\Test\Test;
+use ReflectionException;
 use ReflectionMethod;
+use PHPUnit\Framework\Attributes\Test as Testing;
 
 class RulesTest extends Test
 {
-    public function testRules(): void
+    /**
+     * @throws ReflectionException
+     */
+    #[Testing]
+    public function rules(): void
     {
         $class = new class
         {
-            /**
-             * @Rules('rule1', 'rule2')
-             */
             #[Rules('rule1', 'rule2')]
-            public function myMethod()
+            public function myMethod(): void
             {
             }
         };

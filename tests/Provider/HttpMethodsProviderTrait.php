@@ -8,14 +8,14 @@ use Lion\Route\Route;
 
 trait HttpMethodsProviderTrait
 {
-    const DATA_METHOD = [
+    private const array DATA_METHOD = [
         'filters' => [],
         'handler' => [
             'controller' => false,
             'callback' => true,
         ]
     ];
-    const DATA_METHOD_MIDDLEWARE = [
+    private const array DATA_METHOD_MIDDLEWARE = [
         'filters' => [
             'example-method-1',
             'example-method-2',
@@ -25,21 +25,10 @@ trait HttpMethodsProviderTrait
             'callback' => true,
         ],
     ];
-    const DATA_METHOD_CONTROLLER = [
-        'filters' => [],
-        'handler' => [
-            'controller' => [
-                'name' => ControllerProvider::class,
-                'function' => 'getMiddleware',
-            ],
-            'callback' => false,
-        ],
-    ];
-    const FILTER_NAME_1 = 'example-method-1';
-    const FILTER_NAME_2 = 'example-method-2';
-    const FILTER_NAME_3 = 'example-method-3';
-    const FILTERS_MIDDLEWARE = [self::FILTER_NAME_1, self::FILTER_NAME_2, self::FILTER_NAME_3];
-    const ROUTES = [
+    private const string FILTER_NAME_1 = 'example-method-1';
+    private const string FILTER_NAME_2 = 'example-method-2';
+    private const string FILTER_NAME_3 = 'example-method-3';
+    private const array ROUTES = [
         Route::GET => self::DATA_METHOD,
         Route::POST => self::DATA_METHOD,
         Route::PUT => self::DATA_METHOD,
@@ -47,19 +36,12 @@ trait HttpMethodsProviderTrait
         Route::HEAD => self::DATA_METHOD,
         Route::OPTIONS => self::DATA_METHOD,
         Route::PATCH => self::DATA_METHOD,
-        Route::ANY => self::DATA_METHOD
-    ];
-    const ROUTES_CONTROLLER = [
-        Route::GET => self::DATA_METHOD_CONTROLLER,
-        Route::POST => self::DATA_METHOD_CONTROLLER,
-        Route::PUT => self::DATA_METHOD_CONTROLLER,
-        Route::DELETE => self::DATA_METHOD_CONTROLLER,
-        Route::HEAD => self::DATA_METHOD_CONTROLLER,
-        Route::OPTIONS => self::DATA_METHOD_CONTROLLER,
-        Route::PATCH => self::DATA_METHOD_CONTROLLER,
-        Route::ANY => self::DATA_METHOD_CONTROLLER
+        Route::ANY => self::DATA_METHOD,
     ];
 
+    /**
+     * @return array<int, array<string, string>>
+     */
     public static function httpMethodsProvider(): array
     {
         return [

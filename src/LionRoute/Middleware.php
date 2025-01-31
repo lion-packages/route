@@ -141,7 +141,7 @@ class Middleware
      *
      * @internal
      */
-    public function setParams(array $params): Middleware
+    public function setParams(?array $params = null): Middleware
     {
         $this->params = $params;
 

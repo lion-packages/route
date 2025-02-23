@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lion\Route;
 
+use DI\DependencyException;
+use DI\NotFoundException;
+use Exception;
 use Lion\Dependency\Injection\Container;
 use Lion\Route\Attributes\Rules;
 use Lion\Route\Exceptions\RulesException;
@@ -13,6 +16,7 @@ use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\HandlerResolverInterface;
 use Phroute\Phroute\Route;
 use Phroute\Phroute\RouteDataInterface;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -48,7 +52,7 @@ class Dispatcher
     /**
      * [Rules stored in their execution]
      *
-     * @var array<int, string> $reflectionCache
+     * @var array<string, list<Rules>|ReflectionClass<object>> $reflectionCache
      */
     private array $reflectionCache = [];
 
@@ -80,27 +84,41 @@ class Dispatcher
     /**
      * Dispatches all rules defined by attributes in the method
      *
-     * @param mixed $classInstance [Class instance]
+     * @param object $classInstance [Class instance]
      * @param string $methodName [Class method]
      *
      * @return void
      *
+     * @throws Exception
      * @throws RulesException
      * @throws ReflectionException
+     * @throws DependencyException [Error while resolving the entry]
+     * @throws NotFoundException [No entry found for the given name]
      */
-    private function dispatchRules(mixed $classInstance, string $methodName): void
+    private function dispatchRules(object $classInstance, string $methodName): void
     {
-        $cacheKey = get_class($classInstance) . '::' . $methodName;
+        $className = get_class($classInstance);
 
-        if (!isset($this->reflectionCache[$cacheKey])) {
-            $this->reflectionCache[$cacheKey] = (new ReflectionMethod($classInstance, $methodName))
-                ->getAttributes(Rules::class);
+        if (!isset($this->reflectionCache[$className])) {
+            $this->reflectionCache[$className] = new ReflectionClass($classInstance);
         }
 
-        $attributes = $this->reflectionCache[$cacheKey];
+        $reflectionClass = $this->reflectionCache[$className];
 
-        if (!empty($attributes)) {
-            $this->http->validateRules($attributes[0]->newInstance()->getRules());
+        /** @phpstan-ignore-next-line */
+        if (!$reflectionClass->hasMethod($methodName)) {
+            throw new Exception("The method {$methodName} does not exist in {$className}");
+        }
+
+        $cacheKey = "{$className}::{$methodName}";
+
+        if (!isset($this->reflectionCache[$cacheKey])) {
+            /** @phpstan-ignore-next-line */
+            $method = $reflectionClass->getMethod($methodName);
+
+            $attributes = $method->getAttributes(Rules::class);
+
+            $this->reflectionCache[$cacheKey] = array_map(fn($attr) => $attr->newInstance(), $attributes);
         }
     }
 
@@ -116,6 +134,8 @@ class Dispatcher
      * @throws HttpRouteNotFoundException
      * @throws ReflectionException
      * @throws RulesException
+     * @throws DependencyException [Error while resolving the entry]
+     * @throws NotFoundException [No entry found for the given name]
      */
     public function dispatch(string $httpMethod, string $uri): mixed
     {

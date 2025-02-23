@@ -26,14 +26,6 @@ class RouteTest extends Test
     private const array ARRAY_RESPONSE = [
         'isValid' => true,
     ];
-    private const array JSON_RESPONSE = [
-        'message' => 'property is required: id',
-        'isValid' => false,
-        'data' => [
-            'status' => 'success',
-            'message' => 'controller provider',
-        ],
-    ];
 
     private Route $route;
     private Client $client;
@@ -295,9 +287,7 @@ class RouteTest extends Test
             ->getBody()
             ->getContents();
 
-        $this->assertJsonContent($response, [
-            'isValid' => true,
-        ]);
+        $this->assertJsonContent($response, self::ARRAY_RESPONSE);
     }
 
     public function testMultipleMiddleware(): void

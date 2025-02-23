@@ -2,4 +2,4 @@ parameters:
     level: max
 
     excludePaths:
-        - %currentWorkingDirectory%/src/LionRoute/Dispatcher.php
+        - src/LionRoute/Dispatcher.php

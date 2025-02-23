@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Tests\Provider;
 
 use Lion\Route\Attributes\Rules;
-use Lion\Route\Middleware;
 use Tests\Provider\Rules\IdRuleProvider;
 use Tests\Provider\Rules\NameRuleProvider;
 
 class ControllerProvider
 {
     public function __construct(
-        private Middleware $middleware,
+        private ClassProvider $classProvider,
     ) {
     }
 
@@ -30,35 +29,43 @@ class ControllerProvider
     /**
      * @return array<string, string|null>
      */
-    public function getMiddleware(Middleware $middleware, string $middlewareName = 'test'): array
+    public function getMiddleware(ClassProvider $classProvider, string $middlewareName = 'test'): array
     {
         return [
-            'middleware' => $middleware->setMiddlewareName($middlewareName)->getMiddlewareName()
+            'middleware' => $classProvider->setIndex($middlewareName)->getIndex()
         ];
     }
 
     /**
-     * @return array<string, string|null>
+     * @param string $middleware
+     *
+     * @return array{
+     *     middleware: string
+     * }
      */
     public function setMiddleware(string $middleware): array
     {
         return [
-            'middleware' => $this->middleware->setMiddlewareName($middleware)->getMiddlewareName()
+            'middleware' => $this->classProvider->setIndex($middleware)->getIndex()
         ];
     }
 
     /**
-     * @return array<string, string|null>
+     * @return array{
+     *     middleware: string
+     * }
      */
-    public function middleware(Middleware $middleware): array
+    public function middleware(ClassProvider $classProvider): array
     {
         return [
-            'middleware' => $middleware->getMiddlewareName(),
+            'middleware' => $classProvider->getIndex(),
         ];
     }
 
     /**
-     * @return array<string, bool>
+     * @return array{
+     *     isValid: true
+     * }
      */
     #[Rules(IdRuleProvider::class, NameRuleProvider::class)]
     public function testAttributes(): array

@@ -7,31 +7,39 @@ require_once(__DIR__ . './../vendor/autoload.php');
 header('Content-Type: application/json');
 
 use Lion\Exceptions\Serialize;
-use Lion\Route\Middleware;
+use Lion\Route\Interface\MiddlewareInterface;
 use Lion\Route\Route;
 use Tests\Provider\ControllerProvider;
 
-(new Serialize())
+new Serialize()
     ->exceptionHandler();
 
 $content = json_decode(file_get_contents("php://input"), true);
 
 $_POST = $content === null ? $_POST : $content;
 
-$classExample = new class
+$classExample1 = new class implements MiddlewareInterface
 {
-    public function exampleMethod1(ControllerProvider $controllerProvider): void
+    /**
+     * {@inheritDoc}
+     */
+    public function process(): void
     {
         if (!isset($_POST['id'])) {
             die(json_encode([
                 'message' => 'property is required: id',
                 'isValid' => false,
-                'data' => $controllerProvider->createMethod(),
             ]));
         }
     }
+};
 
-    public function exampleMethod2(): void
+$classExample2 = new class implements MiddlewareInterface
+{
+    /**
+     * {@inheritDoc}
+     */
+    public function process(): void
     {
         if (!isset($_POST['name'])) {
             die(json_encode([
@@ -40,8 +48,14 @@ $classExample = new class
             ]));
         }
     }
+};
 
-    public function exampleMethod3(): void
+$classExample3 = new class implements MiddlewareInterface
+{
+    /**
+     * {@inheritDoc}
+     */
+    public function process(): void
     {
         if (!isset($_POST['last_name'])) {
             die(json_encode([
@@ -50,18 +64,30 @@ $classExample = new class
             ]));
         }
     }
+};
 
-    public function exampleMethod4(int $key): void
+$classExample4 = new class implements MiddlewareInterface
+{
+    /**
+     * {@inheritDoc}
+     */
+    public function process(): void
     {
         if (!isset($_POST['email'])) {
             die(json_encode([
-                'message' => 'property is required: email - ' . $key,
+                'message' => 'property is required: email',
                 'isValid' => false,
             ]));
         }
     }
+};
 
-    public function exampleMethod5(): void
+$classExample5 = new class implements MiddlewareInterface
+{
+    /**
+     * {@inheritDoc}
+     */
+    public function process(): void
     {
         if (!isset($_POST['password'])) {
             die(json_encode([
@@ -75,12 +101,18 @@ $classExample = new class
 Route::init();
 
 Route::addMiddleware([
-    new Middleware('example-method-1', $classExample::class, 'exampleMethod1'),
-    new Middleware('example-method-2', $classExample::class, 'exampleMethod2'),
-    new Middleware('example-method-3', $classExample::class, 'exampleMethod3'),
-    new Middleware('example-method-4', $classExample::class, 'exampleMethod4', ['key' => 1]),
-    new Middleware('example-method-5', $classExample::class, 'exampleMethod5'),
+    'example-method-1' => $classExample1::class,
+    'example-method-2' => $classExample2::class,
+    'example-method-3' => $classExample3::class,
+    'example-method-4' => $classExample4::class,
+    'example-method-5' => $classExample5::class,
 ]);
+
+Route::get('test-example', function () {
+    return [
+        'message' => 'provider'
+    ];
+}, ['example-method-1']);
 
 Route::get('/', fn () => ['isValid' => true]);
 Route::get('controller', [ControllerProvider::class, 'middleware']);
@@ -88,9 +120,9 @@ Route::get('controller/{middleware}', [ControllerProvider::class, 'setMiddleware
 Route::get('controller/middleware/get', [ControllerProvider::class, 'getMiddleware']);
 Route::post('rules', [ControllerProvider::class, 'testAttributes']);
 
-Route::get('controller-index', function (Middleware $middleware, string $name = 'Lion'): array {
+Route::get('controller-index', function (string $name = 'Lion'): array {
     return [
-        'name' => $middleware->setMiddlewareName($name)->getMiddlewareName()
+        'name' => $name,
     ];
 });
 

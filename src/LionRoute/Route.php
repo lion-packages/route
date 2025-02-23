@@ -10,6 +10,7 @@ use Lion\Request\Http;
 use Lion\Request\Response;
 use Lion\Request\Status;
 use Lion\Route\Exceptions\RulesException;
+use Lion\Route\Interface\MiddlewareInterface;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\RouteCollector;
@@ -320,27 +321,18 @@ class Route
     /**
      * Add the defined filters to the router
      *
-     * @param array<int, Middleware> $filters [List of defined filters]
+     * @param array<string, class-string> $filters [List of defined filters]
      *
      * @return void
      */
     public static function addMiddleware(array $filters): void
     {
-        foreach ($filters as $middleware) {
-            self::$router->filter($middleware->getMiddlewareName(), function () use ($middleware): void {
-                /** @var string $class */
-                $class = $middleware->getClass();
+        foreach ($filters as $middlewareName => $middlewareClass) {
+            self::$router->filter($middlewareName, function () use ($middlewareClass): void {
+                /** @var MiddlewareInterface $middlewareInterface */
+                $middlewareInterface = self::$container->resolve($middlewareClass);
 
-                /** @var string $classMiddleware */
-                $classMiddleware = $middleware->getMethodClass();
-
-                /** @var array<string, mixed> $params */
-                $params = $middleware->getParams();
-
-                /** @var object $object */
-                $object = self::$container->resolve($class);
-
-                self::$container->callMethod($object, $classMiddleware, $params);
+                $middlewareInterface->process();
             });
         }
     }

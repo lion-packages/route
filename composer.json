@@ -15,7 +15,8 @@
     },
     "require": {
         "php": ">=8.4",
-        "lion/phroute": "^2.3"
+        "lion/phroute": "^2.3",
+        "lion/exceptions": "^2.0"
     },
     "require-dev": {
         "lion/test": "^3.2",
@@ -23,7 +24,6 @@
         "phpunit/phpunit": "^11.5",
         "lion/security": "^11.1",
         "lion/request": "^7.2",
-        "lion/exceptions": "^2.0",
         "phpstan/phpstan": "^2.1",
         "squizlabs/php_codesniffer": "^3.11",
         "lion/dependency-injection": "^4.2"

@@ -50,11 +50,18 @@ class Dispatcher
     private array $filters;
 
     /**
+     * [Cached reflection objects]
+     *
+     * @var array<string, ReflectionClass<object>> $reflectionCacheClasses
+     */
+    private array $reflectionCacheClasses = [];
+
+    /**
      * [Rules stored in their execution]
      *
-     * @var array<string, list<Rules>|ReflectionClass<object>> $reflectionCache
+     * @var array<string, array<int, string>> $reflectionCacheRules
      */
-    private array $reflectionCache = [];
+    private array $reflectionCacheRules = [];
 
     private $matchedRoute;
 
@@ -91,7 +98,6 @@ class Dispatcher
      *
      * @throws Exception
      * @throws RulesException
-     * @throws ReflectionException
      * @throws DependencyException [Error while resolving the entry]
      * @throws NotFoundException [No entry found for the given name]
      */
@@ -99,27 +105,43 @@ class Dispatcher
     {
         $className = get_class($classInstance);
 
-        if (!isset($this->reflectionCache[$className])) {
-            $this->reflectionCache[$className] = new ReflectionClass($classInstance);
+        if (!isset($this->reflectionCacheClasses[$className])) {
+            $this->reflectionCacheClasses[$className] = new ReflectionClass($classInstance);
         }
 
-        $reflectionClass = $this->reflectionCache[$className];
+        $reflectionClass = $this->reflectionCacheClasses[$className];
 
-        /** @phpstan-ignore-next-line */
         if (!$reflectionClass->hasMethod($methodName)) {
             throw new Exception("The method {$methodName} does not exist in {$className}");
         }
 
         $cacheKey = "{$className}::{$methodName}";
 
-        if (!isset($this->reflectionCache[$cacheKey])) {
-            /** @phpstan-ignore-next-line */
+        if (!isset($this->reflectionCacheRules[$cacheKey])) {
             $method = $reflectionClass->getMethod($methodName);
 
             $attributes = $method->getAttributes(Rules::class);
 
-            $this->reflectionCache[$cacheKey] = array_map(fn($attr) => $attr->newInstance(), $attributes);
+            $rulesList = array_map(
+                function ($attr) {
+                    $instance = $attr->newInstance();
+
+                    return $instance->getRules();
+                },
+                $attributes
+            );
+
+            if (!empty($rulesList)) {
+                /** @var array<int, string> $rules */
+                $rules = reset($rulesList);
+
+                $this->reflectionCacheRules[$cacheKey] = $rules;
+            } else {
+                $this->reflectionCacheRules[$cacheKey] = [];
+            }
         }
+
+        $this->http->validateRules($this->reflectionCacheRules[$cacheKey]);
     }
 
     /**
@@ -132,13 +154,15 @@ class Dispatcher
      *
      * @throws HttpMethodNotAllowedException
      * @throws HttpRouteNotFoundException
-     * @throws ReflectionException
      * @throws RulesException
      * @throws DependencyException [Error while resolving the entry]
      * @throws NotFoundException [No entry found for the given name]
      */
     public function dispatch(string $httpMethod, string $uri): mixed
     {
+        /**
+         * @var array<string, mixed> $vars
+         */
         list($handler, $filters, $vars) = $this->dispatchRoute($httpMethod, trim($uri, '/'));
 
         list($beforeFilter, $afterFilter) = $this->parseFilters($filters);
@@ -150,9 +174,15 @@ class Dispatcher
         $resolvedHandler = $this->handlerResolver->resolve($handler);
 
         if (is_array($resolvedHandler)) {
-            $this->dispatchRules($resolvedHandler[0], $resolvedHandler[1]);
+            /** @var object $instance */
+            $instance = $resolvedHandler[0];
 
-            return $this->container->callMethod($resolvedHandler[0], $resolvedHandler[1], $vars);
+            /** @var string $method */
+            $method = $resolvedHandler[1];
+
+            $this->dispatchRules($instance, $method);
+
+            return $this->container->callMethod($instance, $method, $vars);
         }
 
         return $this->container->callCallback($resolvedHandler, $vars);

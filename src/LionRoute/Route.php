@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lion\Route;
 
 use Closure;
+use DI\DependencyException;
+use DI\NotFoundException;
 use Lion\Dependency\Injection\Container;
 use Lion\Request\Http;
 use Lion\Request\Response;
@@ -342,6 +344,9 @@ class Route
      *
      * @return void
      *
+     * @throws DependencyException [Error while resolving the entry]
+     * @throws NotFoundException [No entry found for the given name]
+     *
      * @codeCoverageIgnore
      */
     public static function dispatch(): void
@@ -380,11 +385,7 @@ class Route
             );
         } catch (RulesException $e) {
             self::$response->finish(
-                self::$response->custom(Status::RULE_ERROR, $e->getMessage(), Http::INTERNAL_SERVER_ERROR)
-            );
-        } catch (ReflectionException $e) {
-            self::$response->finish(
-                self::$response->custom(Status::ERROR, $e->getMessage(), Http::INTERNAL_SERVER_ERROR)
+                self::$response->custom(Status::RULE_ERROR, $e->getMessage(), $e->getCode(), $e->getData())
             );
         }
     }

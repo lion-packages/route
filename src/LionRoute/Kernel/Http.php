@@ -89,13 +89,17 @@ class Http
                     $ruleErrors = array_values($ruleClass->getErrors());
 
                     if (!empty($ruleErrors)) {
-                        $errors[reset($ruleKey)] = reset($ruleErrors);
+                        $key = reset($ruleKey);
+
+                        $error = reset($ruleErrors);
+
+                        $errors[$key] = $error;
                     }
                 }
             }
         }
 
-        if (count($errors) > 0) {
+        if (!empty($errors)) {
             throw new RulesException('parameter error', Status::RULE_ERROR, RequestHttp::INTERNAL_SERVER_ERROR, [
                 'rules-error' => $errors,
             ]);

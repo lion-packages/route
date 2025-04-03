@@ -27,6 +27,12 @@
         "lion/dependency-injection": "^4.2",
         "lion/exceptions": "^2.0",
         "phpunit/phpunit": "^12.0",
-        "overtrue/phplint": "^9.5"
+        "overtrue/phplint": "^9.5",
+        "infection/infection": "^0.29.14"
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": false
+        }
     }
 }

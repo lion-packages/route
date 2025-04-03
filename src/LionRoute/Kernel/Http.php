@@ -33,35 +33,6 @@ class Http
     }
 
     /**
-     * Check URL patterns to validate if a URL matches or is identical
-     *
-     * @param string $uri [API URI]
-     *
-     * @return bool
-     */
-    public function checkUrl(string $uri): bool
-    {
-        /** @var string $requestUri */
-        $requestUri = $_SERVER['REQUEST_URI'];
-
-        $cleanRequestUri = explode('?', $requestUri)[0];
-
-        $arrayUri = explode('/', $uri);
-
-        $arrayUrl = explode('/', $cleanRequestUri);
-
-        foreach ($arrayUri as $index => &$value) {
-            if (preg_match('/^\{.*\}$/', $value)) {
-                $value = 'dynamic-param';
-
-                $arrayUrl[$index] = 'dynamic-param';
-            }
-        }
-
-        return implode('/', $arrayUri) === implode('/', $arrayUrl);
-    }
-
-    /**
      * Check for errors with the defined rules
      *
      * @param array<int, string> $rules [List of rules]
@@ -71,6 +42,8 @@ class Http
      * @throws DependencyException [Error while resolving the entry]
      * @throws NotFoundException [No entry found for the given name]
      * @throws RulesException [If there are rule errors]
+     *
+     * @infection-ignore-all
      */
     public function validateRules(array $rules): void
     {

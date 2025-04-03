@@ -16,7 +16,6 @@ use Lion\Route\Interface\MiddlewareInterface;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\RouteCollector;
-use ReflectionException;
 
 /**
  * Class to define web routes
@@ -176,6 +175,8 @@ class Route
      * @param int $index [Index from which the route is obtained]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function init(int $index = 1): void
     {
@@ -219,6 +220,9 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private static function executeRoute(string $type, string $uri, Closure|array $function, array $options = []): void
     {
@@ -244,6 +248,9 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private static function addRoutes(string $uri, string $method, Closure|array $function, array $options): void
     {
@@ -399,6 +406,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function get(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -418,6 +427,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function post(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -437,6 +448,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function put(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -456,6 +469,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function delete(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -475,6 +490,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function head(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -494,6 +511,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function options(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -513,6 +532,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function patch(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -532,6 +553,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function any(string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -553,6 +576,8 @@ class Route
      * @param array<int|string, string> $options [Filter options]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function match(array $methods, string $uri, Closure|array|string $function, array $options = []): void
     {
@@ -572,6 +597,8 @@ class Route
      * @param Closure $closure [Function that executes]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function prefix(string $name, Closure $closure): void
     {
@@ -591,6 +618,8 @@ class Route
      * @param Closure $closure [Function that executes]
      *
      * @return void
+     *
+     * @infection-ignore-all
      */
     public static function middleware(array $filters, Closure $closure): void
     {

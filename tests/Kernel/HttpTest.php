@@ -15,15 +15,11 @@ use Lion\Route\Helpers\Rules;
 use Lion\Route\Interface\RulesInterface;
 use Lion\Route\Kernel\Http as KernelHttp;
 use Lion\Test\Test;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test as Testing;
-use Tests\Provider\HttpProviderTrait;
 use Valitron\Validator;
 
 class HttpTest extends Test
 {
-    use HttpProviderTrait;
-
     private const string MESSAGE = 'parameter error';
 
     private KernelHttp $kernelHttp;
@@ -50,15 +46,6 @@ class HttpTest extends Test
         unset($_SERVER['REQUEST_METHOD']);
 
         $this->rmdirRecursively('./app/');
-    }
-
-    #[Testing]
-    #[DataProvider('checkUrlProvider')]
-    public function checkUrl(string $requestUri, string $uri, bool $response): void
-    {
-        $_SERVER['REQUEST_URI'] = $requestUri;
-
-        $this->assertSame($response, $this->kernelHttp->checkUrl($uri));
     }
 
     /**

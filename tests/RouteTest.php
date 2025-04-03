@@ -6,9 +6,14 @@ namespace Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Lion\Dependency\Injection\Container;
+use Lion\Request\Response;
 use Lion\Route\Route;
 use Lion\Test\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test as Testing;
+use Phroute\Phroute\RouteCollector;
+use ReflectionException;
 use Tests\Provider\HttpMethodsProviderTrait;
 
 class RouteTest extends Test
@@ -31,6 +36,9 @@ class RouteTest extends Test
     private Client $client;
     private object $customClass;
 
+    /**
+     * @throws ReflectionException
+     */
     protected function setUp(): void
     {
         $this->route = new Route();
@@ -60,6 +68,9 @@ class RouteTest extends Test
         $this->initReflection($this->route);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     protected function tearDown(): void
     {
         $this->setPrivateProperty('routes', []);
@@ -67,6 +78,27 @@ class RouteTest extends Test
         $this->setPrivateProperty('filters', []);
 
         $this->setPrivateProperty('prefix', '');
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    #[Testing]
+    public function init(): void
+    {
+        $index = 3;
+
+        $_SERVER['REQUEST_URI'] = 'https://example.com/?foo=bar';
+
+        $this->route->init($index);
+
+        $this->assertInstanceOf(RouteCollector::class, $this->getPrivateProperty('router'));
+        $this->assertInstanceOf(Container::class, $this->getPrivateProperty('container'));
+        $this->assertInstanceOf(Response::class, $this->getPrivateProperty('response'));
+        $this->assertSame(explode('?', $_SERVER['REQUEST_URI'])[0], $this->getPrivateProperty('uri'));
+        $this->assertSame($index, $this->getPrivateProperty('index'));
+
+        unset($_SERVER['REQUEST_URI']);
     }
 
     public function testGetFilters(): void
@@ -101,7 +133,7 @@ class RouteTest extends Test
     #[DataProvider('httpMethodsProvider')]
     public function testHttpMethods(string $method, string $httpMethod): void
     {
-        $this->route->$method(self::URI, fn () => self::ARRAY_RESPONSE);
+        $this->route->$method(self::URI, fn (): array => self::ARRAY_RESPONSE);
 
         $fullRoutes = $this->route->getFullRoutes();
 
@@ -223,7 +255,11 @@ class RouteTest extends Test
         $this->assertSame(self::DATA_METHOD_MIDDLEWARE, $fullRoutes[self::FULL_URI][Route::POST]);
     }
 
-    public function testPrefix(): void
+    /**
+     * @throws ReflectionException
+     */
+    #[Testing]
+    public function prefix(): void
     {
         $this->route->prefix(self::PREFIX, function () {
             $this->route->get(self::URI, fn () => self::ARRAY_RESPONSE);
@@ -234,6 +270,8 @@ class RouteTest extends Test
         $this->assertArrayHasKey(self::FULL_URI, $fullRoutes);
         $this->assertArrayHasKey(Route::GET, $fullRoutes[self::FULL_URI]);
         $this->assertSame(self::ROUTES[Route::GET], $fullRoutes[self::FULL_URI][Route::GET]);
+
+        $this->initReflection($this->route);
     }
 
     public function testMultiplePrefix(): void

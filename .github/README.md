@@ -1,26 +1,69 @@
+# 🦁 Lion-Route
+
 <p align="center">
-  <a href="https://lion-client.vercel.app/" target="_blank">
-    <img
-         src="https://github.com/lion-packages/mailer/assets/132396080/b4a5f07a-0035-4f07-b998-ef3adb32eaec"
-         width="300"
-         alt="Lion-Framework Logo"
+  <a href="https://dev.lion-packages.com/docs/library/content" target="_blank">
+    <img 
+        src="https://github.com/lion-packages/framework/assets/56183278/60871c9f-1c93-4481-8c1e-d70282b33254"
+        width="450" 
+        alt="Lion-Packages Logo"
     >
   </a>
 </p>
 
 <p align="center">
-  <img src="https://poser.pugx.org/lion/route/v" alt="Latest Stable Version">
-  <img src="https://poser.pugx.org/lion/route/downloads" alt="Total Downloads">
-  <img src="https://poser.pugx.org/lion/route/license" alt="License">
-  <img src="https://poser.pugx.org/lion/route/require/php" alt="PHP Version Require">
+  <a href="https://packagist.org/packages/lion/route">
+    <img src="https://poser.pugx.org/lion/route/v" alt="Latest Stable Version">
+  </a>
+  <a href="https://packagist.org/packages/lion/route">
+    <img src="https://poser.pugx.org/lion/route/downloads" alt="Total Downloads">
+  </a>
+  <a href="https://github.com/lion-packages/route/blob/main/LICENSE">
+    <img src="https://poser.pugx.org/lion/route/license" alt="License">
+  </a>
+  <a href="https://www.php.net/">
+    <img src="https://poser.pugx.org/lion/route/require/php" alt="PHP Version Require">
+  </a>
 </p>
 
-## Install
+🚀 **Lion-Route** This library has quick router usage with regular expressions.
+
+---
+
+## 📖 Features
+
+✔️ Supports post, get, put, delete, options, and match methods.  
+✔️ Middleware Support.  
+✔️ Support with route group.  
+
+---
+
+## 📦 Installation
+
+Install the route using **Composer**:
 
 ```bash
-composer require lion/route lion/security lion/request lion/exceptions lion/dependency-injection
+composer require lion/route lion/exceptions lion/request lion/security lion/dependency-injection
 ```
 
-## License
+## Usage Example
 
-The <strong>route</strong> library is open source software licensed under the [MIT License](https://github.com/lion-packages/route/blob/main/LICENSE).
+```php
+<?php
+
+declare(strict_types=1);
+
+use Lion\Route\Route;
+use App\Http\Controllers\UsersController;
+
+Route::init();
+
+Route::get('users', function(UsersController $usersController): mixed {
+    return $usersController->method();
+});
+
+Route::dispatch();
+```
+
+## 📝 License
+
+The <strong>route</strong> is open-sourced software licensed under the [MIT License](https://github.com/lion-packages/route/blob/main/LICENSE).

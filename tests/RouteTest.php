@@ -21,12 +21,12 @@ class RouteTest extends Test
     use HttpMethodsProviderTrait;
 
     private const string HOST = 'http://127.0.0.1:8000';
-    private const string API_CONTROLLER = self::HOST . '/controller/';
-    private const string API_TEST = self::HOST . '/example';
+    private const string API_CONTROLLER = self::HOST.'/controller/';
+    private const string API_TEST = self::HOST.'/example';
     private const string PREFIX = 'prefix-test';
     private const string URI = 'test';
-    private const string FULL_URI = self::PREFIX . '/' . self::URI;
-    private const string FULL_URI_SECOND = self::PREFIX . '/' . self::PREFIX . '/' . self::URI;
+    private const string FULL_URI = self::PREFIX.'/'.self::URI;
+    private const string FULL_URI_SECOND = self::PREFIX.'/'.self::PREFIX.'/'.self::URI;
     private const string URI_MATCH = 'match-test';
     private const array ARRAY_RESPONSE = [
         'isValid' => true,
@@ -45,21 +45,20 @@ class RouteTest extends Test
 
         $this->client = new Client();
 
-        $this->customClass = new class
-        {
+        $this->customClass = new class() {
             public function exampleMethod1(): void
             {
-                echo ('TESTING');
+                echo 'TESTING';
             }
 
             public function exampleMethod2(): void
             {
-                echo ('TESTING');
+                echo 'TESTING';
             }
 
             public function exampleMethod3(int $key): void
             {
-                echo ('TESTING: ' . $key);
+                echo 'TESTING: '.$key;
             }
         };
 
@@ -146,7 +145,7 @@ class RouteTest extends Test
     {
         $response = json_decode(
             $this->client
-                ->get(self::API_CONTROLLER . self::URI)
+                ->get(self::API_CONTROLLER.self::URI)
                 ->getBody()
                 ->getContents(),
             true
@@ -318,7 +317,7 @@ class RouteTest extends Test
         $response = $this->client
             ->post(self::API_TEST, [
                 'json' => [
-                    'id' => 1,
+                    'id'   => 1,
                     'name' => 'root',
                 ],
             ])

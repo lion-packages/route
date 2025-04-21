@@ -2,7 +2,7 @@
 
 define('LION_START', microtime(true));
 
-require_once(__DIR__ . './../vendor/autoload.php');
+require_once __DIR__.'./../vendor/autoload.php';
 
 header('Content-Type: application/json');
 
@@ -14,19 +14,18 @@ use Tests\Provider\ControllerProvider;
 new Serialize()
     ->exceptionHandler();
 
-$content = json_decode(file_get_contents("php://input"), true);
+$content = json_decode(file_get_contents('php://input'), true);
 
 $_POST = $content === null ? $_POST : $content;
 
-$classExample1 = new class implements MiddlewareInterface
-{
+$classExample1 = new class() implements MiddlewareInterface {
     /**
      * {@inheritDoc}
      */
     public function process(): void
     {
         if (!isset($_POST['id'])) {
-            die(json_encode([
+            exit(json_encode([
                 'message' => 'property is required: id',
                 'isValid' => false,
             ]));
@@ -34,15 +33,14 @@ $classExample1 = new class implements MiddlewareInterface
     }
 };
 
-$classExample2 = new class implements MiddlewareInterface
-{
+$classExample2 = new class() implements MiddlewareInterface {
     /**
      * {@inheritDoc}
      */
     public function process(): void
     {
         if (!isset($_POST['name'])) {
-            die(json_encode([
+            exit(json_encode([
                 'message' => 'property is required: name',
                 'isValid' => false,
             ]));
@@ -50,15 +48,14 @@ $classExample2 = new class implements MiddlewareInterface
     }
 };
 
-$classExample3 = new class implements MiddlewareInterface
-{
+$classExample3 = new class() implements MiddlewareInterface {
     /**
      * {@inheritDoc}
      */
     public function process(): void
     {
         if (!isset($_POST['last_name'])) {
-            die(json_encode([
+            exit(json_encode([
                 'message' => 'property is required: last_name',
                 'isValid' => false,
             ]));
@@ -66,15 +63,14 @@ $classExample3 = new class implements MiddlewareInterface
     }
 };
 
-$classExample4 = new class implements MiddlewareInterface
-{
+$classExample4 = new class() implements MiddlewareInterface {
     /**
      * {@inheritDoc}
      */
     public function process(): void
     {
         if (!isset($_POST['email'])) {
-            die(json_encode([
+            exit(json_encode([
                 'message' => 'property is required: email',
                 'isValid' => false,
             ]));
@@ -82,15 +78,14 @@ $classExample4 = new class implements MiddlewareInterface
     }
 };
 
-$classExample5 = new class implements MiddlewareInterface
-{
+$classExample5 = new class() implements MiddlewareInterface {
     /**
      * {@inheritDoc}
      */
     public function process(): void
     {
         if (!isset($_POST['password'])) {
-            die(json_encode([
+            exit(json_encode([
                 'message' => 'property is required: password',
                 'isValid' => false,
             ]));
@@ -110,7 +105,7 @@ Route::addMiddleware([
 
 Route::get('test-example', function () {
     return [
-        'message' => 'provider'
+        'message' => 'provider',
     ];
 }, ['example-method-1']);
 

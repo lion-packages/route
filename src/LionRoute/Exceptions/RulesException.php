@@ -9,9 +9,7 @@ use Lion\Exceptions\Interfaces\ExceptionInterface;
 use Lion\Exceptions\Traits\ExceptionTrait;
 
 /**
- * Exceptions to the rules
- *
- * @package Lion\Route\Exceptions
+ * Exceptions to the rules.
  */
 class RulesException extends Exception implements ExceptionInterface
 {

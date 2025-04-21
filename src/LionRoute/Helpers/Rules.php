@@ -10,35 +10,33 @@ use Lion\Request\Request;
 use Lion\Security\Validation;
 
 /**
- * Define the rules and execute their validations
+ * Define the rules and execute their validations.
  *
- * @property Validation $validation [Validation class object]
- * @property Request $request [Allows you to obtain data captured in an HTTP
- * request and modify headers]
- * @property array<int|string, string> $responses [Array containing all answers]
- *
- * @package Lion\Route\Helpers
+ * @property Validation                $validation [Validation class object]
+ * @property Request                   $request    [Allows you to obtain data captured in an HTTP
+ *                                                 request and modify headers]
+ * @property array<int|string, string> $responses  [Array containing all answers]
  */
 class Rules
 {
     /**
-     * [Validation class object]
+     * [Validation class object].
      *
-     * @var Validation $validation
+     * @var Validation
      */
     private Validation $validation;
 
     /**
-     * Allows you to obtain data captured in an HTTP request and modify headers
+     * Allows you to obtain data captured in an HTTP request and modify headers.
      *
-     * @var Request $request
+     * @var Request
      */
     private Request $request;
 
     /**
-     * [Array containing all answers]
+     * [Array containing all answers].
      *
-     * @var array<int|string, string> $responses
+     * @var array<int|string, string>
      */
     protected array $responses = [];
 
@@ -55,10 +53,10 @@ class Rules
     }
 
     /**
-     * Executes the validation of the Validate object of Validator
+     * Executes the validation of the Validate object of Validator.
      *
      * @param Closure $validateFunction [Function that executes the rules
-     * defined in the Validator object]
+     *                                  defined in the Validator object]
      *
      * @return void
      */
@@ -78,7 +76,7 @@ class Rules
     }
 
     /**
-     * Gets the list of rule errors
+     * Gets the list of rule errors.
      *
      * @return array<int|string, string>
      */

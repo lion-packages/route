@@ -21,8 +21,8 @@ class ControllerProvider
     public function createMethod(): array
     {
         return [
-            'status' => 'success',
-            'message' => 'controller provider'
+            'status'  => 'success',
+            'message' => 'controller provider',
         ];
     }
 
@@ -32,7 +32,7 @@ class ControllerProvider
     public function getMiddleware(ClassProvider $classProvider, string $middlewareName = 'test'): array
     {
         return [
-            'middleware' => $classProvider->setIndex($middlewareName)->getIndex()
+            'middleware' => $classProvider->setIndex($middlewareName)->getIndex(),
         ];
     }
 
@@ -46,7 +46,7 @@ class ControllerProvider
     public function setMiddleware(string $middleware): array
     {
         return [
-            'middleware' => $this->classProvider->setIndex($middleware)->getIndex()
+            'middleware' => $this->classProvider->setIndex($middleware)->getIndex(),
         ];
     }
 

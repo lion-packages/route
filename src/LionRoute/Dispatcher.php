@@ -105,7 +105,7 @@ class Dispatcher
     {
         $className = get_class($classInstance);
 
-        if (!isset($this->reflectionCacheClasses[$className])) {
+        if (!isset($this->reflectionCacheClasses[$className])){
             $this->reflectionCacheClasses[$className] = new ReflectionClass($classInstance);
         }
 

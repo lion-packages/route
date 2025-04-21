@@ -7,14 +7,12 @@ namespace Lion\Route\Interface;
 use Closure;
 
 /**
- * Defines how to resolve dependencies
- *
- * @package Lion\Route\Interface
+ * Defines how to resolve dependencies.
  */
 interface HandlerResolverInterface
 {
     /**
-     * Create an instance of the given handler
+     * Create an instance of the given handler.
      *
      * @param array<int, mixed>|Closure $handler [Dependency to solve]
      *

@@ -17,29 +17,26 @@ use Phroute\Phroute\HandlerResolverInterface;
 use Phroute\Phroute\Route;
 use Phroute\Phroute\RouteDataInterface;
 use ReflectionClass;
-use ReflectionException;
-use ReflectionMethod;
 
 /**
- * Is responsible for dispatching HTTP web routes
+ * Is responsible for dispatching HTTP web routes.
  *
- * @package Lion\Route
  *
  * @codeCoverageIgnore
  */
 class Dispatcher
 {
     /**
-     * [Container to generate dependency injection]
+     * [Container to generate dependency injection].
      *
-     * @var Container $container
+     * @var Container
      */
     private Container $container;
 
     /**
-     * [Kernel for HTTP requests]
+     * [Kernel for HTTP requests].
      *
-     * @var Http $http
+     * @var Http
      */
     private Http $http;
 
@@ -50,16 +47,16 @@ class Dispatcher
     private array $filters;
 
     /**
-     * [Cached reflection objects]
+     * [Cached reflection objects].
      *
-     * @var array<string, ReflectionClass<object>> $reflectionCacheClasses
+     * @var array<string, ReflectionClass<object>>
      */
     private array $reflectionCacheClasses = [];
 
     /**
-     * [Rules stored in their execution]
+     * [Rules stored in their execution].
      *
-     * @var array<string, array<int, string>> $reflectionCacheRules
+     * @var array<string, array<int, string>>
      */
     private array $reflectionCacheRules = [];
 
@@ -68,10 +65,10 @@ class Dispatcher
     private HandlerResolverInterface|RouterResolver $handlerResolver;
 
     /**
-     * Create a new route dispatcher
+     * Create a new route dispatcher.
      *
-     * @param Container $container [Container to generate dependency injection]
-     * @param RouteDataInterface $data [Interface RouteDataInterface]
+     * @param Container          $container [Container to generate dependency injection]
+     * @param RouteDataInterface $data      [Interface RouteDataInterface]
      */
     public function __construct(Container $container, RouteDataInterface $data)
     {
@@ -89,17 +86,17 @@ class Dispatcher
     }
 
     /**
-     * Dispatches all rules defined by attributes in the method
+     * Dispatches all rules defined by attributes in the method.
      *
      * @param object $classInstance [Class instance]
-     * @param string $methodName [Class method]
-     *
-     * @return void
+     * @param string $methodName    [Class method]
      *
      * @throws Exception
      * @throws RulesException
      * @throws DependencyException [Error while resolving the entry]
-     * @throws NotFoundException [No entry found for the given name]
+     * @throws NotFoundException   [No entry found for the given name]
+     *
+     * @return void
      */
     private function dispatchRules(object $classInstance, string $methodName): void
     {
@@ -145,18 +142,18 @@ class Dispatcher
     }
 
     /**
-     * Dispatch a route for the given HTTP Method / URI
+     * Dispatch a route for the given HTTP Method / URI.
      *
      * @param string $httpMethod
      * @param string $uri
      *
-     * @return mixed
-     *
      * @throws HttpMethodNotAllowedException
      * @throws HttpRouteNotFoundException
      * @throws RulesException
-     * @throws DependencyException [Error while resolving the entry]
-     * @throws NotFoundException [No entry found for the given name]
+     * @throws DependencyException           [Error while resolving the entry]
+     * @throws NotFoundException             [No entry found for the given name]
+     *
+     * @return mixed
      */
     public function dispatch(string $httpMethod, string $uri): mixed
     {
@@ -189,9 +186,9 @@ class Dispatcher
     }
 
     /**
-     * Dispatch a route filter
+     * Dispatch a route filter.
      *
-     * @param $filters
+     * @param      $filters
      * @param null $response
      *
      * @return mixed|null
@@ -211,7 +208,7 @@ class Dispatcher
 
     /**
      * Normalise the array filters attached to the route and merge with any
-     * global filters
+     * global filters.
      *
      * @param $filters
      *
@@ -219,8 +216,8 @@ class Dispatcher
      */
     private function parseFilters($filters): array
     {
-        $beforeFilter = array();
-        $afterFilter = array();
+        $beforeFilter = [];
+        $afterFilter = [];
 
         if (isset($filters[Route::BEFORE])) {
             $beforeFilter = array_intersect_key($this->filters, array_flip((array) $filters[Route::BEFORE]));
@@ -230,20 +227,20 @@ class Dispatcher
             $afterFilter = array_intersect_key($this->filters, array_flip((array) $filters[Route::AFTER]));
         }
 
-        return array($beforeFilter, $afterFilter);
+        return [$beforeFilter, $afterFilter];
     }
 
     /**
      * Perform the route dispatching. Check static routes first followed by
-     * variable routes
+     * variable routes.
      *
      * @param $httpMethod
      * @param $uri
      *
-     * @return mixed
-     *
      * @throws HttpMethodNotAllowedException
      * @throws HttpRouteNotFoundException
+     *
+     * @return mixed
      */
     private function dispatchRoute($httpMethod, $uri): mixed
     {
@@ -255,14 +252,14 @@ class Dispatcher
     }
 
     /**
-     * Handle the dispatching of static routes
+     * Handle the dispatching of static routes.
      *
      * @param $httpMethod
      * @param $uri
      *
-     * @return mixed
-     *
      * @throws HttpMethodNotAllowedException
+     *
+     * @return mixed
      */
     private function dispatchStaticRoute($httpMethod, $uri): mixed
     {
@@ -277,7 +274,7 @@ class Dispatcher
 
     /**
      * Check fallback routes: HEAD for GET requests followed by the ANY
-     * attachment
+     * attachment.
      *
      * @param $routes
      * @param $httpMethod
@@ -286,7 +283,7 @@ class Dispatcher
      */
     private function checkFallbacks($routes, $httpMethod): mixed
     {
-        $additional = array(Route::ANY);
+        $additional = [Route::ANY];
 
         if ($httpMethod === Route::HEAD) {
             $additional[] = Route::GET;
@@ -300,11 +297,11 @@ class Dispatcher
 
         $this->matchedRoute = $routes;
 
-        throw new HttpMethodNotAllowedException('Allow: ' . implode(', ', array_keys($routes)));
+        throw new HttpMethodNotAllowedException('Allow: '.implode(', ', array_keys($routes)));
     }
 
     /**
-     * Handle the dispatching of variable routes
+     * Handle the dispatching of variable routes.
      *
      * @param $httpMethod
      * @param $uri
@@ -340,6 +337,6 @@ class Dispatcher
             return $routes[$httpMethod];
         }
 
-        throw new HttpRouteNotFoundException('Route ' . $uri . ' does not exist');
+        throw new HttpRouteNotFoundException('Route '.$uri.' does not exist');
     }
 }

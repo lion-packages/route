@@ -11,30 +11,30 @@ use Valitron\Validator;
 class NameRuleProvider extends Rules implements RulesInterface
 {
     /**
-     * [field for 'name']
+     * [field for 'name'].
      *
-     * @var string $field
+     * @var string
      */
     public string $field = 'name';
 
     /**
-     * [description for 'name']
+     * [description for 'name'].
      *
-     * @var string $desc
+     * @var string
      */
     public string $desc = 'name';
 
     /**
-     * [value for 'name']
+     * [value for 'name'].
      *
-     * @var string $value;
+     * @var string;
      */
     public string $value = 'name';
 
     /**
-     * [Defines whether the column is optional for postman collections]
+     * [Defines whether the column is optional for postman collections].
      *
-     * @var bool $disabled;
+     * @var bool;
      */
     public bool $disabled = false;
 

@@ -11,30 +11,30 @@ use Valitron\Validator;
 class IdRuleProvider extends Rules implements RulesInterface
 {
     /**
-     * [field for 'id']
+     * [field for 'id'].
      *
-     * @var string $field
+     * @var string
      */
     public string $field = 'id';
 
     /**
-     * [description for 'id']
+     * [description for 'id'].
      *
-     * @var string $desc
+     * @var string
      */
     public string $desc = 'id';
 
     /**
-     * [value for 'id']
+     * [value for 'id'].
      *
-     * @var string $value;
+     * @var string;
      */
     public string $value = 'id';
 
     /**
-     * [Defines whether the column is optional for postman collections]
+     * [Defines whether the column is optional for postman collections].
      *
-     * @var bool $disabled;
+     * @var bool;
      */
     public bool $disabled = false;
 

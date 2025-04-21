@@ -14,16 +14,14 @@ use Lion\Route\Helpers\Rules;
 use Lion\Route\Interface\RulesInterface;
 
 /**
- * Kernel for HTTP requests
+ * Kernel for HTTP requests.
  *
  * @property Container $container [Container to generate dependency injection]
- *
- * @package Lion\Route\Kernel
  */
 class Http
 {
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param Container $container [Container to generate dependency injection]
      */
@@ -33,15 +31,15 @@ class Http
     }
 
     /**
-     * Check for errors with the defined rules
+     * Check for errors with the defined rules.
      *
      * @param array<int, string> $rules [List of rules]
      *
-     * @return void
-     *
      * @throws DependencyException [Error while resolving the entry]
-     * @throws NotFoundException [No entry found for the given name]
-     * @throws RulesException [If there are rule errors]
+     * @throws NotFoundException   [No entry found for the given name]
+     * @throws RulesException      [If there are rule errors]
+     *
+     * @return void
      *
      * @infection-ignore-all
      */

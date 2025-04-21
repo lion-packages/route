@@ -7,22 +7,20 @@ namespace Lion\Route\Attributes;
 use Attribute;
 
 /**
- * Attribute to reflect a rule on a method
- *
- * @package Lion\Route\Attributes
+ * Attribute to reflect a rule on a method.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 class Rules
 {
     /**
-     * [List of rules]
+     * [List of rules].
      *
-     * @var string[] $rules $rules
+     * @var string[]
      */
     private array $rules;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param string ...$rules [List of rules]
      */
@@ -32,7 +30,7 @@ class Rules
     }
 
     /**
-     * Returns a list with the namespaces of the rules
+     * Returns a list with the namespaces of the rules.
      *
      * @return string[] $rules
      */

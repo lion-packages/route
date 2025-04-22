@@ -9,23 +9,21 @@ use Lion\Dependency\Injection\Container;
 use Lion\Route\Interface\HandlerResolverInterface;
 
 /**
- * Class that resolves dependencies on the class's constructor
+ * Class that resolves dependencies on the class's constructor.
  *
  * @property Container $container [Dependency Injection Container Wrapper]
- *
- * @package Lion\Route
  */
 class RouterResolver implements HandlerResolverInterface
 {
     /**
-     * [Dependency Injection Container Wrapper]
+     * [Dependency Injection Container Wrapper].
      *
-     * @var Container $container
+     * @var Container
      */
     private Container $container;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param Container $container [Dependency Injection Container Wrapper]
      */

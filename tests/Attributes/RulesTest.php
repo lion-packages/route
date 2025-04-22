@@ -18,8 +18,7 @@ class RulesTest extends Test
     #[Testing]
     public function rules(): void
     {
-        $class = new class
-        {
+        $class = new class () {
             #[Rules('rule1', 'rule2')]
             public function myMethod(): void
             {

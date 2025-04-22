@@ -45,21 +45,20 @@ class RouteTest extends Test
 
         $this->client = new Client();
 
-        $this->customClass = new class
-        {
+        $this->customClass = new class () {
             public function exampleMethod1(): void
             {
-                echo ('TESTING');
+                echo('TESTING');
             }
 
             public function exampleMethod2(): void
             {
-                echo ('TESTING');
+                echo('TESTING');
             }
 
             public function exampleMethod3(int $key): void
             {
-                echo ('TESTING: ' . $key);
+                echo('TESTING: ' . $key);
             }
         };
 

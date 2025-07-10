@@ -1,5 +1,5 @@
 parameters:
-    level: max
+    level: 10
 
     excludePaths:
         - src/LionRoute/Dispatcher.php

@@ -81,11 +81,11 @@ class Route
     public const string PATCH = 'PATCH';
 
     /**
-     * [public constant to define the 'prefix' property]
+     * public constant to define the 'prefix' property
      *
      * @public const PREFIX
      */
-    private const string PREFIX = 'prefix';
+    public const string PREFIX = 'prefix';
 
     /**
      * [public constant to define the 'before' property]

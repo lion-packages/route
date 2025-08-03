@@ -9,23 +9,22 @@ use Lion\Test\Test;
 
 class MiddlewareTest extends Test
 {
-    const string MIDDLEWARE_NAME = 'custom-class';
-    const string MIDDLEWARE_NAME_TEST = 'custom-class-test';
-    const string EXAMPLE_METHOD = 'exampleMethod';
-    const string EXAMPLE_METHOD_TEST = 'exampleMethodTest';
-    const array EXAMPLE_PARAMS = ['key' => 'value'];
-    const array EXAMPLE_PARAMS_TEST = ['key' => 'value2'];
+    public const string MIDDLEWARE_NAME = 'custom-class';
+    public const string MIDDLEWARE_NAME_TEST = 'custom-class-test';
+    public const string EXAMPLE_METHOD = 'exampleMethod';
+    public const string EXAMPLE_METHOD_TEST = 'exampleMethodTest';
+    public const array EXAMPLE_PARAMS = ['key' => 'value'];
+    public const array EXAMPLE_PARAMS_TEST = ['key' => 'value2'];
 
     private Middleware $middleware;
     private $customClass;
 
     protected function setUp(): void
     {
-        $this->customClass = new class
-        {
+        $this->customClass = new class () {
             public function exampleMethod(): void
             {
-                echo ('TESTING');
+                echo('TESTING');
             }
         };
 
@@ -64,8 +63,7 @@ class MiddlewareTest extends Test
 
     public function testSetClass(): void
     {
-        $newCustomClass = new class
-        {
+        $newCustomClass = new class () {
         };
 
         $this->assertInstanceOf(Middleware::class, $this->middleware->setClass($newCustomClass::class));

@@ -36,56 +36,56 @@ class Route
      *
      * @const ANY
      */
-    const string ANY = 'ANY';
+    public const string ANY = 'ANY';
 
     /**
      * [Constant to define the HTTP POST protocol]
      *
      * @const POST
      */
-    const string POST = 'POST';
+    public const string POST = 'POST';
 
     /**
      * [Constant to define the HTTP GET protocol]
      *
      * @const GET
      */
-    const string GET = 'GET';
+    public const string GET = 'GET';
 
     /**
      * [Constant to define the HTTP PUT protocol]
      *
      * @const PUT
      */
-    const string PUT = 'PUT';
+    public const string PUT = 'PUT';
 
     /**
      * [Constant to define the HTTP DELETE protocol]
      *
      * @const DELETE
      */
-    const string DELETE = 'DELETE';
+    public const string DELETE = 'DELETE';
 
     /**
      * [Constant to define the HTTP HEAD protocol]
      *
      * @const HEAD
      */
-    const string HEAD = 'HEAD';
+    public const string HEAD = 'HEAD';
 
     /**
      * [Constant to define the HTTP OPTIONS protocol]
      *
      * @const OPTIONS
      */
-    const string OPTIONS = 'OPTIONS';
+    public const string OPTIONS = 'OPTIONS';
 
     /**
      * [Constant to define the HTTP PATCH protocol]
      *
      * @const PATCH
      */
-    const string PATCH = 'PATCH';
+    public const string PATCH = 'PATCH';
 
     /**
      * [Constant to define the 'prefix' property]

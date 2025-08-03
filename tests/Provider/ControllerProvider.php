@@ -13,7 +13,8 @@ class ControllerProvider
 {
     public function __construct(
         private Middleware $middleware,
-    ) {}
+    ) {
+    }
 
     public function createMethod(): array
     {

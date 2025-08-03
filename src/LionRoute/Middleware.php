@@ -31,7 +31,8 @@ class Middleware
         private ?string $class = null,
         private ?string $methodClass = null,
         private ?array $params = []
-    ) {}
+    ) {
+    }
 
     /**
      * Returns the name of the middleware

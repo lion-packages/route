@@ -59,8 +59,7 @@ class HttpTest extends Test
     #[Testing]
     public function validateRules(): void
     {
-        $rule = new class extends Rules implements RulesInterface
-        {
+        $rule = new class () extends Rules implements RulesInterface {
             /**
              * {@inheritdoc}
              */
@@ -74,8 +73,7 @@ class HttpTest extends Test
             }
         };
 
-        $rule2 = new class extends Rules implements RulesInterface
-        {
+        $rule2 = new class () extends Rules implements RulesInterface {
             /**
              * {@inheritdoc}
              */

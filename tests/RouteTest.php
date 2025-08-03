@@ -15,18 +15,18 @@ class RouteTest extends Test
 {
     use HttpMethodsProviderTrait;
 
-    const string HOST = 'http://127.0.0.1:8000';
-    const string API_CONTROLLER = self::HOST . '/controller/';
-    const string API_TEST = self::HOST . '/example';
-    const string PREFIX = 'prefix-test';
-    const string URI = 'test';
-    const string FULL_URI = self::PREFIX . '/' . self::URI;
-    const string FULL_URI_SECOND = self::PREFIX . '/' . self::PREFIX . '/' . self::URI;
-    const string URI_MATCH = 'match-test';
-    const array ARRAY_RESPONSE = [
+    public const string HOST = 'http://127.0.0.1:8000';
+    public const string API_CONTROLLER = self::HOST . '/controller/';
+    public const string API_TEST = self::HOST . '/example';
+    public const string PREFIX = 'prefix-test';
+    public const string URI = 'test';
+    public const string FULL_URI = self::PREFIX . '/' . self::URI;
+    public const string FULL_URI_SECOND = self::PREFIX . '/' . self::PREFIX . '/' . self::URI;
+    public const string URI_MATCH = 'match-test';
+    public const array ARRAY_RESPONSE = [
         'isValid' => true,
     ];
-    const array JSON_RESPONSE = [
+    public const array JSON_RESPONSE = [
         'message' => 'property is required: id',
         'isValid' => false,
         'data' => [
@@ -45,21 +45,20 @@ class RouteTest extends Test
 
         $this->client = new Client();
 
-        $this->customClass = new class
-        {
+        $this->customClass = new class () {
             public function exampleMethod1(): void
             {
-                echo ('TESTING');
+                echo('TESTING');
             }
 
             public function exampleMethod2(): void
             {
-                echo ('TESTING');
+                echo('TESTING');
             }
 
             public function exampleMethod3(int $key): void
             {
-                echo ('TESTING: ' . $key);
+                echo('TESTING: ' . $key);
             }
         };
 

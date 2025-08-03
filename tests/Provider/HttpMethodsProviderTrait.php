@@ -8,14 +8,14 @@ use Lion\Route\Route;
 
 trait HttpMethodsProviderTrait
 {
-    const DATA_METHOD = [
+    public const DATA_METHOD = [
         'filters' => [],
         'handler' => [
             'controller' => false,
             'callback' => true,
         ]
     ];
-    const DATA_METHOD_MIDDLEWARE = [
+    public const DATA_METHOD_MIDDLEWARE = [
         'filters' => [
             'example-method-1',
             'example-method-2',
@@ -25,7 +25,7 @@ trait HttpMethodsProviderTrait
             'callback' => true,
         ],
     ];
-    const DATA_METHOD_CONTROLLER = [
+    public const DATA_METHOD_CONTROLLER = [
         'filters' => [],
         'handler' => [
             'controller' => [
@@ -35,11 +35,11 @@ trait HttpMethodsProviderTrait
             'callback' => false,
         ],
     ];
-    const FILTER_NAME_1 = 'example-method-1';
-    const FILTER_NAME_2 = 'example-method-2';
-    const FILTER_NAME_3 = 'example-method-3';
-    const FILTERS_MIDDLEWARE = [self::FILTER_NAME_1, self::FILTER_NAME_2, self::FILTER_NAME_3];
-    const ROUTES = [
+    public const FILTER_NAME_1 = 'example-method-1';
+    public const FILTER_NAME_2 = 'example-method-2';
+    public const FILTER_NAME_3 = 'example-method-3';
+    public const FILTERS_MIDDLEWARE = [self::FILTER_NAME_1, self::FILTER_NAME_2, self::FILTER_NAME_3];
+    public const ROUTES = [
         Route::GET => self::DATA_METHOD,
         Route::POST => self::DATA_METHOD,
         Route::PUT => self::DATA_METHOD,
@@ -49,7 +49,7 @@ trait HttpMethodsProviderTrait
         Route::PATCH => self::DATA_METHOD,
         Route::ANY => self::DATA_METHOD
     ];
-    const ROUTES_CONTROLLER = [
+    public const ROUTES_CONTROLLER = [
         Route::GET => self::DATA_METHOD_CONTROLLER,
         Route::POST => self::DATA_METHOD_CONTROLLER,
         Route::PUT => self::DATA_METHOD_CONTROLLER,

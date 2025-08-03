@@ -23,8 +23,7 @@ class RulesTest extends Test
      */
     protected function setUp(): void
     {
-        $rule = new class extends Rules
-        {
+        $rule = new class () extends Rules {
             public function validate(Closure $validateFunction): void
             {
                 parent::validate($validateFunction);

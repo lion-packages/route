@@ -12,8 +12,7 @@ class RulesTest extends Test
 {
     public function testRules(): void
     {
-        $class = new class
-        {
+        $class = new class () {
             /**
              * @Rules('rule1', 'rule2')
              */

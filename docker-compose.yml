@@ -1,6 +1,6 @@
 services:
-    app:
-        container_name: route-app
+    php:
+        container_name: route-php
         build:
             context: .
             dockerfile: Dockerfile
@@ -9,6 +9,7 @@ services:
             - "8001:8001"
         volumes:
             - ./:/var/www/html
+
 networks:
     lion:
         driver: bridge

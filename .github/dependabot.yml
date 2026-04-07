@@ -6,9 +6,12 @@ multi-ecosystem-groups:
       interval: "monthly"
       time: "05:15"
       timezone: "America/Bogota"
+    milestone: 4
 
 updates:
-  # Composer (PHP)
+  # ========================
+  # Maintenance - PHP
+  # ========================
   - package-ecosystem: "composer"
     directory: "/"
     patterns: ["*"]
@@ -16,3 +19,21 @@ updates:
     labels:
       - "php"
       - "dependencies"
+    reviewers:
+      - "Sleon4"
+
+  # ========================
+  # Security - PHP
+  # ========================
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 3
+    rebase-strategy: "auto"
+    labels:
+      - "php"
+      - "security"
+    reviewers:
+      - "Sleon4"
+    milestone: 4

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.0/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.0/phpunit.xsd"
     backupGlobals="false"
     backupStaticProperties="false"
     bootstrap="vendor/autoload.php"
@@ -26,7 +26,6 @@
     <php>
         <env name="APP_ENV" value="testing" />
         <ini name="date.timezone" value="America/Bogota" />
-        <ini name="intl.default_locale" value="C.UTF-8" />
         <ini name="memory_limit" value="2048M" />
     </php>
 

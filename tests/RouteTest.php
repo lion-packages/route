@@ -89,12 +89,15 @@ class RouteTest extends Test
 
         $_SERVER['REQUEST_URI'] = 'https://example.com/?foo=bar';
 
+        /** @var string $requestUri */
+        $requestUri = $_SERVER['REQUEST_URI'];
+
         $this->route->init($index);
 
         $this->assertInstanceOf(RouteCollector::class, $this->getPrivateProperty('router'));
         $this->assertInstanceOf(Container::class, $this->getPrivateProperty('container'));
         $this->assertInstanceOf(Response::class, $this->getPrivateProperty('response'));
-        $this->assertSame(explode('?', $_SERVER['REQUEST_URI'])[0], $this->getPrivateProperty('uri'));
+        $this->assertSame(explode('?', $requestUri)[0], $this->getPrivateProperty('uri'));
         $this->assertSame($index, $this->getPrivateProperty('index'));
 
         unset($_SERVER['REQUEST_URI']);

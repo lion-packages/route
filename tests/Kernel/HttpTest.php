@@ -20,7 +20,7 @@ use Valitron\Validator;
 
 class HttpTest extends Test
 {
-    private const string MESSAGE = 'parameter error';
+    private const string MESSAGE = 'Parameter error.';
 
     private KernelHttp $kernelHttp;
     private Container $container;
@@ -65,7 +65,7 @@ class HttpTest extends Test
                 $this->validate(function (Validator $validator) {
                     $validator
                         ->rule('required', 'id')
-                        ->message("the 'id' property is optional");
+                        ->message("The 'id' property is optional.");
                 });
             }
         };
@@ -79,7 +79,7 @@ class HttpTest extends Test
                 $this->validate(function (Validator $validator) {
                     $validator
                         ->rule('optional', 'name')
-                        ->message("the 'name' property is optional");
+                        ->message("The 'name' property is optional.");
                 });
             }
         };

@@ -167,12 +167,10 @@ Route::get('get-full-routes', function (): array {
     return Route::getFullRoutes();
 });
 
-Route::get('no-content', function (): object {
+Route::get('no-content', function (): void {
     http_response_code(204);
 
-    return (object) [
-        'code' => 204,
-    ];
+    exit;
 });
 
 Route::post('simple-middleware', function (): array {

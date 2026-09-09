@@ -33,15 +33,15 @@ class Http
     }
 
     /**
-     * Check for errors with the defined rules
+     * Check for errors with the defined rules.
      *
-     * @param array<int, string> $rules [List of rules]
+     * @param array<int, string> $rules List of rules.
      *
      * @return void
      *
-     * @throws DependencyException [Error while resolving the entry]
-     * @throws NotFoundException [No entry found for the given name]
-     * @throws RulesException [If there are rule errors]
+     * @throws DependencyException Error while resolving the entry.
+     * @throws NotFoundException No entry found for the given name.
+     * @throws RulesException If there are validation errors.
      *
      * @infection-ignore-all
      */
@@ -73,7 +73,7 @@ class Http
         }
 
         if (!empty($errors)) {
-            throw new RulesException('parameter error', Status::RULE_ERROR, RequestHttp::INTERNAL_SERVER_ERROR, [
+            throw new RulesException('Parameter error.', Status::RULE_ERROR, RequestHttp::INTERNAL_SERVER_ERROR, [
                 'rules-error' => $errors,
             ]);
         }

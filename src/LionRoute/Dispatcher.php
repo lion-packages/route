@@ -9,7 +9,6 @@ use DI\NotFoundException;
 use Exception;
 use Lion\Dependency\Injection\Container;
 use Lion\Route\Attributes\Rules;
-use Lion\Route\Exceptions\RulesException;
 use Lion\Route\Kernel\Http;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
@@ -17,27 +16,23 @@ use Phroute\Phroute\HandlerResolverInterface;
 use Phroute\Phroute\Route;
 use Phroute\Phroute\RouteDataInterface;
 use ReflectionClass;
-use ReflectionException;
-use ReflectionMethod;
 
 /**
- * Is responsible for dispatching HTTP web routes
- *
- * @package Lion\Route
+ * Is responsible for dispatching HTTP web routes.
  *
  * @codeCoverageIgnore
  */
 class Dispatcher
 {
     /**
-     * [Container to generate dependency injection]
+     * Container to generate dependency injection.
      *
      * @var Container $container
      */
     private Container $container;
 
     /**
-     * [Kernel for HTTP requests]
+     * Kernel for HTTP requests.
      *
      * @var Http $http
      */
@@ -50,14 +45,14 @@ class Dispatcher
     private array $filters;
 
     /**
-     * [Cached reflection objects]
+     * Cached reflection objects.
      *
      * @var array<string, ReflectionClass<object>> $reflectionCacheClasses
      */
     private array $reflectionCacheClasses = [];
 
     /**
-     * [Rules stored in their execution]
+     * Rules stored in their execution.
      *
      * @var array<string, array<int, string>> $reflectionCacheRules
      */
@@ -70,8 +65,8 @@ class Dispatcher
     /**
      * Create a new route dispatcher
      *
-     * @param Container $container [Container to generate dependency injection]
-     * @param RouteDataInterface $data [Interface RouteDataInterface]
+     * @param Container $container Container to generate dependency injection.
+     * @param RouteDataInterface $data Interface RouteDataInterface.
      */
     public function __construct(Container $container, RouteDataInterface $data)
     {
@@ -89,17 +84,16 @@ class Dispatcher
     }
 
     /**
-     * Dispatches all rules defined by attributes in the method
+     * Dispatches all rules defined by attributes in the method.
      *
-     * @param object $classInstance [Class instance]
-     * @param string $methodName [Class method]
+     * @param object $classInstance Class instance.
+     * @param string $methodName Class method.
      *
      * @return void
      *
-     * @throws Exception
-     * @throws RulesException
-     * @throws DependencyException [Error while resolving the entry]
-     * @throws NotFoundException [No entry found for the given name]
+     * @throws Exception If the method does not exist.
+     * @throws DependencyException Error while resolving the entry.
+     * @throws NotFoundException No entry found for the given name.
      */
     private function dispatchRules(object $classInstance, string $methodName): void
     {
@@ -145,7 +139,7 @@ class Dispatcher
     }
 
     /**
-     * Dispatch a route for the given HTTP Method / URI
+     * Dispatch a route for the given HTTP Method / URI.
      *
      * @param string $httpMethod
      * @param string $uri
@@ -153,10 +147,9 @@ class Dispatcher
      * @return mixed
      *
      * @throws HttpMethodNotAllowedException
-     * @throws HttpRouteNotFoundException
-     * @throws RulesException
-     * @throws DependencyException [Error while resolving the entry]
-     * @throws NotFoundException [No entry found for the given name]
+     * @throws HttpRouteNotFoundException If the URL does not exist.
+     * @throws DependencyException Error while resolving the entry.
+     * @throws NotFoundException No entry found for the given name.
      */
     public function dispatch(string $httpMethod, string $uri): mixed
     {
@@ -189,19 +182,27 @@ class Dispatcher
     }
 
     /**
-     * Dispatch a route filter
+     * Dispatch a route filter.
      *
-     * @param $filters
-     * @param null $response
+     * @param array $filters
+     * @param mixed $response
      *
      * @return mixed|null
      */
-    private function dispatchFilters($filters, $response = null): mixed
+    private function dispatchFilters(array $filters, mixed $response = null): mixed
     {
         while ($filter = array_shift($filters)) {
             $handler = $this->handlerResolver->resolve($filter);
 
-            if (($filteredResponse = call_user_func($handler, $response)) !== null) {
+            if (is_array($handler) && is_object($handler[0])) {
+                $filteredResponse = $this->container->callMethod($handler[0], $handler[1]);
+            } elseif (is_object($handler) && method_exists($handler, 'process')) {
+                $filteredResponse = $this->container->callMethod($handler, 'process');
+            } else {
+                $filteredResponse = $this->container->callCallback($handler);
+            }
+
+            if ($filteredResponse !== null) {
                 return $filteredResponse;
             }
         }
@@ -210,8 +211,8 @@ class Dispatcher
     }
 
     /**
-     * Normalise the array filters attached to the route and merge with any
-     * global filters
+     * Normalize the array filters attached to the route and merge with any
+     * global filters.
      *
      * @param $filters
      *
@@ -235,7 +236,7 @@ class Dispatcher
 
     /**
      * Perform the route dispatching. Check static routes first followed by
-     * variable routes
+     * variable routes.
      *
      * @param $httpMethod
      * @param $uri
@@ -243,7 +244,7 @@ class Dispatcher
      * @return mixed
      *
      * @throws HttpMethodNotAllowedException
-     * @throws HttpRouteNotFoundException
+     * @throws HttpRouteNotFoundException If the URL does not exist.
      */
     private function dispatchRoute($httpMethod, $uri): mixed
     {
@@ -255,7 +256,7 @@ class Dispatcher
     }
 
     /**
-     * Handle the dispatching of static routes
+     * Handle the dispatching of static routes.
      *
      * @param $httpMethod
      * @param $uri
@@ -277,10 +278,12 @@ class Dispatcher
 
     /**
      * Check fallback routes: HEAD for GET requests followed by the ANY
-     * attachment
+     * attachment.
      *
      * @param $routes
      * @param $httpMethod
+     *
+     * @return mixed
      *
      * @throws HttpMethodNotAllowedException
      */
@@ -304,13 +307,15 @@ class Dispatcher
     }
 
     /**
-     * Handle the dispatching of variable routes
+     * Handle the dispatching of variable routes.
      *
      * @param $httpMethod
      * @param $uri
      *
+     * @return mixed
+     *
      * @throws HttpMethodNotAllowedException
-     * @throws HttpRouteNotFoundException
+     * @throws HttpRouteNotFoundException If the URL does not exist.
      */
     private function dispatchVariableRoute($httpMethod, $uri): mixed
     {
@@ -340,6 +345,6 @@ class Dispatcher
             return $routes[$httpMethod];
         }
 
-        throw new HttpRouteNotFoundException('Route ' . $uri . ' does not exist');
+        throw new HttpRouteNotFoundException("Route {$uri} does not exist.");
     }
 }
